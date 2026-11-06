@@ -37,3 +37,13 @@ Dos cuentas sintéticas: asignación de saldo, envío de 20 INFT, compra de 5 IN
 
 ## Paso a producción real
 Separar el contrato ERC-20 / la bóveda de un ledger de pruebas. Antes de habilitar la venta/canje/depósito de valor real: desplegar contratos en red de pruebas pública, auditar, publicar cadena y direcciones, implementar infraestructura de llaves y canje físico, revisar obligaciones regulatorias mexicanas, condiciones y riesgos. **No presentar INFT-TEST como una criptomoneda de valor real.**
+
+## Integración con UNIVERSHZRW — actualización
+- La URL principal `/criptomoneda` abre directamente la terminal completa; las rutas de guía y transparencia siguen disponibles.
+- Encabezado, menú y temas de UNIVERSHZRW desde recursos compartidos, sin segundo encabezado independiente.
+- Login y logout visibles dentro de INFINITO mediante service binding `AUTH_APP`; el servicio de identidad de UNIVERSHZRW emite las cookies protegidas. No se crea una base separada de usuarios.
+- Página de parámetros: suministro propuesto, emisión real pendiente, cartera de prueba, saldo total demo, cuentas, operaciones y volumen reciente, con datos de Cloudflare D1 en `/criptomoneda/terminal/api/parameters`.
+- Las cantidades MXN se muestran como no disponibles mientras no haya mercado real. El laboratorio conserva exclusivamente saldos `INFT-TEST` y `Coins-TEST`.
+- La variante `www` redirige al dominio oficial para que la autenticación funcione en un solo origen.
+- Operaciones de prueba registradas en D1 mediante restricciones SQL; se comprobó en navegador sin sesión que aparecen login, encabezado y métricas en cero.
+- **No se ha probado el acceso con credenciales reales del usuario ni el envío entre dos cuentas reales.**

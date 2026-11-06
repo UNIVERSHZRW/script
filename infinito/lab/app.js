@@ -8,8 +8,8 @@ async function api(action,data){const opts={credentials:"same-origin",cache:"no-
 function elem(tag,text,cls){const e=document.createElement(tag);if(text!==undefined)e.textContent=String(text);if(cls)e.className=cls;return e}
 function setDisabled(auth){document.querySelectorAll("#swapForm button[type=submit],#sendForm button[type=submit],#redeemForm button[type=submit]").forEach(b=>b.disabled=!auth);$("copy").disabled=!auth;const f=$("faucet");f.disabled=!auth||!!current?.claimed}
 function renderHistory(rows){const body=$("explorerRows");body.replaceChildren();if(!rows||!rows.length){const tr=elem("tr");const td=elem("td","No existen movimientos todavía. Prueba la asignación de saldo.","empty");td.colSpan=5;tr.append(td);body.append(tr);return}for(const x of rows){const tr=elem("tr"),from=x.from_address||"Sistema de pruebas",to=x.to_address||"—";let val=money(x.inft_milli)+" INFT";const cells=[names[x.kind]||x.kind,from+" → "+to,val,stamp(x.created_at),(x.id||"").slice(0,18)+"…"];cells.forEach((v,i)=>{const td=elem("td",v,i===0?"kind":i===4?"txid":"");tr.append(td)});body.append(tr)}}
-function renderState(s){current=s.wallet||null;const ok=!!s.authenticated;$("sessionState").textContent=ok?"Cuenta verificada":"Sin sesión";$("loginAlert").hidden=ok;$("inftBalance").textContent=ok?money(s.wallet.inft_milli):"—";$("coinsBalance").textContent=ok?Number(s.wallet.test_coins).toLocaleString("es-MX"):"—";$("address").textContent=ok?s.wallet.address:"Inicia sesión";$("faucetStatus").textContent=!ok?"Requiere inicio de sesión.":s.claimed?"Asignación inicial ya utilizada.":"Disponible: 100 INFT-TEST y 1,000 Coins-TEST.";current=ok?Object.assign({},s.wallet,{claimed:s.claimed}):null;setDisabled(ok)}
-async function refresh(){try{const results=await Promise.all([api("state"),api("explorer")]);renderState(results[0]);renderHistory(results[1].events);$("connection").textContent="Servicio de pruebas conectado"}catch(e){$("connection").textContent="Servicio no disponible";toast(e.message,true)}}
+function renderState(s){current=s.wallet||null;const ok=!!s.authenticated;$("sessionState").textContent=ok?"Cuenta verificada":"Sin sesión";$("loginAlert").hidden=ok;$("accountPanel").hidden=!ok;if(ok){$("accountName").textContent=s.user?.display_name||"Cuenta verificada";$("accountEmail").textContent=s.user?.email||"";}$("inftBalance").textContent=ok?money(s.wallet.inft_milli):"—";$("coinsBalance").textContent=ok?Number(s.wallet.test_coins).toLocaleString("es-MX"):"—";$("address").textContent=ok?s.wallet.address:"Inicia sesión";$("faucetStatus").textContent=!ok?"Requiere inicio de sesión.":s.claimed?"Asignación inicial ya utilizada.":"Disponible: 100 INFT-TEST y 1,000 Coins-TEST.";current=ok?Object.assign({},s.wallet,{claimed:s.claimed}):null;setDisabled(ok)}
+async function refresh(){try{const results=await Promise.all([api("state"),api("explorer"),api("parameters")]);renderState(results[0]);renderHistory(results[1].events);renderParameters(results[2]);$("connection").textContent="Servicio de pruebas conectado"}catch(e){$("connection").textContent="Servicio no disponible";toast(e.message,true)}}
 async function execute(action,data,done){if(working)return;working=true;document.querySelectorAll("form button[type=submit],#faucet").forEach(x=>x.disabled=true);try{const result=await api(action,data);toast(result.message||"Operación de prueba registrada.");if(done)done();await refresh()}catch(e){toast(e.message,true);await refresh().catch(()=>{})}finally{working=false}}
 $("copy").addEventListener("click",async()=>{if(!current)return;try{await navigator.clipboard.writeText(current.address);toast("Dirección de prueba copiada.")}catch{toast("Copia manualmente la dirección.",true)}});
 $("copyCode").addEventListener("click",async()=>{try{await navigator.clipboard.writeText("INFT-DEMO-2026");toast("Código de demostración copiado.")}catch{toast("Copia manualmente el código.",true)}});
@@ -20,3 +20,26 @@ $("swapForm").addEventListener("submit",e=>{e.preventDefault();const coins=Numbe
 $("sendForm").addEventListener("submit",e=>{e.preventDefault();const recipient=$("recipient").value.trim().toUpperCase(),amount=$("sendAmount").value.trim();if(!/^INFT-[A-F0-9]{12}$/.test(recipient)){toast("La dirección INFT del destinatario no tiene el formato correcto.",true);return}if(!confirm("¿Confirmas enviar "+amount+" INFT-TEST a "+recipient+"? Esto solo mueve saldo de prueba."))return;execute("send",{recipient,amount},()=>{$("sendAmount").value="";$("recipient").value=""})});
 $("redeemForm").addEventListener("submit",e=>{e.preventDefault();execute("physical",{code:$("redeemCode").value.trim()},()=>{$("redeemCode").value=""})});
 $("refresh").addEventListener("click",refresh);quote();refresh();
+function renderParameters(d){
+ const m=d.metrics||{};
+ $("labCirculation").textContent=Number(m.circulating_milli||0).toLocaleString("es-MX",{maximumFractionDigits:0})==="NaN"?"—":money(m.circulating_milli)+" INFT-TEST";
+ $("labWallets").textContent=Number(m.wallets||0).toLocaleString("es-MX");
+ $("labOperations").textContent=Number(m.operations||0).toLocaleString("es-MX");
+ $("labVolume").textContent=money(m.sent_milli_24h)+" INFT-TEST";
+}
+$("loginForm").addEventListener("submit",async e=>{
+ e.preventDefault();
+ const btn=$("loginSubmit");btn.disabled=true;btn.textContent="Verificando acceso…";
+ try{
+  const email=$("loginEmail").value.trim(),password=$("loginPassword").value;
+  const v=await api("login",{email,password});
+  if(!v.ok)throw Error(v.error||"No se pudo iniciar sesión.");
+  $("loginPassword").value="";
+  window.location.reload();
+ }catch(e){toast(e.message||"No se pudo iniciar sesión.",true)}
+ finally{btn.disabled=false;btn.textContent="Iniciar sesión en UNIVERSHZRW"}
+});
+$("logoutButton").addEventListener("click",async()=>{
+ try{await api("logout",{});window.location.reload()}catch(e){toast(e.message||"No se pudo cerrar la sesión.",true)}
+});
+window.addEventListener("focus",()=>{if(!document.hidden)refresh().catch(()=>{})});

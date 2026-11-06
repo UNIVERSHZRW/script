@@ -40,8 +40,9 @@ contract InfinitoSecurityTest is Test {
 
     function testUnknownCoinCannotRedeem() public {
         uint256 deadline = block.timestamp + 1 days;
+        bytes memory signature = voucher(COIN, collector, deadline);
         vm.expectRevert(InfinitoPhysicalVault.CoinUnavailable.selector);
-        vault.redeem(COIN, collector, deadline, voucher(COIN, collector, deadline));
+        vault.redeem(COIN, collector, deadline, signature);
     }
 
     function testFuzzFundedAndRedeemedExactlyOnce(uint96 originalAmount) public {

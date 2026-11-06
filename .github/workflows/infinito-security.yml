@@ -1,0 +1,57 @@
+name: INFINITO — build, tests and security gates
+on:
+  push:
+    paths:
+      - "infinito/contracts/**"
+      - "infinito/test/**"
+      - "infinito/script/**"
+      - "infinito/foundry.toml"
+      - "infinito/production/**"
+      - "infinito/creadores/**"
+      - ".github/workflows/infinito-security.yml"
+  pull_request:
+    paths:
+      - "infinito/contracts/**"
+      - "infinito/test/**"
+      - "infinito/script/**"
+      - "infinito/foundry.toml"
+      - "infinito/production/**"
+      - "infinito/creadores/**"
+      - ".github/workflows/infinito-security.yml"
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  solidity:
+    name: Compile and test token and vault
+    runs-on: ubuntu-latest
+    timeout-minutes: 20
+    steps:
+      - name: Checkout source without token persistence
+        uses: actions/checkout@v4
+        with:
+          persist-credentials: false
+      - name: Install Foundry
+        uses: foundry-rs/foundry-toolchain@v1
+        with:
+          version: stable
+      - name: Download pinned and public Solidity dependencies
+        run: |
+          mkdir -p infinito/lib
+          git clone --depth 1 --branch v5.4.0 https://github.com/OpenZeppelin/openzeppelin-contracts.git infinito/lib/openzeppelin-contracts
+          git clone --depth 1 --branch v1.10.0 https://github.com/foundry-rs/forge-std.git infinito/lib/forge-std
+      - name: Verify deployed portal source parses cleanly
+        run: |
+          node --check infinito/production/moneda-worker.mjs
+          node --check infinito/production/portal.js
+          node --check infinito/creadores/saldo-inft.js
+          node --check infinito/creadores/saldo-worker.mjs
+      - name: Build contracts
+        run: forge build --root infinito --sizes
+      - name: Run contract tests
+        run: forge test --root infinito -vvv
+      - name: Summarize release gate
+        if: always()
+        run: echo "A passing CI check is necessary but NOT a substitute for external audit." >> "$GITHUB_STEP_SUMMARY"

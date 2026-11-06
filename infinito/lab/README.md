@@ -47,3 +47,10 @@ Separar el contrato ERC-20 / la bóveda de un ledger de pruebas. Antes de habili
 - La variante `www` redirige al dominio oficial para que la autenticación funcione en un solo origen.
 - Operaciones de prueba registradas en D1 mediante restricciones SQL; se comprobó en navegador sin sesión que aparecen login, encabezado y métricas en cero.
 - **No se ha probado el acceso con credenciales reales del usuario ni el envío entre dos cuentas reales.**
+
+## Correcciones de presentación y accesibilidad
+- Se restauró el logotipo U de UNIVERSHZRW habilitando las imágenes SVG embebidas dentro de la política CSP de la terminal.
+- La cabecera de teléfono usa el logotipo compartido, acceso a cuenta y el botón **Menú** desplegable. Verificada visualmente con pantalla de 390 px.
+- También quedaron integradas las rutas de guía y pieza física con el encabezado compartido.
+- INFINITO tiene enlaces de acceso desde los módulos de Economía y desde la tienda de Coins, sin tocar las operaciones financieras vigentes.
+- Verificada en navegador la ruta `/criptomoneda`, la autenticación sin sesión, los parámetros del laboratorio y la presentación de escritorio y teléfono. No se ha autenticado con cuentas reales ni se ha lanzado el token en una blockchain.

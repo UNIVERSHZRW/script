@@ -43,3 +43,30 @@ $("logoutButton").addEventListener("click",async()=>{
  try{await api("logout",{});window.location.reload()}catch(e){toast(e.message||"No se pudo cerrar la sesión.",true)}
 });
 window.addEventListener("focus",()=>{if(!document.hidden)refresh().catch(()=>{})});
+
+/* Reorganiza solo la cabecera de INFINITO en móvil, sin alterar el menú global en otras páginas */
+(function(){
+ function setup(){
+  const header=document.getElementById("uhz-global-header");
+  if(!header||header.classList.contains("inft-compact-header"))return;
+  const nav=header.querySelector(".uhzg-main");if(!nav)return;
+  header.classList.add("inft-compact-header");
+  const account=document.createElement("a");account.className="inft-mobile-login";
+  account.href="/iniciar-sesion";account.textContent="Entrar";
+  const menu=document.createElement("button");menu.type="button";menu.className="inft-mobile-menu";
+  menu.textContent="Menú";menu.setAttribute("aria-expanded","false");menu.setAttribute("aria-controls","uhz-infinito-menu");
+  nav.id="uhz-infinito-menu";
+  header.insertBefore(account,nav);header.insertBefore(menu,nav);
+  menu.addEventListener("click",()=>{const on=header.classList.toggle("inft-menu-open");menu.setAttribute("aria-expanded",String(on));menu.textContent=on?"Cerrar":"Menú"});
+  nav.addEventListener("click",e=>{if(e.target.closest("a")){header.classList.remove("inft-menu-open");menu.setAttribute("aria-expanded","false");menu.textContent="Menú"}});
+  document.addEventListener("keydown",e=>{if(e.key==="Escape"){header.classList.remove("inft-menu-open");menu.setAttribute("aria-expanded","false");menu.textContent="Menú"}});
+  const observe=()=>{
+   const signed=!!current;
+   account.href=signed?"/mi-cuenta":"/iniciar-sesion";
+   account.textContent=signed?"Mi cuenta":"Entrar";
+  };
+  window.addEventListener("focus",observe);observe();
+  const sessionEl=document.getElementById("sessionState");if(sessionEl)new MutationObserver(observe).observe(sessionEl,{childList:true,characterData:true,subtree:true});
+ }
+ if(document.readyState==="loading")document.addEventListener("DOMContentLoaded",setup,{once:true});else setup();
+})();

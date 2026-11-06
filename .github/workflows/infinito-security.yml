@@ -7,6 +7,7 @@ on:
       - "infinito/script/**"
       - "infinito/foundry.toml"
       - "infinito/production/**"
+      - "infinito/creadores/**"
       - ".github/workflows/infinito-security.yml"
   pull_request:
     paths:
@@ -15,6 +16,7 @@ on:
       - "infinito/script/**"
       - "infinito/foundry.toml"
       - "infinito/production/**"
+      - "infinito/creadores/**"
       - ".github/workflows/infinito-security.yml"
   workflow_dispatch:
 
@@ -44,6 +46,8 @@ jobs:
         run: |
           node --check infinito/production/moneda-worker.mjs
           node --check infinito/production/portal.js
+          node --check infinito/creadores/saldo-inft.js
+          node --check infinito/creadores/saldo-worker.mjs
       - name: Build contracts
         run: forge build --root infinito --sizes
       - name: Run contract tests

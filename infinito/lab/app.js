@@ -12,7 +12,7 @@ function renderState(s){current=s.wallet||null;const ok=!!s.authenticated;$("ses
 async function refresh(){try{const results=await Promise.all([api("state"),api("explorer"),api("parameters")]);renderState(results[0]);void refreshCertificates();renderHistory(results[1].events);renderParameters(results[2]);$("connection").textContent="Servicio de pruebas conectado"}catch(e){$("connection").textContent="Servicio no disponible";toast(e.message,true)}}
 async function execute(action,data,done){if(working)return;working=true;document.querySelectorAll("form button[type=submit],#faucet").forEach(x=>x.disabled=true);try{const result=await api(action,data);toast(result.message||"Operación de prueba registrada.");if(done)done();await refresh()}catch(e){toast(e.message,true);await refresh().catch(()=>{})}finally{working=false}}
 $("copy").addEventListener("click",async()=>{if(!current)return;try{await navigator.clipboard.writeText(current.address);toast("Dirección de prueba copiada.")}catch{toast("Copia manualmente la dirección.",true)}});
-$("copyCode").addEventListener("click",async()=>{try{await navigator.clipboard.writeText("INFT-DEMO-2026");toast("Código de demostración copiado.")}catch{toast("Copia manualmente el código.",true)}});
+
 $("faucet").addEventListener("click",()=>execute("faucet",{}));
 $("swapCoins").addEventListener("input",quote);$("direction").addEventListener("change",quote);
 function quote(){const n=Number($("swapCoins").value);$("swapQuote").textContent=Number.isFinite(n)&&n>=0?money(n*100)+" INFT-TEST":"—"}

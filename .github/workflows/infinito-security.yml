@@ -1,0 +1,47 @@
+name: INFINITO — build, tests and security gates
+on:
+  push:
+    paths:
+      - "infinito/contracts/**"
+      - "infinito/test/**"
+      - "infinito/script/**"
+      - "infinito/foundry.toml"
+      - ".github/workflows/infinito-security.yml"
+  pull_request:
+    paths:
+      - "infinito/contracts/**"
+      - "infinito/test/**"
+      - "infinito/script/**"
+      - "infinito/foundry.toml"
+      - ".github/workflows/infinito-security.yml"
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  solidity:
+    name: Compile and test token and vault
+    runs-on: ubuntu-latest
+    timeout-minutes: 20
+    steps:
+      - name: Checkout source without token persistence
+        uses: actions/checkout@v4
+        with:
+          persist-credentials: false
+      - name: Install Foundry
+        uses: foundry-rs/foundry-toolchain@v1
+        with:
+          version: stable
+      - name: Install pinned contracts and test libraries
+        run: |
+          forge install --root infinito --no-git OpenZeppelin/openzeppelin-contracts@v5.4.0 foundry-rs/forge-std@v1.10.0
+      - name: Build contracts
+        run: forge build --root infinito --sizes
+      - name: Run contract tests
+        run: forge test --root infinito -vvv
+      - name: Require no failed tests
+        if: failure()
+        run: |
+          echo "INFINITO release must not proceed while build/tests fail."
+          exit 1

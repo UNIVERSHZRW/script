@@ -8,7 +8,7 @@ async function api(action,data){const opts={credentials:"same-origin",cache:"no-
 function elem(tag,text,cls){const e=document.createElement(tag);if(text!==undefined)e.textContent=String(text);if(cls)e.className=cls;return e}
 function setDisabled(auth){document.querySelectorAll("#swapForm button[type=submit],#sendForm button[type=submit],#redeemForm button[type=submit]").forEach(b=>b.disabled=!auth);$("copy").disabled=!auth;const f=$("faucet");f.disabled=!auth||!!current?.claimed}
 function renderHistory(rows){const body=$("explorerRows");body.replaceChildren();if(!rows||!rows.length){const tr=elem("tr");const td=elem("td","No existen movimientos todavía. Prueba la asignación de saldo.","empty");td.colSpan=5;tr.append(td);body.append(tr);return}for(const x of rows){const tr=elem("tr"),from=x.from_address||"Sistema de pruebas",to=x.to_address||"—";let val=money(x.inft_milli)+" INFT";const cells=[names[x.kind]||x.kind,from+" → "+to,val,stamp(x.created_at),(x.id||"").slice(0,18)+"…"];cells.forEach((v,i)=>{const td=elem("td",v,i===0?"kind":i===4?"txid":"");tr.append(td)});body.append(tr)}}
-function renderState(s){current=s.wallet||null;const ok=!!s.authenticated;$("sessionState").textContent=ok?"Cuenta verificada":"Sin sesión";$("loginAlert").hidden=ok;$("accountPanel").hidden=!ok;if(ok){$("accountName").textContent=s.user?.display_name||"Cuenta verificada";$("accountEmail").textContent=s.user?.email||"";}$("inftBalance").textContent=ok?money(s.wallet.inft_milli):"—";$("coinsBalance").textContent=ok?Number(s.wallet.test_coins).toLocaleString("es-MX"):"—";$("address").textContent=ok?s.wallet.address:"Inicia sesión";$("faucetStatus").textContent=!ok?"Requiere inicio de sesión.":s.claimed?"Asignación inicial ya utilizada.":"Disponible: 100 INFT-TEST y 1,000 Coins-TEST.";current=ok?Object.assign({},s.wallet,{claimed:s.claimed}):null;setDisabled(ok)}
+function renderState(s){current=s.wallet||null;const ok=!!s.authenticated;$("sessionState").textContent=ok?"Cuenta verificada":"Sin sesión";$("loginAlert").hidden=ok;$("inftBalance").textContent=ok?money(s.wallet.inft_milli):"—";$("coinsBalance").textContent=ok?Number(s.wallet.test_coins).toLocaleString("es-MX"):"—";$("address").textContent=ok?s.wallet.address:"Inicia sesión";$("faucetStatus").textContent=!ok?"Requiere inicio de sesión.":s.claimed?"Asignación inicial ya utilizada.":"Disponible: 100 INFT-TEST y 1,000 Coins-TEST.";current=ok?Object.assign({},s.wallet,{claimed:s.claimed}):null;setDisabled(ok)}
 async function refresh(){try{const results=await Promise.all([api("state"),api("explorer"),api("parameters")]);renderState(results[0]);renderHistory(results[1].events);renderParameters(results[2]);$("connection").textContent="Servicio de pruebas conectado"}catch(e){$("connection").textContent="Servicio no disponible";toast(e.message,true)}}
 async function execute(action,data,done){if(working)return;working=true;document.querySelectorAll("form button[type=submit],#faucet").forEach(x=>x.disabled=true);try{const result=await api(action,data);toast(result.message||"Operación de prueba registrada.");if(done)done();await refresh()}catch(e){toast(e.message,true);await refresh().catch(()=>{})}finally{working=false}}
 $("copy").addEventListener("click",async()=>{if(!current)return;try{await navigator.clipboard.writeText(current.address);toast("Dirección de prueba copiada.")}catch{toast("Copia manualmente la dirección.",true)}});
@@ -39,34 +39,4 @@ $("loginForm").addEventListener("submit",async e=>{
  }catch(e){toast(e.message||"No se pudo iniciar sesión.",true)}
  finally{btn.disabled=false;btn.textContent="Iniciar sesión en UNIVERSHZRW"}
 });
-$("logoutButton").addEventListener("click",async()=>{
- try{await api("logout",{});window.location.reload()}catch(e){toast(e.message||"No se pudo cerrar la sesión.",true)}
-});
 window.addEventListener("focus",()=>{if(!document.hidden)refresh().catch(()=>{})});
-
-/* Reorganiza solo la cabecera de INFINITO en móvil, sin alterar el menú global en otras páginas */
-(function(){
- function setup(){
-  const header=document.getElementById("uhz-global-header");
-  if(!header||header.classList.contains("inft-compact-header"))return;
-  const nav=header.querySelector(".uhzg-main");if(!nav)return;
-  header.classList.add("inft-compact-header");
-  const account=document.createElement("a");account.className="inft-mobile-login";
-  account.href="/iniciar-sesion";account.textContent="Entrar";
-  const menu=document.createElement("button");menu.type="button";menu.className="inft-mobile-menu";
-  menu.textContent="Menú";menu.setAttribute("aria-expanded","false");menu.setAttribute("aria-controls","uhz-infinito-menu");
-  nav.id="uhz-infinito-menu";
-  header.insertBefore(account,nav);header.insertBefore(menu,nav);
-  menu.addEventListener("click",()=>{const on=header.classList.toggle("inft-menu-open");menu.setAttribute("aria-expanded",String(on));menu.textContent=on?"Cerrar":"Menú"});
-  nav.addEventListener("click",e=>{if(e.target.closest("a")){header.classList.remove("inft-menu-open");menu.setAttribute("aria-expanded","false");menu.textContent="Menú"}});
-  document.addEventListener("keydown",e=>{if(e.key==="Escape"){header.classList.remove("inft-menu-open");menu.setAttribute("aria-expanded","false");menu.textContent="Menú"}});
-  const observe=()=>{
-   const signed=!!current;
-   account.href=signed?"/mi-cuenta":"/iniciar-sesion";
-   account.textContent=signed?"Mi cuenta":"Entrar";
-  };
-  window.addEventListener("focus",observe);observe();
-  const sessionEl=document.getElementById("sessionState");if(sessionEl)new MutationObserver(observe).observe(sessionEl,{childList:true,characterData:true,subtree:true});
- }
- if(document.readyState==="loading")document.addEventListener("DOMContentLoaded",setup,{once:true});else setup();
-})();

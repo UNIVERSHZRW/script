@@ -18,24 +18,22 @@ footer{background:var(--card);border-color:var(--stroke);color:var(--muted);marg
 html[data-uhz-theme="dark"] .wallet-large,html[data-theme="dark"] .wallet-large{background:linear-gradient(125deg,#1b3b52,var(--card))}
 @media(max-width:950px){.parameters-grid{grid-template-columns:repeat(2,minmax(0,1fr))}}
 @media(max-width:660px){.uhz-section-nav nav{gap:8px;padding:8px 0;justify-content:start}.uhz-section-nav nav .spacer{display:none}.uhz-section-nav nav a{font-size:11px}.login-panel{grid-template-columns:1fr;padding:17px}.account-panel{align-items:start;flex-direction:column}.parameters-grid{grid-template-columns:1fr 1fr;gap:8px}.param{padding:14px}.param strong{font-size:20px}.hero{padding-top:30px}.metrics{margin-bottom:23px}.orbit{height:175px}.core{font-size:130px}.ring{width:180px;height:100px}.ring2{width:190px;height:140px}}
-
-/* Encabezado global UNIVERSHZRW compacto SOLO dentro de INFINITO, en teléfonos */
-@media(max-width:700px){
- html body #uhz-global-header.inft-compact-header{display:flex!important;align-items:center!important;justify-content:flex-start!important;flex-wrap:wrap!important;gap:8px!important;padding:10px 12px!important;margin:0!important;min-height:60px!important;height:auto!important;position:relative!important}
- html body #uhz-global-header.inft-compact-header .uhzg-brand{order:1!important;display:flex!important;align-items:center!important;flex:1 1 auto!important;min-width:0!important;max-width:calc(100% - 154px)!important;margin:0!important;gap:8px!important}
- html body #uhz-global-header.inft-compact-header .uhzg-brand img{height:38px!important;width:38px!important;min-width:38px!important}
- html body #uhz-global-header.inft-compact-header .uhzg-brand strong{font-size:16px!important;line-height:1.1!important}
- html body #uhz-global-header.inft-compact-header .uhzg-brand small{font-size:9px!important;line-height:1.25!important}
- html body #uhz-global-header.inft-compact-header .inft-mobile-login{order:2!important;display:inline-flex!important;align-items:center!important;justify-content:center!important;background:#11374c!important;color:#fff!important;border:1px solid #477d96!important;border-radius:9px!important;min-height:36px!important;padding:6px 10px!important;font-weight:750!important;font-size:11px!important;text-decoration:none!important}
- html body #uhz-global-header.inft-compact-header .inft-mobile-menu{order:3!important;display:inline-flex!important;align-items:center!important;justify-content:center!important;background:transparent!important;color:#f2f8fc!important;border:1px solid #477d96!important;border-radius:9px!important;min-height:36px!important;padding:6px 9px!important;font-weight:800!important;font-size:11px!important}
- html body #uhz-global-header.inft-compact-header .uhzg-main{order:4!important;display:none!important;width:100%!important;min-width:0!important;flex:none!important;margin:0!important;padding:9px 0 3px!important;border-top:1px solid #2c4c60!important;gap:7px!important;align-items:center!important;max-height:320px!important;overflow-y:auto!important}
- html body #uhz-global-header.inft-compact-header.inft-menu-open .uhzg-main{display:grid!important;grid-template-columns:repeat(2,minmax(0,1fr))!important}
- html body #uhz-global-header.inft-compact-header .uhzg-main>.uhzg-link,
- html body #uhz-global-header.inft-compact-header .uhzg-main>.uhzg-notifications,
- html body #uhz-global-header.inft-compact-header .uhzg-main>.uhzg-language,
- html body #uhz-global-header.inft-compact-header .uhzg-main>.uhzg-account{min-width:0!important;width:100%!important;margin:0!important}
- html body #uhz-global-header.inft-compact-header .uhzg-main>.uhzg-link{text-align:center!important;white-space:normal!important;font-size:11px!important;padding:8px 6px!important}
- html body #uhz-global-header.inft-compact-header .uhzg-main .uhzg-theme-picker{min-width:0!important;width:100%!important;text-align:center!important}
- html body #uhz-global-header.inft-compact-header .uhzg-main .uhzg-login{min-width:0!important;width:100%!important;display:block!important;text-align:center!important}
- .uhz-section-nav nav{padding-top:8px;padding-bottom:8px}
+/* La cabecera propia de UNIVERSHZRW sigue visible, sin controles extra de INFINITO. */
+@media (max-width:700px){
+  html body #uhz-global-header {
+    display:flex!important;align-items:center!important;justify-content:flex-start!important;
+    min-height:60px!important;height:auto!important;padding:10px 13px!important;
+    gap:0!important;flex-wrap:nowrap!important;
+  }
+  html body #uhz-global-header .uhzg-brand {
+    display:flex!important;align-items:center!important;flex:0 1 auto!important;
+    width:auto!important;max-width:100%!important;min-width:0!important;
+    margin:0!important;padding:0!important;gap:8px!important;
+  }
+  html body #uhz-global-header .uhzg-brand img {
+    width:40px!important;height:40px!important;min-width:40px!important;
+  }
+  html body #uhz-global-header .uhzg-brand strong {font-size:17px!important;line-height:1.1!important}
+  html body #uhz-global-header .uhzg-brand small {font-size:9px!important;line-height:1.25!important}
+  html body #uhz-global-header .uhzg-main {display:none!important}
 }

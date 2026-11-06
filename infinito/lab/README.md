@@ -54,3 +54,10 @@ Separar el contrato ERC-20 / la bóveda de un ledger de pruebas. Antes de habili
 - También quedaron integradas las rutas de guía y pieza física con el encabezado compartido.
 - INFINITO tiene enlaces de acceso desde los módulos de Economía y desde la tienda de Coins, sin tocar las operaciones financieras vigentes.
 - Verificada en navegador la ruta `/criptomoneda`, la autenticación sin sesión, los parámetros del laboratorio y la presentación de escritorio y teléfono. No se ha autenticado con cuentas reales ni se ha lanzado el token en una blockchain.
+
+## Limpieza del diseño solicitada
+- Eliminada del HTML la barra adicional «UNIVERSHZRW / Economía / INFINITO» y sus enlaces; el encabezado compartido del sitio permanece.
+- Eliminado el recuadro de sesión duplicado con correo y botones «Mi cuenta / Cerrar sesión», sin alterar la sesión ni la cartera.
+- Eliminado el código JavaScript que inyectaba «Mi cuenta / Menú» en la cabecera móvil; el CSS limita esa cabecera al logotipo original en teléfonos.
+- Se conserva el acceso normal desde la plataforma, el formulario de inicio de sesión para visitantes, y todos los servicios y parámetros de INFT-TEST.
+- Verificada con navegador móvil en producción la ausencia de elementos duplicados y la presencia de cartera y parámetros; no se accedió a cuentas privadas para las pruebas.

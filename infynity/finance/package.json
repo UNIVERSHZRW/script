@@ -1,0 +1,1 @@
+{"name":"univershzrw-finance","private":true,"type":"module","version":"1.0.0","scripts":{"build":"node build.mjs","test":"node --test tests/*.test.mjs"},"dependencies":{"viem":"2.57.16"},"devDependencies":{"@electric-sql/pglite":"0.5.14","esbuild":"0.28.2"}}

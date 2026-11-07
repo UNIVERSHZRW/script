@@ -1,27 +1,17 @@
 # INFYNITY · UNIVERSHZRW
 
-Production: https://univershzrw.com/criptomoneda
+Production: https://univershzrw.com/criptomoneda  
+Account: https://univershzrw.com/criptomoneda/panel  
+Owner operations: https://admin.univershzrw.com/inft
 
-`worker.mjs` is a self-contained Cloudflare Worker ES module. It includes the site, CSS, client JavaScript, native WebGL coin renderer, CSS 3D fallback, SVG favicon and optimized WebP artwork. No external build or client library is required.
+`worker.mjs` is the self-contained `univershzrw-moneda` Cloudflare Worker. It includes the site, styles, native WebGL coin, CSS 3D fallback, SVG favicon, optimized artwork and documentation. Preserve existing routes, settings and observability when updating it through the content API.
 
-Deploy it as `univershzrw-moneda`, entry point `worker.mjs`, compatibility date `2026-11-06`. Preserve the routes under `/criptomoneda*` on the apex domain and canonical www alias. Enable observability logs and traces. The deployed module has no secret credentials.
+The main calls to action open the authenticated financial portal described in [../finance/README.md](../finance/README.md). That portal provides actual account bookkeeping, privately uploaded deposit evidence, manual reconciliation, withdrawals with reserved balances, confirmed exchange quotes and owner controls. The former public availability form has been replaced with links to those operations. The legacy terminal root redirects to the account portal; obsolete mutation endpoints remain closed.
 
-## Behaviors
+The public chart displays published **Mesa UNIVERSHZRW reference quotes** and their stated reasons. It never substitutes revenue allocations for market prices. Volume is the sum of settled platform buy/sell operations, rather than an external exchange's volume. Empty quote history remains empty until the owner publishes a quote.
 
-- Real artwork on both faces, automatic rotation and pause; reduced motion and a WebGL-free fallback.
-- Same-origin, HttpOnly session integration through the existing portal; Coin balance is requested from `community_my_coins` only after the portal validates the account.
-- Server-proxied Polygon status, address balances and transaction receipt checks. No arbitrary RPC gateway.
-- Security headers, canonical redirects, bounded JSON parsing, origin checks, explicit route and method allowlists.
-- Availability queries for buy/sell/redeem do not create orders, collect payments or debit Coins.
+Polygon status, personal on-chain balances and receipt verification use the contract configured through owner administration. An explicit legacy `INFT_TOKEN_ADDRESS` binding can override that read-only lookup; none is needed for the current database configuration. Contract bytecode, exact INFT symbol, supply and decimals are checked. This application does not deploy or mint a token, sign transfers, create external liquidity, or guarantee returns.
 
-## Operational requirements
+Security headers, canonical www redirects, bounded parsing, origin checks and explicit route/method allowlists are retained. Existing HttpOnly account cookies and the site's shared mobile menu remain in use. The public quote endpoint is read-only; financial writes are authenticated through the separate portal and service-only RPC.
 
-A deployed official INFT token contract, verified supply and token ABI, funding and custody arrangements, real liquidity, an authorized settlement engine, and a published Coins redemption policy are required to enable buying, selling or redemption. This deployment does not create a token, a blockchain, a market or a guaranteed investment return. Current financial capabilities fail closed.
-
-An optional `INFT_TOKEN_ADDRESS` binding enables read-only contract and balance checks. The token's exact INFT symbol, decimals, supply and bytecode are validated. Adding this binding alone never enables trading or settlement.
-
-The displayed target supply is the existing contract proposal of 21,000,000 INFT. Accounting allocations from platform revenue are never displayed as market quotations.
-
-## Validation
-
-15 automated security and API tests passed before deployment. Checks cover security headers, HEAD bodies, www canonicalization, method allowlists, same-origin quotes, input tampering, request sizes, absent contract balances, malformed hashes, node outages, exact token ABI identity and reverted receipts. Live browser QA verifies the published layout, coin fallback rotation and the redemption availability form. Authenticated wallet ownership and settlement require the user's own wallet; no financial transaction is performed during QA.
+The 15 website security tests passed after integration, alongside the 12 finance tests. Browser checks confirmed the published customer/admin entry screens, panel links and mobile navigation at 340 CSS pixels. No real transfer or authenticated financial form submission was made during verification.

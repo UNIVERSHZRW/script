@@ -1,0 +1,22 @@
+{
+  "name": "univershzrw-admin-console",
+  "version": "1.0.0",
+  "description": "Administraci\u00f3n unificada de UNIVERSHZRW",
+  "scripts": {
+    "build": "node build.mjs",
+    "test": "node --test tests/*.test.mjs"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+  "type": "module",
+  "dependencies": {
+    "tus-js-client": "4.3.1"
+  },
+  "private": true,
+  "devDependencies": {
+    "@electric-sql/pglite": "0.5.14",
+    "acorn": "8.19.0",
+    "esbuild": "0.28.2"
+  }
+}

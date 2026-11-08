@@ -1,0 +1,42 @@
+
+/* INFINITO - integración exclusiva en el saldo de Creadores */
+[data-view="wallet"] .inft-conversion-card{border:1px solid #b8d5e7!important;box-shadow:0 10px 30px rgba(21,103,145,.07);background:linear-gradient(152deg,#ffffff,#f2fafe)!important;--inft-ink:#163c55;--inft-muted:#5f7c90;--inft-blue:#1188b7;--inft-border:#d9e7f0}
+[data-view="wallet"] .inft-conversion-card>*{min-width:0}
+[data-view="wallet"] .inft-card-heading{display:flex;align-items:center;gap:12px;margin:5px 0 16px}
+[data-view="wallet"] .inft-card-heading h2{font-size:clamp(20px,2.3vw,27px);line-height:1.2;margin:0!important;letter-spacing:-.045em;color:var(--inft-ink)}
+[data-view="wallet"] .inft-card-heading p{margin:6px 0 0;font-size:12px;color:var(--inft-muted);line-height:1.55}
+[data-view="wallet"] .inft-mark{display:grid;place-items:center;border-radius:14px;width:55px;height:55px;background:#10384e;color:#efcf80;font:bold 48px/1 Georgia,serif;flex-shrink:0}
+[data-view="wallet"] .inft-exchange-summary{display:grid;grid-template-columns:1fr 1fr;gap:9px}
+[data-view="wallet"] .inft-exchange-summary>div{padding:13px;border-radius:11px;background:#eaf4f9;border:1px solid #d3e4ed}
+[data-view="wallet"] .inft-exchange-summary span{display:block;font-size:10px;color:#51798b;font-weight:750}
+[data-view="wallet"] .inft-exchange-summary strong{display:block;font-size:16px;margin-top:7px;color:#123951;overflow-wrap:anywhere}
+[data-view="wallet"] .inft-conversion-card>label{display:block;margin:13px 0 6px;font-size:12px;font-weight:850;color:#254f65}
+[data-view="wallet"] .inft-amount-field{display:flex;align-items:center;gap:10px;border:1px solid var(--inft-border);border-radius:10px;background:#fff;padding:0 12px}
+[data-view="wallet"] .inft-amount-field:focus-within{border-color:var(--inft-blue)}
+[data-view="wallet"] .inft-amount-field input{flex:1;min-width:0;min-height:45px;font-size:15px;font-weight:750;color:#153d55;background:transparent;border:0;outline:0;box-shadow:none}
+[data-view="wallet"] .inft-amount-field>span{color:#47738b;font-weight:800;font-size:12px}
+[data-view="wallet"] .inft-quote-line{display:flex;justify-content:space-between;gap:12px;align-items:baseline;padding:11px 0;border-bottom:1px solid var(--inft-border)}
+[data-view="wallet"] .inft-quote-line>span{font-size:12px;color:#668095}
+[data-view="wallet"] .inft-quote-line>strong{color:#173d57;font-size:12px;text-align:right;overflow-wrap:anywhere}
+[data-view="wallet"] .inft-wallet-actions{display:flex;flex-wrap:wrap;gap:8px;margin-top:12px}
+[data-view="wallet"] .inft-connect-wallet,.inft-creator-link{display:inline-flex;align-items:center;justify-content:center;min-height:42px;padding:10px 13px;border:1px solid #157dad;border-radius:9px;color:#fff;background:#127daa;font-size:12px;font-weight:850;text-decoration:none;cursor:pointer}
+[data-view="wallet"] .inft-creator-link{color:#14759e;background:#fff}
+[data-view="wallet"] .inft-connect-wallet:hover{background:#0d648e}
+[data-view="wallet"] .inft-creator-wallet-status{margin:4px 0;font-size:11px;color:#597c91;overflow-wrap:anywhere}
+[data-view="wallet"] .inft-exchange-submit{width:100%;min-height:46px;border-radius:9px;padding:12px;color:#fff;border:1px solid #b6ceda;background:#a2b5bf;cursor:not-allowed;font-size:13px;font-weight:850}
+[data-view="wallet"] .inft-creator-disclaimer{font-size:11px;line-height:1.7;margin:8px 0;color:#55778c}
+[data-view="wallet"] .inft-old-gold{margin:12px 0 22px;border:1px solid #dae5eb;border-radius:11px;background:#fff;padding:8px 15px}
+[data-view="wallet"] .inft-old-gold summary{font-size:12px;font-weight:800;color:#597486;cursor:pointer;padding:9px 0}
+[data-view="wallet"] .inft-old-gold .wallet-card{box-shadow:none}
+[data-view="wallet"] .inft-history-legacy{border:1px solid #dce6ed;padding:11px 14px;border-radius:10px;margin-top:8px}
+[data-view="wallet"] .inft-history-legacy summary{cursor:pointer;color:#57768b;font-size:12px;font-weight:850}
+[data-view="wallet"] .inft-history-legacy>section{margin:12px 0 0}
+.top-wallet .inft-old-gold-link{display:none!important}
+.top-wallet .inft-header-link{color:#e4f8ff!important;font-weight:850}
+@media(max-width:660px){[data-view="wallet"] .inft-card-heading{align-items:flex-start}[data-view="wallet"] .inft-mark{width:48px;height:48px;font-size:42px}[data-view="wallet"] .inft-exchange-summary{grid-template-columns:1fr 1fr}[data-view="wallet"] .inft-exchange-summary strong{font-size:13px}[data-view="wallet"] .inft-wallet-actions>*{flex:1}}
+html[data-uhz-theme=dark] [data-view="wallet"] .inft-conversion-card,html[data-theme=dark] [data-view="wallet"] .inft-conversion-card{background:linear-gradient(155deg,#10263a,#18384b)!important;border-color:#3f7086!important}
+html[data-uhz-theme=dark] [data-view="wallet"] .inft-card-heading h2,html[data-theme=dark] [data-view="wallet"] .inft-card-heading h2,html[data-uhz-theme=dark] [data-view="wallet"] .inft-quote-line strong,html[data-theme=dark] [data-view="wallet"] .inft-quote-line strong{color:#e9f6fa}
+html[data-uhz-theme=dark] [data-view="wallet"] .inft-exchange-summary>div,html[data-theme=dark] [data-view="wallet"] .inft-exchange-summary>div{background:#1a394b;border-color:#41677a}
+html[data-uhz-theme=dark] [data-view="wallet"] .inft-exchange-summary strong,html[data-theme=dark] [data-view="wallet"] .inft-exchange-summary strong{color:#d8f4fd}
+
+[data-view="wallet"] .inft-discovery-strip{display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:14px;border:1px solid #c9dce6;border-radius:11px;padding:13px 17px;background:#edf6fa;color:#3c6882;font-size:12px;margin:15px 0 24px}[data-view="wallet"] .inft-discovery-strip a{color:#126f9c;font-weight:850;text-decoration:none}[data-view="wallet"] .inft-discovery-strip a:hover{text-decoration:underline}

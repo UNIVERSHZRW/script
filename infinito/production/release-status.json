@@ -1,0 +1,25 @@
+{
+  "name": "INFINITO",
+  "ticker": "INFT",
+  "domain": "univershzrw.com",
+  "network_proposed": "Polygon PoS",
+  "chain_id_proposed": 137,
+  "official_token_contract": null,
+  "physical_vault_contract": null,
+  "token_onchain_deployed": false,
+  "real_token_supply_confirmed": "0",
+  "market_trading_enabled": false,
+  "web3_wallet_connect_available": true,
+  "public_tx_receipt_verification_available": true,
+  "physical_coin_fulfilment_enabled": false,
+  "physically_minted_verified": 0,
+  "external_security_audit_completed": false,
+  "solidity_ci": {
+    "status": "passed",
+    "total_tests": 14,
+    "run_url": "https://github.com/UNIVERSHZRW/script/actions/runs/42150152946"
+  },
+  "old_demo_routes": "archived",
+  "previous_demo_data": "preserved",
+  "release_approval": "not approved"
+}

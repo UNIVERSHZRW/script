@@ -1,0 +1,39 @@
+{
+  "initial": [
+    {
+      "worker": "univershzrw-comunidad",
+      "success": true,
+      "modified": "2026-11-08T01:18:11.806127Z",
+      "etag": "587f4e0c5973f730902f415e07642febbde9bb9fa3d9a852440271495144ea53",
+      "sha256": "c8c57d67b1194376d8f3cc7b36a18e130be058053e8576d5cdc6e05bdb7fa46e"
+    },
+    {
+      "worker": "univershzrw-aportes",
+      "success": true,
+      "modified": "2026-11-08T01:18:12.424928Z",
+      "etag": "9e8cba3bfae56b480aa6cf3fbfc445084dc445219dc436bb7264e05588a54a2b",
+      "sha256": "527f7dde80a2786b275ab43dbc45884032f0e8a5676c43620af771fe4b7daed3"
+    },
+    {
+      "worker": "univershzrw-admin",
+      "success": true,
+      "modified": "2026-11-08T01:18:13.087568Z",
+      "etag": "ac5cb1fefee613b9a24d87ca11b17e2e49a18fe9fa0b6e6620cfd7cf3ef8113e",
+      "sha256": "1becab3280d6bc0f148c0229f06939d715bb734439342ddbe2e7ce86e6bc684f"
+    },
+    {
+      "worker": "univershzrw",
+      "success": true,
+      "modified": "2026-11-08T01:18:13.891434Z",
+      "etag": "83f12423b0a79eb2fac0360a3b7c4fc99e6d55459d69fc09d75c90ed6d8541c7",
+      "sha256": "233daaea213cd76df247d3876aca5016f8162095373df0808152922c9f50669d"
+    }
+  ],
+  "coreCorrection": {
+    "success": true,
+    "modified": "2026-11-08T01:20:09.416711Z",
+    "etag": "3126adc278b6ffa8da548734a00c1d01f99e410c62324b3aa09f5ca48011d3eb"
+  },
+  "nativeAdminVersion": "1aa678969562",
+  "databaseMigration": "content_provider_connectors_domains"
+}

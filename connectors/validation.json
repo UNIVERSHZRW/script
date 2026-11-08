@@ -1,0 +1,51 @@
+{
+  "date": "2026-11-08",
+  "automated": {
+    "total": 39,
+    "admin": 24,
+    "connectors": 15,
+    "passed": 39
+  },
+  "production": {
+    "owner_session_ui": true,
+    "native_connectors_tab": true,
+    "inspect_sample_video": {
+      "provider": "MDN CC0 sample",
+      "filename": "flower.mp4",
+      "verified": true,
+      "size_bytes": 1128375,
+      "readyState": 4,
+      "duration_seconds": 5.055,
+      "media_error": null,
+      "stream_on_univershzrw_origin": true,
+      "played_to_end": true
+    },
+    "contribution_selector_present": true,
+    "terabox_selection": true,
+    "anonymous_inspect_http": 401,
+    "database_provider_guard": {
+      "onedrive": true,
+      "sharepoint": true,
+      "forged_host_rejected": true,
+      "private_host_rejected": true
+    },
+    "mobile_contribution_form": {
+      "viewport_width": 390,
+      "scroll_width": 375,
+      "horizontal_overflow": false,
+      "selector_width": 301.33
+    }
+  },
+  "not_performed": [
+    "Content publication",
+    "Real Coin purchases or debits",
+    "Real external storage authorization",
+    "Live MediaFire file resolution with a supplied owner file",
+    "Native TeraBox/MEGA/OneDrive playback"
+  ],
+  "limitations": [
+    "TeraBox, OneDrive and MEGA currently open their original provider; native playback is not implemented.",
+    "Provider permissions, CAPTCHAs, quotas and file removal still apply.",
+    "Paid catalog grant-to-player integration was tested with controlled backend responses, without charging real Coins."
+  ]
+}

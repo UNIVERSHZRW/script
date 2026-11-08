@@ -1,0 +1,21 @@
+import {aliases} from './routing.mjs';
+const ORIGIN='https://admin.univershzrw.com';
+const SECURITY={'x-content-type-options':'nosniff','referrer-policy':'same-origin','x-frame-options':'DENY','strict-transport-security':'max-age=31536000; includeSubDomains','permissions-policy':'camera=(), microphone=(), geolocation=()','x-robots-tag':'noindex,nofollow,noarchive','content-security-policy':"default-src 'self'; script-src 'self'; style-src 'self' 'unsafe-inline'; img-src 'self' https: data: blob:; connect-src 'self' https://kgqkszlennwhlyngktcc.storage.supabase.co https://kgqkszlennwhlyngktcc.supabase.co; frame-src 'none'; frame-ancestors 'none'; object-src 'none'; base-uri 'self'; form-action 'self'"};
+const icon='<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 64 64"><rect width="64" height="64" rx="17" fill="#1b345f"/><path d="M19 16v23c0 16 26 16 26 0V16" fill="none" stroke="#a7c1ff" stroke-width="7" stroke-linecap="round"/></svg>';
+export function createAppWorker(assets){return {async fetch(request,env){const url=new URL(request.url),path=url.pathname;if(url.origin!==ORIGIN)return new Response('No encontrado',{status:404,headers:SECURITY});
+ if(path.startsWith('/_uhz/portal/backend/')||path.startsWith('/_uhz/portal/api/creator/')||path.startsWith('/_uhz/admin-api/')||path.startsWith('/api/catalog-media/')){
+  if(!env.COMMUNITY_APP)return Response.json({message:'No se pudo conectar con la plataforma.'},{status:503,headers:{'cache-control':'no-store'}});
+  const target=new URL(request.url);if(path.startsWith('/_uhz/portal/'))target.pathname=path.slice('/_uhz/portal'.length);else if(path.startsWith('/_uhz/admin-api/'))target.pathname='/admin-backend/'+path.slice('/_uhz/admin-api/'.length);
+  try{return await env.COMMUNITY_APP.fetch(new Request(target,request));}catch{return Response.json({message:'No se pudo completar la solicitud. Reintenta en un momento.'},{status:503,headers:{'cache-control':'no-store','x-content-type-options':'nosniff'}});}
+ }
+ if(!['GET','HEAD'].includes(request.method))return new Response('Método no permitido',{status:405,headers:{...SECURITY,Allow:'GET, HEAD'}});
+ if(path==='/admin-icon.svg'||path==='/favicon.ico')return new Response(request.method==='HEAD'?null:icon,{headers:{...SECURITY,'content-type':'image/svg+xml','cache-control':'public,max-age=86400'}});
+ const asset=assets[path];if(asset){const etag='"'+assets.version+'-'+path.slice(1)+'"';if(request.headers.get('if-none-match')===etag)return new Response(null,{status:304,headers:{...SECURITY,etag}});return new Response(request.method==='HEAD'?null:asset.body,{headers:{...SECURITY,'content-type':asset.type,'cache-control':'public,max-age=3600',etag}});}
+ if(path==='/')return new Response(request.method==='HEAD'?null:assets.html,{headers:{...SECURITY,'content-type':'text/html; charset=utf-8','cache-control':'no-store','x-uhz-admin-app':'3','x-uhz-admin-shell':'2','x-uhz-admin-version':assets.version}});
+ if(['/iniciar-sesion','/recuperar-contrasena','/nueva-contrasena','/verificar-cuenta'].includes(path)){const to=new URL('/',ORIGIN);to.search=url.search;if(path==='/recuperar-contrasena')to.searchParams.set('auth','recover');return Response.redirect(to.href,302);}
+ if(['/legacy','/control','/index.html','/catalogo','/economia/administrar','/guardian','/creadores','/herramientas','/panel','/usuarios','/perfil','/mi-cuenta','/comunidad','/coins','/inft'].includes(path.replace(/\/$/,''))||path.startsWith('/licencias')||path.startsWith('/_uhz/admin/')){
+  const key=url.searchParams.get('modulo')||url.searchParams.get('view')||url.searchParams.get('cuenta')||({'/catalogo':'catalogo','/economia/administrar':'publicar','/guardian':'guardian','/creadores':'aportes','/herramientas':'importar','/usuarios':'usuarios','/perfil':'perfil','/inft':'inft'})[path.replace(/\/$/,'')]||(path.startsWith('/licencias')?'licencias':'resumen');
+  const route=aliases[key]||['resumen'],to=new URL('/',ORIGIN);const edit=url.searchParams.get('editar');if(edit&&/^[0-9a-f-]{36}$/i.test(edit)){to.searchParams.set('modulo',key);to.searchParams.set('editar',edit);}to.hash=route.join('/');return Response.redirect(to.href,302);
+ }
+ return new Response('No encontrado',{status:404,headers:SECURITY});
+}};}

@@ -1,0 +1,26 @@
+{
+  "name": "univershzrw-admin-console",
+  "version": "1.0.0",
+  "description": "Administración unificada de UNIVERSHZRW",
+  "scripts": {
+    "build": "node build-native.mjs",
+    "test": "node --test tests/*.test.mjs"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+  "type": "module",
+  "dependencies": {
+    "react": "19.3.1",
+    "react-dom": "19.3.1",
+    "tus-js-client": "4.3.1"
+  },
+  "private": true,
+  "devDependencies": {
+    "@electric-sql/pglite": "0.5.14",
+    "@testing-library/react": "16.3.3",
+    "acorn": "8.19.0",
+    "esbuild": "0.28.2",
+    "happy-dom": "21.0.4"
+  }
+}

@@ -1,0 +1,1121 @@
+{
+  "content_resources": {
+    "title": "Contenido",
+    "sub": "Biblioteca pública y editorial · al guardar un recurso se crea automáticamente su descarga pendiente",
+    "order": "updated_at",
+    "cols": [
+      [
+        "title",
+        "Título"
+      ],
+      [
+        "section",
+        "Sección"
+      ],
+      [
+        "content_type",
+        "Tipo"
+      ],
+      [
+        "category",
+        "Categoría"
+      ],
+      [
+        "review_status",
+        "Revisión"
+      ],
+      [
+        "publish",
+        "Publicado"
+      ],
+      [
+        "updated_at",
+        "Actualizado"
+      ]
+    ],
+    "fields": [
+      [
+        "title",
+        "Título",
+        "text"
+      ],
+      [
+        "legacy_id",
+        "ID recurso (opcional; Supabase lo genera si lo dejas vacío)",
+        "text"
+      ],
+      [
+        "section",
+        "Sección",
+        "select",
+        "SOFTWARE_APPS|INVESTIGACIONES|LIBROS_CURSOS|PELICULAS_SERIES|COMUNIDAD"
+      ],
+      [
+        "publish",
+        "Publicar",
+        "bool"
+      ],
+      [
+        "authors",
+        "Autores",
+        "text"
+      ],
+      [
+        "year",
+        "Año",
+        "text"
+      ],
+      [
+        "content_type",
+        "Tipo de contenido",
+        "text"
+      ],
+      [
+        "category",
+        "Categoría",
+        "text"
+      ],
+      [
+        "review_status",
+        "Estado de revisión",
+        "text"
+      ],
+      [
+        "reference",
+        "Referencia",
+        "textarea"
+      ],
+      [
+        "summary",
+        "Resumen",
+        "textarea"
+      ],
+      [
+        "keywords",
+        "Palabras clave",
+        "textarea"
+      ],
+      [
+        "source_url",
+        "Fuente HTTPS",
+        "url"
+      ],
+      [
+        "preview_image_url",
+        "Imagen previa",
+        "url"
+      ],
+      [
+        "video_url",
+        "Video",
+        "url"
+      ],
+      [
+        "license_use",
+        "Licencia",
+        "text"
+      ],
+      [
+        "contributed_by",
+        "Aportado por",
+        "text"
+      ],
+      [
+        "legal_notice",
+        "Aviso legal",
+        "textarea"
+      ],
+      [
+        "extension_url",
+        "URL extensión",
+        "url"
+      ],
+      [
+        "record_status",
+        "Estado registro",
+        "select",
+        "ACTIVO|BAJA|BLOQUEADO|SUSPENDIDO"
+      ]
+    ]
+  },
+  "downloads": {
+    "title": "Descargas",
+    "sub": "Autorización y revisión de recursos",
+    "order": "updated_at",
+    "cols": [
+      [
+        "name",
+        "Recurso"
+      ],
+      [
+        "legacy_id",
+        "ID"
+      ],
+      [
+        "state",
+        "Estado"
+      ],
+      [
+        "rights_reviewed",
+        "Derechos revisados"
+      ],
+      [
+        "allow_download",
+        "Descarga"
+      ],
+      [
+        "publish",
+        "Publicar"
+      ]
+    ],
+    "fields": [
+      [
+        "legacy_id",
+        "ID",
+        "text"
+      ],
+      [
+        "name",
+        "Nombre",
+        "text"
+      ],
+      [
+        "url",
+        "URL segura",
+        "url"
+      ],
+      [
+        "state",
+        "Estado",
+        "select",
+        "PENDIENTE|VERIFICADO|ACTIVO|APROBADO|BLOQUEADO"
+      ],
+      [
+        "rights_reviewed",
+        "Derechos revisados",
+        "bool"
+      ],
+      [
+        "allow_download",
+        "Permitir descarga",
+        "bool"
+      ],
+      [
+        "publish",
+        "Publicar",
+        "bool"
+      ],
+      [
+        "notes",
+        "Notas",
+        "textarea"
+      ]
+    ]
+  },
+  "contributions": {
+    "title": "Aportes",
+    "sub": "Entradas recibidas desde la comunidad",
+    "order": "received_at",
+    "cols": [
+      [
+        "title",
+        "Título"
+      ],
+      [
+        "contributor_name",
+        "Aportante"
+      ],
+      [
+        "contributor_email",
+        "Correo"
+      ],
+      [
+        "detected_destination",
+        "Destino"
+      ],
+      [
+        "management_status",
+        "Estado"
+      ],
+      [
+        "received_at",
+        "Recibido"
+      ]
+    ],
+    "fields": [
+      [
+        "management_status",
+        "Estado",
+        "select",
+        "PENDIENTE DE REVISIÓN|EN REVISIÓN|APROBADO|RECHAZADO|PUBLICADO"
+      ],
+      [
+        "published_on_web",
+        "Publicado",
+        "bool"
+      ],
+      [
+        "admin_notes",
+        "Notas admin",
+        "textarea"
+      ]
+    ]
+  },
+  "rights_reports": {
+    "title": "Derechos",
+    "sub": "Reportes legales y solicitudes de retiro",
+    "order": "received_at",
+    "cols": [
+      [
+        "legacy_id",
+        "Folio"
+      ],
+      [
+        "legal_name",
+        "Nombre"
+      ],
+      [
+        "email",
+        "Correo"
+      ],
+      [
+        "material_title",
+        "Material"
+      ],
+      [
+        "status",
+        "Estado"
+      ],
+      [
+        "received_at",
+        "Recibido"
+      ]
+    ],
+    "fields": [
+      [
+        "status",
+        "Estado",
+        "select",
+        "RECIBIDO|EN REVISIÓN|RESUELTO|CERRADO|RECHAZADO"
+      ],
+      [
+        "admin_notes",
+        "Notas admin",
+        "textarea"
+      ]
+    ]
+  },
+  "ads": {
+    "title": "Publicidad",
+    "sub": "Campañas publicadas",
+    "order": "updated_at",
+    "cols": [
+      [
+        "advertiser",
+        "Anunciante"
+      ],
+      [
+        "title",
+        "Campaña"
+      ],
+      [
+        "placements",
+        "Ubicación"
+      ],
+      [
+        "campaign_status",
+        "Estado"
+      ],
+      [
+        "payment_status",
+        "Pago"
+      ],
+      [
+        "starts_at",
+        "Inicio"
+      ],
+      [
+        "ends_at",
+        "Fin"
+      ],
+      [
+        "views",
+        "Vistas"
+      ],
+      [
+        "clicks",
+        "Clics"
+      ],
+      [
+        "publish",
+        "Publicar"
+      ]
+    ],
+    "fields": [
+      [
+        "legacy_id",
+        "ID anuncio",
+        "text"
+      ],
+      [
+        "publish",
+        "Publicar",
+        "bool"
+      ],
+      [
+        "placements",
+        "Dónde aparece",
+        "placements"
+      ],
+      [
+        "advertiser",
+        "Anunciante",
+        "text"
+      ],
+      [
+        "title",
+        "Título",
+        "text"
+      ],
+      [
+        "ad_text",
+        "Texto",
+        "textarea"
+      ],
+      [
+        "media_url",
+        "Media URL",
+        "url"
+      ],
+      [
+        "media_type",
+        "Tipo media",
+        "select",
+        "texto|imagen|gif|video"
+      ],
+      [
+        "destination_url",
+        "Destino",
+        "url"
+      ],
+      [
+        "cta",
+        "CTA",
+        "text"
+      ],
+      [
+        "label",
+        "Etiqueta",
+        "text"
+      ],
+      [
+        "payment_status",
+        "Pago",
+        "select",
+        "PENDIENTE|PAGADO|APROBADO|MANUAL"
+      ],
+      [
+        "campaign_status",
+        "Campaña",
+        "select",
+        "BORRADOR|ACTIVA|PAUSADA|FINALIZADA|CANCELADA"
+      ],
+      [
+        "starts_at",
+        "Inicio",
+        "datetime"
+      ],
+      [
+        "ends_at",
+        "Fin",
+        "datetime"
+      ],
+      [
+        "priority",
+        "Prioridad",
+        "number"
+      ],
+      [
+        "plan_legacy_id",
+        "Plan",
+        "text"
+      ],
+      [
+        "client_email",
+        "Correo cliente",
+        "email"
+      ],
+      [
+        "client_phone",
+        "Teléfono cliente",
+        "text"
+      ],
+      [
+        "notes",
+        "Notas",
+        "textarea"
+      ]
+    ]
+  },
+  "ad_requests": {
+    "title": "Solicitudes de publicidad",
+    "sub": "Contrataciones y pagos",
+    "order": "requested_at",
+    "cols": [
+      [
+        "folio",
+        "Folio"
+      ],
+      [
+        "client_name",
+        "Cliente"
+      ],
+      [
+        "plan_name",
+        "Plan"
+      ],
+      [
+        "amount",
+        "Importe"
+      ],
+      [
+        "payment_method",
+        "Método"
+      ],
+      [
+        "payment_status",
+        "Pago"
+      ],
+      [
+        "spei_status",
+        "SPEI"
+      ],
+      [
+        "status",
+        "Solicitud"
+      ],
+      [
+        "requested_at",
+        "Fecha"
+      ]
+    ],
+    "fields": [
+      [
+        "status",
+        "Estado",
+        "select",
+        "PENDIENTE_PAGO|PAGADO|EN_REVISION|APROBADO|RECHAZADO|CANCELADO"
+      ],
+      [
+        "admin_notes",
+        "Notas admin",
+        "textarea"
+      ]
+    ]
+  },
+  "ad_plans": {
+    "title": "Planes de publicidad",
+    "sub": "Precios, duración y beneficios",
+    "order": "sort_order",
+    "cols": [
+      [
+        "name",
+        "Plan"
+      ],
+      [
+        "base_price",
+        "Precio"
+      ],
+      [
+        "duration_days",
+        "Días"
+      ],
+      [
+        "featured",
+        "Destacado"
+      ],
+      [
+        "status",
+        "Estado"
+      ],
+      [
+        "publish",
+        "Publicar"
+      ]
+    ],
+    "fields": [
+      [
+        "legacy_id",
+        "ID plan",
+        "text"
+      ],
+      [
+        "name",
+        "Nombre",
+        "text"
+      ],
+      [
+        "subtitle",
+        "Subtítulo",
+        "text"
+      ],
+      [
+        "description",
+        "Descripción",
+        "textarea"
+      ],
+      [
+        "base_price",
+        "Precio base",
+        "number"
+      ],
+      [
+        "currency",
+        "Moneda",
+        "text"
+      ],
+      [
+        "duration_days",
+        "Duración días",
+        "number"
+      ],
+      [
+        "duration_text",
+        "Texto duración",
+        "text"
+      ],
+      [
+        "format_mode",
+        "Modo formato",
+        "text"
+      ],
+      [
+        "allow_text",
+        "Texto",
+        "bool"
+      ],
+      [
+        "allow_image",
+        "Imagen",
+        "bool"
+      ],
+      [
+        "allow_gif",
+        "GIF",
+        "bool"
+      ],
+      [
+        "allow_video",
+        "Video",
+        "bool"
+      ],
+      [
+        "max_characters",
+        "Máx. caracteres",
+        "number"
+      ],
+      [
+        "count_views",
+        "Contar vistas",
+        "bool"
+      ],
+      [
+        "count_clicks",
+        "Contar clics",
+        "bool"
+      ],
+      [
+        "count_view_time",
+        "Tiempo vista",
+        "bool"
+      ],
+      [
+        "daily_report",
+        "Reporte diario",
+        "bool"
+      ],
+      [
+        "weekly_report",
+        "Reporte semanal",
+        "bool"
+      ],
+      [
+        "final_report",
+        "Reporte final",
+        "bool"
+      ],
+      [
+        "weekly_changes",
+        "Cambios semanales",
+        "number"
+      ],
+      [
+        "featured",
+        "Destacado",
+        "bool"
+      ],
+      [
+        "sort_order",
+        "Orden",
+        "number"
+      ],
+      [
+        "button_text",
+        "Botón",
+        "text"
+      ],
+      [
+        "status",
+        "Estado",
+        "text"
+      ],
+      [
+        "publish",
+        "Publicar",
+        "bool"
+      ],
+      [
+        "notes",
+        "Notas",
+        "textarea"
+      ]
+    ]
+  },
+  "products": {
+    "title": "Tienda",
+    "sub": "Catálogo profesional · imágenes, precios, descuentos, stock y pagos",
+    "order": "sort_order",
+    "cols": [
+      [
+        "name",
+        "Producto"
+      ],
+      [
+        "sku",
+        "SKU"
+      ],
+      [
+        "product_type",
+        "Tipo"
+      ],
+      [
+        "price",
+        "Precio"
+      ],
+      [
+        "stock",
+        "Stock"
+      ],
+      [
+        "featured",
+        "Destacado"
+      ],
+      [
+        "status",
+        "Estado"
+      ],
+      [
+        "publish",
+        "Publicar"
+      ]
+    ],
+    "fields": []
+  },
+  "shop_orders": {
+    "title": "Pedidos",
+    "sub": "Pedidos y seguimiento de cobro",
+    "order": "created_at",
+    "cols": [
+      [
+        "folio",
+        "Folio"
+      ],
+      [
+        "customer_name",
+        "Cliente"
+      ],
+      [
+        "email",
+        "Correo"
+      ],
+      [
+        "total",
+        "Total"
+      ],
+      [
+        "payment_method",
+        "Método"
+      ],
+      [
+        "payment_status",
+        "Pago"
+      ],
+      [
+        "spei_status",
+        "SPEI"
+      ],
+      [
+        "status",
+        "Pedido"
+      ],
+      [
+        "created_at",
+        "Creado"
+      ]
+    ],
+    "fields": [
+      [
+        "status",
+        "Estado",
+        "select",
+        "PENDIENTE_PAGO|PAGADO|PREPARACION|ENVIADO|ENTREGADO|CANCELADO"
+      ],
+      [
+        "tracking_code",
+        "Guía",
+        "text"
+      ],
+      [
+        "admin_notes",
+        "Notas admin",
+        "textarea"
+      ]
+    ]
+  },
+  "chatbot_knowledge": {
+    "title": "Conocimiento del asistente",
+    "sub": "Respuestas que aprende UNIVERSHZRW",
+    "order": "priority",
+    "cols": [
+      [
+        "legacy_id",
+        "ID"
+      ],
+      [
+        "category",
+        "Categoría"
+      ],
+      [
+        "answer",
+        "Respuesta"
+      ],
+      [
+        "priority",
+        "Prioridad"
+      ],
+      [
+        "status",
+        "Estado"
+      ],
+      [
+        "publish",
+        "Publicar"
+      ]
+    ],
+    "fields": [
+      [
+        "legacy_id",
+        "ID",
+        "text"
+      ],
+      [
+        "category",
+        "Categoría",
+        "text"
+      ],
+      [
+        "key_questions",
+        "Preguntas clave (separadas por |)",
+        "array"
+      ],
+      [
+        "answer",
+        "Respuesta",
+        "textarea"
+      ],
+      [
+        "keywords",
+        "Palabras clave (separadas por |)",
+        "array"
+      ],
+      [
+        "action",
+        "Acción",
+        "text"
+      ],
+      [
+        "action_text",
+        "Texto acción",
+        "text"
+      ],
+      [
+        "priority",
+        "Prioridad",
+        "number"
+      ],
+      [
+        "status",
+        "Estado",
+        "text"
+      ],
+      [
+        "publish",
+        "Publicar",
+        "bool"
+      ],
+      [
+        "notes",
+        "Notas",
+        "textarea"
+      ]
+    ]
+  },
+  "chatbot_questions": {
+    "title": "Preguntas pendientes",
+    "sub": "Consultas que el asistente no resolvió",
+    "order": "received_at",
+    "cols": [
+      [
+        "folio",
+        "Folio"
+      ],
+      [
+        "question",
+        "Pregunta"
+      ],
+      [
+        "intent",
+        "Intención"
+      ],
+      [
+        "confidence",
+        "Confianza"
+      ],
+      [
+        "status",
+        "Estado"
+      ],
+      [
+        "received_at",
+        "Recibida"
+      ]
+    ],
+    "fields": [
+      [
+        "status",
+        "Estado",
+        "select",
+        "PENDIENTE|REVISADA|RESUELTA|IGNORADA"
+      ],
+      [
+        "admin_answer",
+        "Respuesta admin",
+        "textarea"
+      ],
+      [
+        "convert_to_knowledge",
+        "Convertir en conocimiento",
+        "bool"
+      ],
+      [
+        "notes",
+        "Notas",
+        "textarea"
+      ]
+    ]
+  },
+  "chatbot_blocked_words": {
+    "title": "Moderación del asistente",
+    "sub": "Lenguaje y reglas de seguridad",
+    "order": "updated_at",
+    "cols": [
+      [
+        "phrase",
+        "Palabra / frase"
+      ],
+      [
+        "level",
+        "Nivel"
+      ],
+      [
+        "response",
+        "Respuesta"
+      ],
+      [
+        "block_session",
+        "Bloquea sesión"
+      ],
+      [
+        "active",
+        "Activa"
+      ]
+    ],
+    "fields": [
+      [
+        "phrase",
+        "Palabra o frase",
+        "text"
+      ],
+      [
+        "level",
+        "Nivel",
+        "select",
+        "AVISO|ADVERTENCIA|BLOQUEO"
+      ],
+      [
+        "response",
+        "Respuesta",
+        "textarea"
+      ],
+      [
+        "block_session",
+        "Bloquear sesión",
+        "bool"
+      ],
+      [
+        "active",
+        "Activa",
+        "bool"
+      ],
+      [
+        "notes",
+        "Notas",
+        "textarea"
+      ]
+    ]
+  },
+  "integration_status": {
+    "title": "Integraciones",
+    "sub": "Estado de servicios externos",
+    "order": "integration",
+    "cols": [
+      [
+        "integration",
+        "Integración"
+      ],
+      [
+        "enabled",
+        "Habilitada"
+      ],
+      [
+        "configured",
+        "Configurada"
+      ],
+      [
+        "last_ok_at",
+        "Última conexión"
+      ],
+      [
+        "last_error",
+        "Último error"
+      ]
+    ],
+    "fields": [
+      [
+        "enabled",
+        "Habilitada",
+        "bool"
+      ]
+    ]
+  },
+  "payment_audit": {
+    "title": "Historial de pagos",
+    "sub": "Trazabilidad de Mercado Pago y SPEI",
+    "order": "occurred_at",
+    "cols": [
+      [
+        "occurred_at",
+        "Fecha"
+      ],
+      [
+        "entity_folio",
+        "Folio"
+      ],
+      [
+        "method",
+        "Método"
+      ],
+      [
+        "event_type",
+        "Evento"
+      ],
+      [
+        "status",
+        "Estado"
+      ],
+      [
+        "amount",
+        "Importe"
+      ],
+      [
+        "detail",
+        "Detalle"
+      ]
+    ],
+    "fields": []
+  },
+  "audit_log": {
+    "title": "Bitácora",
+    "sub": "Eventos internos y trazabilidad",
+    "order": "occurred_at",
+    "cols": [
+      [
+        "occurred_at",
+        "Fecha"
+      ],
+      [
+        "event_type",
+        "Evento"
+      ],
+      [
+        "detail",
+        "Detalle"
+      ],
+      [
+        "status",
+        "Estado"
+      ]
+    ],
+    "fields": []
+  },
+  "site_config": {
+    "title": "Configuración",
+    "sub": "Parámetros generales del proyecto",
+    "order": "key",
+    "cols": [
+      [
+        "key",
+        "Clave"
+      ],
+      [
+        "value",
+        "Valor"
+      ],
+      [
+        "description",
+        "Descripción"
+      ],
+      [
+        "is_public",
+        "Público"
+      ]
+    ],
+    "fields": [
+      [
+        "value",
+        "Valor",
+        "config"
+      ],
+      [
+        "description",
+        "Descripción",
+        "textarea"
+      ],
+      [
+        "is_public",
+        "Visible públicamente",
+        "bool"
+      ]
+    ]
+  }
+}

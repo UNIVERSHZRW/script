@@ -1,0 +1,11 @@
+import{readFile,writeFile,mkdir}from'node:fs/promises';import{createHash}from'node:crypto';import*as esbuild from'esbuild';import{aliases}from'./native/model.mjs';
+await mkdir('dist',{recursive:true});
+await writeFile('native/routing.mjs','export const aliases='+JSON.stringify(aliases)+';\n');
+await esbuild.build({entryPoints:['native/entry.jsx'],outfile:'dist/admin-app.js',bundle:true,minify:true,platform:'browser',format:'iife',target:['es2022'],define:{'process.env.NODE_ENV':'"production"'},legalComments:'eof'});
+await esbuild.build({entryPoints:['uploads-client.js'],outfile:'dist/admin-uploads.js',bundle:true,minify:true,platform:'browser',format:'iife',target:['es2022'],legalComments:'eof'});
+const app=await readFile('dist/admin-app.js','utf8'),uploads=await readFile('dist/admin-uploads.js','utf8'),css=await readFile('native/app.css','utf8'),html=await readFile('native/index.html','utf8');
+const version=createHash('sha256').update(app).update(uploads).update(css).update(html).update(await readFile('native/worker.mjs')).digest('hex').slice(0,12);
+const assets={version,html:html.replaceAll('__VERSION__',version),'/admin.js':{body:app,type:'application/javascript; charset=utf-8'},'/admin.css':{body:css,type:'text/css; charset=utf-8'},'/_uhz/admin-uploads.js':{body:uploads,type:'application/javascript; charset=utf-8'}};
+await esbuild.build({stdin:{contents:"import{createAppWorker}from'./native/worker.mjs';export default createAppWorker("+JSON.stringify(assets)+");",resolveDir:process.cwd(),sourcefile:'admin-app-worker.mjs'},outfile:'dist/univershzrw-admin.mjs',bundle:true,minify:true,format:'esm',platform:'neutral',target:['es2022'],legalComments:'eof'});
+await writeFile('dist/admin-app.css',css);await writeFile('dist/admin-index.html',assets.html);await writeFile('dist/version.json',JSON.stringify({version,architecture:'native-single-application',embeddedDocuments:0})+'\n');
+console.log(JSON.stringify({version,bundleBytes:app.length,workerBytes:(await readFile('dist/univershzrw-admin.mjs')).length,embeddedDocuments:0}));

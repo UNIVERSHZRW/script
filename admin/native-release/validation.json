@@ -1,0 +1,23 @@
+{
+  "automated_tests": {
+    "total": 23,
+    "passed": 23,
+    "failed": 0,
+    "environment": "isolated Postgres/PGlite, Worker handler tests, React in isolated DOM with controlled API responses"
+  },
+  "published_browser_check": "Owner login rendered on the native application at https://admin.univershzrw.com/",
+  "authenticated_production_browser_check": "not performed; local owner browser session was unavailable",
+  "deployment_checks": {
+    "legacy_routes_removed": true,
+    "community_service_binding_preserved": true,
+    "logs_enabled": true,
+    "traces_enabled": true,
+    "query_parameters_redacted": true
+  },
+  "source_recovery": {
+    "deployed_worker": true,
+    "browser_assets": true,
+    "original_jsx": false,
+    "reason": "execution environment failed to start after publication"
+  }
+}

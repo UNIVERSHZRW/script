@@ -1,0 +1,31 @@
+{
+  "version": "8c5873a2ec75",
+  "published_utc": "2026-11-08T00:13:00.168948Z",
+  "origin": "https://admin.univershzrw.com/",
+  "worker": "univershzrw-admin",
+  "architecture": "single-native-application",
+  "embedded_documents": 0,
+  "bindings": [
+    {
+      "name": "COMMUNITY_APP",
+      "type": "service",
+      "service": "univershzrw-comunidad"
+    }
+  ],
+  "compatibility_date": "2026-10-23",
+  "owner_email": "univershzrw@gmail.com",
+  "contact_phone": "+524931431385",
+  "removed_routes": [
+    {
+      "id": "3702f1a7babd4ac2a6aaa60527f671a2",
+      "pattern": "admin.univershzrw.com/*",
+      "script": "univershzrw-admin-guardian-ui"
+    },
+    {
+      "id": "98c8267193e347c58ddc84bae4f76711",
+      "pattern": "admin.univershzrw.com/inft*",
+      "script": "univershzrw-inft-panel"
+    }
+  ],
+  "recovery": "exact deployed Worker and extracted browser assets; JSX workspace unavailable"
+}

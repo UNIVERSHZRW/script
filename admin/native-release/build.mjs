@@ -1,0 +1,10 @@
+import {readFile,writeFile,mkdir} from 'node:fs/promises';
+import {createHash} from 'node:crypto';
+const root=new URL('./',import.meta.url);
+const read=name=>readFile(new URL(name,root),'utf8');
+const app=await read('app.js'),css=await read('app.css'),uploads=await read('admin-uploads.js'),template=await read('index.html'),runtime=await read('runtime-prefix.mjs');
+const version=createHash('sha256').update(app).update(css).update(uploads).update(template).update(runtime).digest('hex').slice(0,12);
+const assets={version,html:template.replace(/\?v=[a-f0-9]{12}/g,'?v='+version),'/admin.js':{body:app,type:'application/javascript; charset=utf-8'},'/admin.css':{body:css,type:'text/css; charset=utf-8'},'/_uhz/admin-uploads.js':{body:uploads,type:'application/javascript; charset=utf-8'}};
+await mkdir(new URL('dist/',root),{recursive:true});
+await writeFile(new URL('dist/worker.mjs',root),runtime+'\nexport default f('+JSON.stringify(assets)+');\n');
+console.log(JSON.stringify({version,output:new URL('dist/worker.mjs',root).pathname}));

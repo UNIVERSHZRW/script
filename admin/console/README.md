@@ -1,3 +1,5 @@
+> Versión archivada (v2). La interfaz principal actual es la [administración nativa v3](../native-release/README.md). Este administrador con páginas incrustadas ya no se sirve en el dominio; no volver a desplegarlo como interfaz principal.
+
 # Administración unificada de UNIVERSHZRW
 
 Publicada en https://admin.univershzrw.com/ el 7 de noviembre de 2026.

@@ -1,0 +1,39 @@
+import test from 'node:test';
+import assert from 'node:assert/strict';
+import worker from './browser-tools-worker.mjs';
+const url=path=>'https://univershzrw.com'+path;
+
+test('serves tools page with five functional sections',async()=>{
+ const r=await worker.fetch(new Request(url('/herramientas')));
+ assert.equal(r.status,200);
+ assert.match(r.headers.get('content-type'),/text\/html/);
+ const html=await r.text();
+ for(const section of ['panel-enlaces','panel-qr','panel-imagenes','panel-seo','panel-meta'])assert.ok(html.includes(section),section);
+ assert.match(html,/Herramientas gratuitas/);
+});
+test('only same-origin scripts and no outbound browser connections',async()=>{
+ const r=await worker.fetch(new Request(url('/herramientas')));
+ const csp=r.headers.get('content-security-policy');
+ assert.match(csp,/script-src 'self'/);
+ assert.match(csp,/connect-src 'none'/);
+ assert.match(csp,/form-action 'none'/);
+});
+test('browser processing code has no upload endpoint',async()=>{
+ const r=await worker.fetch(new Request(url('/herramientas/app.js')));
+ const js=await r.text();
+ assert.match(js,/canvas\.toBlob/);
+ assert.match(js,/new QRCode/);
+ assert.match(js,/DOMParser/);
+ assert.doesNotMatch(js,/fetch\(|XMLHttpRequest|sendBeacon|FormData/);
+});
+test('QRCode library has full MIT attribution',async()=>{
+ const r=await worker.fetch(new Request(url('/herramientas/qrcode.min.js')));
+ assert.equal(r.status,200);
+ assert.match(await r.text(),/Permission is hereby granted/);
+});
+test('rejects state-changing HTTP methods and unknown routes',async()=>{
+ const write=await worker.fetch(new Request(url('/herramientas'),{method:'POST'}));
+ const missing=await worker.fetch(new Request(url('/herramientas/no-such-path')));
+ assert.equal(write.status,405);
+ assert.equal(missing.status,404);
+});

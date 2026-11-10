@@ -37,3 +37,6 @@ test('rejects state-changing HTTP methods and unknown routes',async()=>{
  assert.equal(write.status,405);
  assert.equal(missing.status,404);
 });
+
+test('directory exposes five free tools and hash anchors',async()=>{const r=await worker.fetch(new Request(url('/herramientas')));const html=await r.text();for(const slug of ['enlaces','qr','imagenes','seo','meta'])assert.match(html,new RegExp('href="#'+slug+'"'));assert.match(html,/100% gratuitas/);});
+test('hash based tool selection and QR public page input are supported',async()=>{const r=await worker.fetch(new Request(url('/herramientas/app.js')));const js=await r.text();assert.match(js,/hashchange/);assert.match(js,/function openTool/);assert.match(js,/URLSearchParams/);});

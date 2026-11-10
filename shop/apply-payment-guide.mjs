@@ -23,7 +23,7 @@ export function applyPaymentGuide(current,guideJS,guideCSS){
  if(worker.includes('const PAY_GUIDE_JS='))return worker;
  const previousHTML=getVar('HTML'),previousAPP=getVar('APP');
  if(!previousHTML.includes('</head>'))throw Error('Missing store head.');
- const html=previousHTML.replace('</head>','<link rel="stylesheet" href="/tienda_online/payment-guide.css?v=20261109-paysafe"><script defer src="/tienda_online/payment-guide.js?v=20261109-paysafe"></script></head>');
+ const html=previousHTML.replace('</head>','<link rel="stylesheet" href="/tienda_online/payment-guide.css?v=20261109-paysafe2"><script defer src="/tienda_online/payment-guide.js?v=20261109-paysafe2"></script></head>');
  let app=previousAPP;
  const at=app.indexOf('if(res.initPoint&&');
  const until=app.indexOf("throw new Error('No se obtuvo el enlace",at);

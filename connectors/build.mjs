@@ -11,6 +11,7 @@ await esbuild.build({entryPoints:['connectors/generated/community-entry.mjs'],bu
 // Active contribution Worker and the older creator/collaboration screens receive the same client.
 let aportes=await readFile('connectors/original/univershzrw-aportes.mjs','utf8');
 aportes=replaceOnce(aportes,'<script src=\\"/Aportar_contenido/app.js\\" defer></script>','<script src=\\"/_uhz/portal/backend/media/contribution.js?v=1\\" defer></script><script src=\\"/Aportar_contenido/app.js\\" defer></script>');
+aportes=replaceOnce(aportes,'</head>',"<link rel=\\\"stylesheet\\\" href=\\\"/herramientas/inline.css?v=20261109-inplace\\\"><script defer src=\\\"/herramientas/inline.js?v=20261109-inplace\\\"></script>"+'</head>');
 await writeFile('connectors/dist/univershzrw-aportes.mjs',aportes);
 const main=await readFile('connectors/original/univershzrw.mjs','utf8');
 const extra="<script src=\"/_uhz/portal/backend/media/contribution.js?v=1\" defer></script>";

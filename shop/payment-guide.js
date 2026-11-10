@@ -41,8 +41,21 @@ function overview(){
  section.append(create('p','uhz-payment-caution','No compartas el CVV, NIP, contraseñas o códigos de seguridad con ninguna persona. El estado real de pago se confirma únicamente desde el proveedor.'));
  top.after(section);
 }
+function enhanceSPEI(){
+ const root=document.getElementById('shop-view');
+ if(!root||!root.querySelector('#spei-form'))return;
+ for(const field of root.querySelectorAll('.detail-facts>div')){
+  const key=field.querySelector('b'),label=String(key?.textContent||'').toLowerCase();
+  if(!/clabe|referenc|beneficiary|beneficiari|bank|banco|amount|importe/.test(label)||field.querySelector('.uhz-copy-payment'))continue;
+  const value=String(field.textContent||'').replace(String(key?.textContent||''),'').trim();
+  if(!value)continue;
+  const copy=create('button','uhz-copy-payment','Copiar');copy.type='button';copy.setAttribute('aria-label','Copiar '+label);
+  copy.addEventListener('click',async()=>{try{await navigator.clipboard.writeText(value);copy.textContent='Copiado';}catch{copy.textContent='Selecciona el dato para copiarlo';}});
+  field.append(copy);
+ }
+}
 function attach(){
- try{enhanceCheckout();overview()}catch(e){console.warn('Payment method guide',e)}
+ try{enhanceCheckout();overview();enhanceSPEI()}catch(e){console.warn('Payment method guide',e)}
 }
 if(document.readyState==='loading')document.addEventListener('DOMContentLoaded',attach,{once:true});else attach();
 let queued=false;new MutationObserver(()=>{if(queued)return;queued=true;queueMicrotask(()=>{queued=false;attach()})}).observe(document.documentElement,{childList:true,subtree:true});

@@ -1,0 +1,15 @@
+(()=>{'use strict';
+const $=id=>document.getElementById(id);
+const api='/_uhz/portal/backend/rest/v1/rpc/';
+async function rpc(name){const r=await fetch(api+name,{method:'POST',credentials:'include',cache:'no-store',headers:{'content-type':'application/json'},body:'{}'});if(!r.ok)throw Error('Sesión no verificada');return r.json();}
+async function refresh(){try{const [coins,member]=await Promise.all([rpc('community_my_coins'),rpc('uhz_economy_my_dashboard')]);$('tier').textContent=member.plan==='premium'?'Premium':'Gratis';$('balance').textContent='₡'+new Intl.NumberFormat('es-MX').format(Number(coins.balance)||0);$('accountLink').href='/mi-cuenta';}catch{$('tier').textContent='Inicia sesión para consultar';$('balance').textContent='—';}}
+const input=$('coinAmount'),price=$('coinPrice'),submit=$('coinSubmit');
+const packBonus=Object.freeze({50:5,150:23,500:100});
+function update(){const n=Number(input.value);if(!Number.isInteger(n)||n<1||n>5000){price.textContent='Elige entre 1 y 5,000 Coins.';return null;}const extra=packBonus[n]||0;price.textContent='Precio: $'+n.toLocaleString('es-MX')+' MXN · Recibes '+(n+extra).toLocaleString('es-MX')+' Coins'+(extra?' ('+extra+' de regalo)':'');document.querySelectorAll('[data-coin-package]').forEach(b=>{const selected=Number(b.dataset.coinPackage)===n;b.classList.toggle('selected',selected);b.setAttribute('aria-pressed',String(selected));});return n;}
+input.addEventListener('input',update);
+document.querySelectorAll('[data-coin-package]').forEach(b=>b.addEventListener('click',()=>{input.value=b.dataset.coinPackage;update();}));
+let ready=false;
+async function checkGateway(){submit.disabled=true;const note=document.querySelector('.crypto-disclosure');try{const r=await fetch('/planes/crypto/status',{cache:'no-store',headers:{accept:'application/json'}});const data=await r.json();ready=r.ok&&data.ready===true;submit.disabled=!ready;if(note)note.textContent=ready?'Pasarela de pago conectada. La transacción requerirá confirmación del procesador.':'Pago cripto no habilitado: falta conectar un procesador comercial y confirmar la acreditación de Coins.';}catch{if(note)note.textContent='No se pudo verificar la pasarela. Por seguridad no se aceptan pagos.';}}
+submit.addEventListener('click',async()=>{const n=update();if(!ready||!n)return;submit.disabled=true;const out=$('coinStatus');out.textContent='Iniciando pago seguro…';try{const r=await fetch('/planes/crypto/checkout',{method:'POST',credentials:'same-origin',headers:{'content-type':'application/json'},body:JSON.stringify({base_coins:n,request_id:crypto.randomUUID()})});const data=await r.json();if(!r.ok)throw Error(data.error||'No se pudo iniciar el pago.');const to=new URL(String(data.checkout_url||''));if(to.protocol!=='https:'||to.username||to.password||!['nowpayments.io','coinbase.com'].some(d=>to.hostname===d||to.hostname.endsWith('.'+d)))throw Error('Destino de pago no verificado');location.assign(to.href);}catch(e){out.textContent=e.message;submit.disabled=!ready;}});
+update();refresh();checkGateway();
+})();

@@ -1,0 +1,8 @@
+{
+  "name": "univershzrw-economy-center",
+  "private": true,
+  "type": "module",
+  "scripts": {
+    "test": "node --test center.test.mjs"
+  }
+}

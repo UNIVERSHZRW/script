@@ -16,5 +16,10 @@ document.querySelectorAll('[data-panel]').forEach(b=>b.addEventListener('click',
 $('img-quality').addEventListener('input',e=>set('img-quality-value',e.target.value+'%'));
 $('image-run').addEventListener('click',images);$('qr-run').addEventListener('click',qrs);$('seo-run').addEventListener('click',audit);
 $('seo-csv').addEventListener('click',()=>{if(lastReport)download(new Blob(['\ufeff',lastReport],{type:'text/csv;charset=utf-8'}),'univershzrw-auditoria-seo.csv')});
+/* Keep only benign editor preferences, never photos, URLs or document contents. */
+const preferences=['img-format','img-size','img-fit','img-quality','img-watermark','qr-size'];
+try{const stored=JSON.parse(localStorage.getItem('uhz_studio_prefs_v1')||'{}');for(const id of preferences){if(typeof stored[id]==='string'){const field=$(id);if(field&&[...field.options||[]].length){if([...field.options].some(x=>x.value===stored[id]))field.value=stored[id]}else if(field&&id==='img-watermark')field.value=stored[id].slice(0,90);else if(field&&id==='img-quality'&&/^\d{2,3}$/.test(stored[id]))field.value=stored[id]}}set('img-quality-value',$('img-quality').value+'%');}catch{}
+function persistSettings(){try{const x={};for(const id of preferences)x[id]=$(id).value;localStorage.setItem('uhz_studio_prefs_v1',JSON.stringify(x));}catch{}}
+for(const id of preferences)$(id).addEventListener('change',persistSettings);
 $('workspace').hidden=false;
 })();

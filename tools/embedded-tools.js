@@ -97,9 +97,27 @@ function mountArticle(){
 }
 function mountAdmin(){
  if(location.hostname!=='admin.univershzrw.com')return;
- document.querySelectorAll('.source-field').forEach(field=>{if(field.querySelector('.uht-source-embedded'))return;const wrap=make('div','uht-source-embedded');field.append(wrap);toolbox({id:'uht-source-'+Math.random().toString(36).slice(2),title:'Comprobar estructura del enlace',tools:['enlaces'],context:field,container:wrap});});
- document.querySelectorAll('.editor-tabs').forEach(tabs=>{const parent=tabs.parentElement;if(!parent||parent.querySelector('#uht-admin-editor'))return;toolbox({id:'uht-admin-editor',title:'Asistente editorial integrado',tools:['seo','imagenes','meta'],context:parent,container:parent,insertBefore:tabs.nextSibling});});
- document.querySelectorAll('.connector-check').forEach(form=>{const parent=form.parentElement;if(!parent||parent.querySelector('#uht-admin-connectors'))return;toolbox({id:'uht-admin-connectors',title:'Inspección local del enlace',tools:['enlaces'],context:form,container:parent,insertBefore:form.nextSibling});});
+ document.querySelectorAll('.source-field').forEach(field=>{
+  const existing=field.querySelector('.uht-source-embedded');if(existing)return;
+  const holder=field.querySelector('[data-uhz-admin-tools="source"]')||make('div','uht-source-embedded');
+  if(!holder.isConnected)field.append(holder);
+  holder.classList.add('uht-source-embedded');
+  toolbox({id:'uht-source-'+Math.random().toString(36).slice(2),title:'Comprobar estructura del enlace',tools:['enlaces'],context:field,container:holder});
+ });
+ document.querySelectorAll('.editor-tabs').forEach(tabs=>{
+  const parent=tabs.parentElement;if(!parent||parent.querySelector('#uht-admin-editor'))return;
+  const holder=parent.querySelector('[data-uhz-admin-tools="editor"]')||parent;
+  toolbox({id:'uht-admin-editor',title:'Asistente editorial integrado',tools:['seo','imagenes','meta'],context:parent,container:holder,insertBefore:holder===parent?tabs.nextSibling:null});
+ });
+ document.querySelectorAll('.connector-check').forEach(form=>{
+  const parent=form.parentElement;if(!parent||parent.querySelector('#uht-admin-connectors'))return;
+  const holder=parent.querySelector('[data-uhz-admin-tools="connectors"]')||parent;
+  toolbox({id:'uht-admin-connectors',title:'Inspección local del enlace',tools:['enlaces'],context:form,container:holder,insertBefore:holder===parent?form.nextSibling:null});
+ });
+ document.querySelectorAll('[data-uhz-admin-tools="catalog"]').forEach(holder=>{
+  if(holder.querySelector('#uht-admin-catalog'))return;
+  toolbox({id:'uht-admin-catalog',title:'Utilidades de publicaciones',tools:['seo','imagenes','meta'],context:holder.parentElement||holder,container:holder});
+ });
 }
 const run=()=>{try{mountContribution();mountArticle();mountAdmin()}catch(e){console.warn('UNIVERSHZRW tools',e)}};
 if(document.readyState==='loading')document.addEventListener('DOMContentLoaded',run,{once:true});else run();

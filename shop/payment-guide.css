@@ -18,3 +18,6 @@ html[data-uhz-theme="dark"] .uhz-payment-overview{background:#142b40;border-colo
 html[data-uhz-theme="dark"] .uhz-payment-option{background:#20364b;border-color:#41617c;color:#e6f3ff}
 html[data-uhz-theme="dark"] :is(.uhz-payment-intro,.uhz-payment-option p,.uhz-payment-method-copy small,.uhz-payment-caution){color:#c0d6e5}
 html[data-uhz-theme="dark"] .uhz-payment-method-copy strong{color:#e6f3ff}
+
+.uhz-copy-payment{margin-left:10px;padding:5px 9px;border-radius:7px;border:1px solid #7ba7bd;background:#f4fafe;color:#1c5871;font-size:12px;font-weight:700;cursor:pointer}
+html[data-uhz-theme="dark"] .uhz-copy-payment{background:#17384b;color:#bfe7fa;border-color:#4b738b}

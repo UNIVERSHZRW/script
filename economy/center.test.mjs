@@ -45,3 +45,20 @@ test('Only authenticated legacy RPCs may create requests, never capture payments
  assert.match(source,/result\.paid!==false/);
  assert.match(html,/Las solicitudes de Coins no generan cargos/);
 });
+
+test('Authenticated Coin activity is rendered using live RPCs, without exposing other users',async()=>{
+ const response=await worker.fetch(new Request(URL_BASE));
+ const body=await response.text();
+ assert.match(body,/id="coin-history"/);
+ assert.match(body,/id="coin-requests"/);
+ assert.match(body,/id="refresh-activity"/);
+ assert.match(source,/community_coin_history/);
+ assert.match(source,/uhz_economy_my_requests_v1/);
+ assert.match(source,/safeStatus/);
+ assert.doesNotMatch(source,/service_role|SUPABASE_SECRET|raw_user_meta_data/);
+});
+test('Live INFT status is not misrepresented as a verified market',async()=>{
+ assert.match(source,/displayINFT/);
+ assert.match(source,/Sin auditoría independiente de reservas/);
+ assert.match(source,/Sin precio de mercado verificado/);
+});

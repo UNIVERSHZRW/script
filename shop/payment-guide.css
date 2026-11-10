@@ -1,0 +1,20 @@
+/* UNIVERSHZRW — visualización de métodos de pago hospedados */
+.uhz-payment-method{display:flex!important;align-items:flex-start!important;gap:12px!important;padding:14px!important;min-height:75px!important}
+.uhz-payment-method input[type=radio]{flex:none;margin-top:5px}
+.uhz-payment-method-copy{display:flex;flex-direction:column;gap:3px;min-width:0}
+.uhz-payment-method-copy strong{font-size:14px;font-weight:800;line-height:1.4;color:var(--ink,#204154)}
+.uhz-payment-method-copy small{font-size:12px;color:var(--body,#607787);line-height:1.5}
+.uhz-payment-caution{font-size:12px;line-height:1.6;padding:11px 13px;background:rgba(21,108,151,.07);border-left:3px solid #2880a8;color:var(--body,#50697d);margin:15px 0}
+.uhz-payment-overview{margin:24px 0;padding:22px;border:1px solid #d3e3eb;border-radius:16px;background:#f6fafd}
+.uhz-payment-overview h2{font-size:23px;margin:0 0 6px;letter-spacing:-.025em}
+.uhz-payment-intro{font-size:13px;color:#586f83;max-width:920px}
+.uhz-payment-grid{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:12px;margin-top:15px}
+.uhz-payment-option{padding:15px;border:1px solid #d5e5ee;border-radius:12px;background:#fff}
+.uhz-payment-option strong{font-weight:800;font-size:13px}
+.uhz-payment-option p{font-size:12px;line-height:1.5;color:#597284;margin:5px 0 0}
+@media(max-width:860px){.uhz-payment-grid{grid-template-columns:repeat(2,minmax(0,1fr))}}
+@media(max-width:530px){.uhz-payment-overview{padding:14px}.uhz-payment-grid{grid-template-columns:1fr}.uhz-payment-method{padding:10px!important}}
+html[data-uhz-theme="dark"] .uhz-payment-overview{background:#142b40;border-color:#41617c;color:#e6f3ff}
+html[data-uhz-theme="dark"] .uhz-payment-option{background:#20364b;border-color:#41617c;color:#e6f3ff}
+html[data-uhz-theme="dark"] :is(.uhz-payment-intro,.uhz-payment-option p,.uhz-payment-method-copy small,.uhz-payment-caution){color:#c0d6e5}
+html[data-uhz-theme="dark"] .uhz-payment-method-copy strong{color:#e6f3ff}

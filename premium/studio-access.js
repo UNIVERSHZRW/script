@@ -6,7 +6,7 @@ async function check(){
  try{
   const r=await fetch('/estudio/api/entitlement',{credentials:'same-origin',cache:'no-store',headers:{accept:'application/json'}});
   const j=await r.json();
-  if(j.access===true){status.classList.add('good');status.querySelector('strong').textContent='Acceso autorizado al Estudio Premium';status.querySelector('small').textContent='Tus herramientas procesan archivos en el dispositivo.';const s=document.createElement('script');s.src='/estudio/app.js?v=20261109-1';s.onerror=()=>{status.querySelector('small').textContent='No se pudo cargar el editor. Actualiza la página.';};document.body.append(s);return;}
+  if(j.access===true){status.classList.add('good');status.querySelector('strong').textContent='Acceso autorizado al Estudio Premium';status.querySelector('small').textContent='Tus herramientas procesan archivos en el dispositivo.';const s=document.createElement('script');s.src='/estudio/app.js?v=20261109-2';s.onerror=()=>{status.querySelector('small').textContent='No se pudo cargar el editor. Actualiza la página.';};document.body.append(s);return;}
   if(j.reason==='login'){status.querySelector('strong').textContent='Inicia sesión para activar las herramientas';}
   else if(j.reason==='unavailable'){status.querySelector('strong').textContent='No pudimos verificar tu membresía';}
   else{status.querySelector('strong').textContent='Acceso con Premium activo';}

@@ -92,8 +92,18 @@ function mountContribution(){
  const h=main.querySelector('h1');const host=h?.parentElement===main?main:main;toolbox({id:'uhz-contribution-inline',title:'Herramientas para preparar tu aportación',tools:['enlaces','imagenes','seo'],context:main,container:host,insertBefore:h?h.nextSibling:null});
 }
 function mountArticle(){
- if(!location.pathname.toLowerCase().startsWith('/recurso/'))return;document.getElementById('uhz-tools-share')?.remove();const main=document.querySelector('main');if(!main||document.getElementById('uhz-article-inline'))return;const articleURL=location.origin+location.pathname;const panel=make('section','uht-shell uht-article');panel.id='uhz-article-inline';panel.append(make('strong',null,'Compartir artículo mediante QR'),make('small','uht-muted','Gratis · Generado en tu navegador'));const body=make('div','uht-pane');panel.append(body);qrWidget(body,articleURL);
- const h=main.querySelector('h1');if(h)h.insertAdjacentElement('afterend',panel);else main.prepend(panel);
+ const resourcePath=location.pathname.toLowerCase().startsWith('/recurso/');
+ const query=new URLSearchParams(location.search),recordId=query.get('_uhz_ficha');
+ const resourceQuery=location.pathname==='/'&&/^[a-f0-9-]{36}$/i.test(recordId||'');
+ if(!resourcePath&&!resourceQuery)return;
+ document.getElementById('uhz-tools-share')?.remove();
+ const main=resourcePath?document.querySelector('main'):document.querySelector('.uhzf-dialog[open],.uhzf-dialog[aria-modal="true"],.uhzf-dialog');
+ if(!main||main.querySelector('#uhz-article-inline'))return;
+ const articleURL=resourcePath?location.origin+location.pathname:location.origin+'/?_uhz_ficha='+encodeURIComponent(recordId);
+ const panel=make('section','uht-shell uht-article');panel.id='uhz-article-inline';
+ panel.append(make('strong',null,'Compartir artículo mediante QR'),make('small','uht-muted','Gratis · Generado en tu navegador'));
+ const body=make('div','uht-pane');panel.append(body);qrWidget(body,articleURL);
+ const heading=main.querySelector('h1,h2');if(heading)heading.insertAdjacentElement('afterend',panel);else main.prepend(panel);
 }
 function mountAdmin(){
  if(location.hostname!=='admin.univershzrw.com')return;

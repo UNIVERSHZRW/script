@@ -88,13 +88,11 @@ function toolbox({id,title,tools,context,insertBefore=null,container}){
  if(insertBefore)container.insertBefore(outer,insertBefore);else container.append(outer);
 }
 function mountContribution(){
- if(!location.pathname.toLowerCase().startsWith('/aportar_contenido'))return;const main=document.querySelector('main#contenido');if(!main||document.getElementById('uhz-contribution-inline'))return;
- const old=document.getElementById('uhz-tools-contribute');if(old)old.remove();
+ if(!location.pathname.toLowerCase().startsWith('/aportar_contenido'))return;const old=document.getElementById('uhz-tools-contribute');if(old)old.remove();const main=document.querySelector('main#contenido');if(!main||document.getElementById('uhz-contribution-inline'))return;
  const h=main.querySelector('h1');const host=h?.parentElement===main?main:main;toolbox({id:'uhz-contribution-inline',title:'Herramientas para preparar tu aportación',tools:['enlaces','imagenes','seo'],context:main,container:host,insertBefore:h?h.nextSibling:null});
 }
 function mountArticle(){
- if(!location.pathname.toLowerCase().startsWith('/recurso/'))return;const main=document.querySelector('main');if(!main||document.getElementById('uhz-article-inline'))return;
- document.getElementById('uhz-tools-share')?.remove();const articleURL=location.origin+location.pathname;const panel=make('section','uht-shell uht-article');panel.id='uhz-article-inline';panel.append(make('strong',null,'Compartir artículo mediante QR'),make('small','uht-muted','Gratis · Generado en tu navegador'));const body=make('div','uht-pane');panel.append(body);qrWidget(body,articleURL);
+ if(!location.pathname.toLowerCase().startsWith('/recurso/'))return;document.getElementById('uhz-tools-share')?.remove();const main=document.querySelector('main');if(!main||document.getElementById('uhz-article-inline'))return;const articleURL=location.origin+location.pathname;const panel=make('section','uht-shell uht-article');panel.id='uhz-article-inline';panel.append(make('strong',null,'Compartir artículo mediante QR'),make('small','uht-muted','Gratis · Generado en tu navegador'));const body=make('div','uht-pane');panel.append(body);qrWidget(body,articleURL);
  const h=main.querySelector('h1');if(h)h.insertAdjacentElement('afterend',panel);else main.prepend(panel);
 }
 function mountAdmin(){

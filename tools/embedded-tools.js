@@ -22,7 +22,7 @@ function providerInfo(text,kind='auto'){
  return {name,original:u.href,preview,download,note};
 }
 async function copyText(s){try{await navigator.clipboard.writeText(s);return true;}catch{return false;}}
-function controlRow(label,buttons){const r=make('div','uht-actions');const cap=make('span','uht-muted',label);r.append(cap);for(const [name,value] of buttons){const b=make('button','uht-action',name);b.type='button';b.addEventListener('click',async()=>{if(await copyText(value))cap.textContent='Copiado: '+name;else cap.textContent='No se pudo copiar automáticamente.';});r.append(b);}return r;}
+function controlRow(label,buttons){const r=make('div','uht-actions');const cap=make('span','uht-muted',label);r.append(cap);for(const [name,value] of buttons){const b=make('button','uht-action',name);b.type='button';b.addEventListener('click',async()=>{if(await copyText(value))cap.textContent='Copiado: '+name;else cap.textContent='No se pudo copiar automáticamente.';});r.append(b);const shown=make('code','uht-result-url',value);shown.title='Dirección resultante';r.append(shown);}return r;}
 function linkWidget(root,context){root.innerHTML='<div class="uht-fields"><label>URL externa <input class="uht-link-url" type="url" placeholder="https://drive.google.com/file/d/..." maxlength="2048"></label><label>Tipo <select class="uht-link-type"><option value="auto">Automático</option><option value="video">Video</option><option value="other">Otro</option></select></label></div><button type="button" class="uht-primary uht-run">Inspeccionar enlace</button><div class="uht-output" role="status" aria-live="polite"></div>';
  const url=$(root,'.uht-link-url');
  const seed=()=>{if(url.value)return;const inputs=[...context.querySelectorAll('input[type="url"],input[name*="url"],input[id*="url"]')].filter(e=>e!==url);const found=inputs.find(x=>/^https:\/\//.test(x.value));if(found)url.value=found.value;};
@@ -85,6 +85,7 @@ function toolbox({id,title,tools,context,insertBefore=null,container}){
  const nav=make('div','uht-switch');nav.setAttribute('role','group');nav.setAttribute('aria-label','Seleccionar herramienta');outer.append(nav);
  const body=make('div','uht-body');outer.append(body);
  for(const type of tools){const [label,render]=OPTIONS[type];if(!render)continue;const button=make('button','uht-chip',label);button.type='button';button.dataset.tool=type;const panel=make('div','uht-pane');panel.hidden=true;panel.dataset.tool=type;body.append(panel);nav.append(button);button.addEventListener('click',()=>{const showing=!panel.hidden;for(const e of body.children)e.hidden=true;for(const b of nav.children)b.setAttribute('aria-pressed','false');if(!showing){panel.hidden=false;button.setAttribute('aria-pressed','true');if(!panel.dataset.ready){render(panel,context);panel.dataset.ready='1'}}});}
+ outer.addEventListener('keydown',e=>{if(e.key==='Enter'&&e.target.matches('input,select'))e.preventDefault()});
  if(insertBefore)container.insertBefore(outer,insertBefore);else container.append(outer);
 }
 function mountContribution(){

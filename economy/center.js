@@ -72,7 +72,9 @@ try{
   article.append(make('p','muted',plan.period_days>0?'Por '+plan.period_days+' días. Sin renovación automática.':'Sin cuota de membresía.'));
   const features=make('ul','features');
   for(const item of ['Hasta '+plan.folder_limit+' carpetas personales','Hasta '+plan.contribution_limit+' aportaciones por periodo',plan.coins>0?plan.coins+' Coins incluidos':'Coins disponibles por separado',plan.creator_rewards?'Elegible para recompensas verificadas':'Actividades gratuitas según disponibilidad'])features.append(make('li',null,item));
+  if(plan.code==='premium')for(const feature of ['Procesar 20 imágenes en un ZIP con marca de agua','Crear 50 QR en una campaña y descargar ZIP','Auditar hasta 200 fichas SEO con reporte CSV'])features.append(make('li',null,feature));
   article.append(features);
+  if(plan.code==='premium'){const studio=make('a','action','Abrir Estudio de Creadores');studio.href='/estudio';article.append(studio);}
   if(plan.code==='premium'){const btn=make('button','action','Solicitar Premium sin pagar');btn.type='button';btn.addEventListener('click',()=>requestPremium(btn));article.append(btn);}else{const a=make('a','action','Continuar gratis');a.href='/mi-cuenta';article.append(a);}
   root.append(article);
  }

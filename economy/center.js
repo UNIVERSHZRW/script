@@ -4,6 +4,63 @@ const make=(tag,cls,value)=>{const el=document.createElement(tag);if(cls)el.clas
 const status=(id,value)=>{const el=$(id);if(el)el.textContent=String(value)};
 const api='/_uhz/portal/backend/rest/v1/rpc/';
 async function rpc(name,body){const r=await fetch(api+name,{method:'POST',credentials:'same-origin',headers:{'content-type':'application/json'},body:JSON.stringify(body),cache:'no-store'});const data=await r.json().catch(()=>({}));if(!r.ok)throw Object.assign(Error(data.message||data.error||'No se pudo procesar la solicitud.'),{status:r.status});return data;}
+
+function formatDate(value){try{const d=new Date(value);return Number.isNaN(d.getTime())?'Sin fecha':new Intl.DateTimeFormat('es-MX',{day:'2-digit',month:'short',year:'numeric',hour:'2-digit',minute:'2-digit'}).format(d);}catch{return 'Sin fecha';}}
+function empty(target,message){const node=$(target);node.replaceChildren(make('p','activity-empty',message));}
+function line(label,value,note,date,kind){
+ const wrap=make('article','activity-entry');
+ const head=make('div','entry-head'),title=make('strong',null,label),right=make('strong',kind||'',value);
+ head.append(title,right);wrap.append(head);
+ wrap.append(make('span','entry-subtitle',note));
+ const time=make('time',null,formatDate(date));
+ if(date)time.setAttribute('datetime',String(date));
+ wrap.append(time);return wrap;
+}
+function safeStatus(raw){
+ const status=String(raw||'').toLowerCase();
+ const labels={pending_checkout:'Pendiente, sin pago',pending:'Pendiente',requested:'Solicitado',awaiting_review:'En revisión',under_review:'En revisión',approved:'Aprobado',rejected:'Rechazado',cancelled:'Cancelado',expired:'Vencido',credited:'Acreditado'};
+ return labels[status]||'Estado: '+status.slice(0,45);
+}
+function isLoginError(e){return [401,403].includes(Number(e.status))||/sesión|inicia sesión|autentic|identifícate|credenciales/i.test(e.message||'');}
+async function loadActivity(){
+ const button=$('refresh-activity');button.disabled=true;
+ status('activity-status','Actualizando información de tu cuenta…');
+ try{
+  const result=await Promise.allSettled([rpc('community_coin_history',{}),rpc('uhz_economy_my_requests_v1',{})]);
+  const history=result[0],requests=result[1];let hadError=false;
+  if(history.status==='fulfilled'&&Array.isArray(history.value)){
+   const root=$('coin-history');root.replaceChildren();
+   for(const item of history.value.slice(0,20)){
+    const amount=Number(item.coins_delta);
+    if(!Number.isFinite(amount))continue;
+    root.append(line('Movimiento de Coins',(amount>0?'+':'')+amount+' Coins',String(item.note||'Movimiento de la cuenta').slice(0,140),item.created_at,amount>=0?'delta-positive':'delta-negative'));
+   }
+   if(!root.children.length)empty('coin-history','Todavía no existen movimientos de Coins en esta cuenta.');
+  }else{hadError=true;empty('coin-history',isLoginError(history.reason||{})?'Inicia sesión para ver los movimientos.':'No fue posible cargar los movimientos.');}
+  if(requests.status==='fulfilled'&&Array.isArray(requests.value)){
+   const root=$('coin-requests');root.replaceChildren();
+   for(const item of requests.value.slice(0,20)){
+    const total=Number(item.total_coins);
+    if(!Number.isInteger(total)||total<0)continue;
+    root.append(line('Solicitud de '+total+' Coins',safeStatus(item.status),'Folio: '+String(item.id||'sin folio').slice(0,40)+' · '+String(item.origin==='personalizado'?'Cantidad personalizada':'Paquete'),item.created_at,''));
+   }
+   if(!root.children.length)empty('coin-requests','No has registrado solicitudes de Coins.');
+  }else{hadError=true;empty('coin-requests',isLoginError(requests.reason||{})?'Inicia sesión para consultar solicitudes.':'No fue posible cargar las solicitudes.');}
+  status('activity-status',hadError?'No se pudo consultar todo el historial. Comprueba tu sesión e intenta actualizar.':'Movimientos y solicitudes consultados en Supabase. Las solicitudes pendientes no implican una compra realizada.');
+ }catch{status('activity-status','No fue posible actualizar. Intenta nuevamente.');}
+ finally{button.disabled=false;}
+}
+async function displayINFT(market){
+ const el=$('inft-live-status');if(!el)return;
+ if(!market||typeof market!=='object'){el.textContent='Estado de INFYNITY no disponible. No se mostrará ningún precio inventado.';return;}
+ const launched=market.onchain_issued===true;
+ const price=market.market_price_mxn;
+ const parts=['Estado público: '+(launched?'Emisión registrada':'Emisión no confirmada')];
+ if(Number.isFinite(Number(price))&&Number(price)>0)parts.push('Precio publicado: '+fmt(Number(price)));else parts.push('Sin precio de mercado verificado');
+ parts.push(market.reserves_independently_audited===true?'Reservas auditadas':'Sin auditoría independiente de reservas');
+ parts.push(market.payouts_enabled===true?'Retiros registrados como habilitados':'Retiros no habilitados');
+ el.textContent=parts.join(' · ')+'.';
+}
 async function renderPlans(){
 try{
  const response=await fetch('/economia/centro/api',{headers:{accept:'application/json'},cache:'no-store'}),data=await response.json();
@@ -19,6 +76,7 @@ try{
   if(plan.code==='premium'){const btn=make('button','action','Solicitar Premium sin pagar');btn.type='button';btn.addEventListener('click',()=>requestPremium(btn));article.append(btn);}else{const a=make('a','action','Continuar gratis');a.href='/mi-cuenta';article.append(a);}
   root.append(article);
  }
+ if(data.market)displayINFT(data.market);
  status('plan-notice','Catálogo consultado a Supabase. Solicitar Premium no realiza un cargo ni activa automáticamente la membresía.');
 }catch{const root=$('plan-grid');root.replaceChildren(make('article','card','No fue posible confirmar los precios. Intenta nuevamente más tarde.'));status('plan-notice','Los precios permanecen ocultos hasta poder verificarlos.');}
 }
@@ -30,6 +88,7 @@ async function personal(){
  catch(e){status('plan-state',e.status===401?'Sin sesión activa.':'No se pudo verificar tu plan.');}
  status('account-status',hasAccount?'Tu cuenta se consulta desde la sesión actual.':'Inicia sesión para consultar tu información personal.');
  $('request-coins').disabled=false;
+ await loadActivity();
 }
 async function requestPremium(btn){
  if(!confirm('Se registrará una solicitud de Premium. No habrá cobro ni activación automática. ¿Continuar?'))return;
@@ -45,9 +104,10 @@ document.querySelectorAll('[data-amount]').forEach(button=>button.addEventListen
 $('request-coins').addEventListener('click',async()=>{
  const count=calculate();if(!confirm('Registrar una solicitud de '+count+' Coins base sin pagar ni recibir Coins todavía. ¿Continuar?'))return;
  const button=$('request-coins');button.disabled=true;status('coin-order-status','Registrando solicitud…');
- try{const result=await rpc('uhz_eco_custom_pack_request',{p_base_coins:count,p_request_id:crypto.randomUUID()});if(result.paid!==false||Number(result.credited)!==0)throw Error('Respuesta inesperada: no se confirmó ningún pago.');status('coin-order-status','Solicitud registrada. Folio: '+String(result.folio||'no disponible')+'. Total propuesto: '+String(result.total_coins||count)+' Coins. Sin cargo ni acreditación.');}
+ try{const result=await rpc('uhz_eco_custom_pack_request',{p_base_coins:count,p_request_id:crypto.randomUUID()});if(result.paid!==false||Number(result.credited)!==0)throw Error('Respuesta inesperada: no se confirmó ningún pago.');status('coin-order-status','Solicitud registrada. Folio: '+String(result.folio||'no disponible')+'. Total propuesto: '+String(result.total_coins||count)+' Coins. Sin cargo ni acreditación.');void loadActivity();}
  catch(e){if(e.status===401){location.href='/iniciar-sesion?next=%2Feconomia%2Fcentro';return;}status('coin-order-status',e.message);}
  finally{button.disabled=false}
 });
+$('refresh-activity').addEventListener('click',loadActivity);
 calculate();renderPlans();personal();
 })();

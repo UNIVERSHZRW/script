@@ -49,3 +49,17 @@ El plan visible en `/planes` recibe un script de sincronización `plan-sync.js` 
 ## Próxima fase de desarrollo
 
 Prototipar el flujo compra -> pago verificado -> acreditación de Coins en un entorno de pruebas aislado, incorporando reembolsos y contracargos. Reutilizar el backend y la tabla de pedidos existentes, no montar Medusa/Lago completos. Para INFYNITY, proseguir únicamente con pruebas y revisión legal antes de cualquier intercambio público.
+
+## Actualización operativa de historial y estado (9 nov. 2026)
+
+- La página `/economia/centro` incorpora ahora **movimientos reales de Coins**, mediante el RPC de solo lectura `community_coin_history`, y **solicitudes personales** mediante el nuevo RPC `uhz_economy_my_requests_v1`.
+- Este RPC se limita a las 30 solicitudes más recientes de la sesión y combina los dos sistemas anteriores: paquetes y cantidades personalizadas. No permite cambios de estado ni acreditaciones. Solo `authenticated` y `service_role` disponen de `EXECUTE`; `anon` no.
+- Botón **Actualizar historial**, avisos claros de sesión y distinción entre solicitudes pendientes y saldo efectivamente acreditado.
+- Se muestra el estado público de INFYNITY (emisión, precio publicado si existe, auditoría de reservas y posibilidad de retiros) desde el mismo dashboard público que informa los planes. No existen precios inventados.
+- Accesos directos a los contenidos y al uso de Coins en el buscador.
+- Se sincronizaron HTML, CSS y JS embebidos en el Worker público, con actualización de versiones de assets para evitar caché de la versión anterior.
+- Cloudflare confirmó el despliegue del Worker; comprobación de sintaxis JavaScript positiva; RPC consultado y validado en permisos, `anon=false`, `authenticated=true`.
+
+### Alcance de este cambio
+
+No se habilitaron cobros con Mercado Pago, acreditaciones por pagos, reservas de tokens, compra/venta ni canje con valor real. El módulo financiero todavía no tiene contrato ni tesorería registrados. Ninguna solicitud pendiente debe representarse como una compra pagada.

@@ -21,6 +21,7 @@ Se preservan las **cinco herramientas gratuitas individuales**: inspector de enl
 - `/estudio/api/entitlement`: verifica `uhz_economy_my_dashboard` y, para cuenta superadministradora, `uhz_account_status`, mediante el proxy autenticado existente. Si falla la verificación, no concede acceso.
 - `/estudio/app.js`: devuelve el código funcional solo si la cuenta tiene Premium vigente o el rol de superadministración confirmado. Los ficheros nunca pasan por el backend.
 - `/herramientas`: acceso al Estudio sin restringir funciones gratuitas.
+- `/economia` y `/economia/` se redirigen a `/economia/centro` mediante un Worker de ruta exacta. Esto elimina la copia vieja de Planes sin tocar el Worker `univershzrw-economia` que conserva el secreto `GUEST_SIGNING_KEY`. Las rutas de `/comprar-coins`, `/economia/moneda` y `/economia/centro` mantienen sus Workers.
 - `/economia/centro`: tarjeta Premium ampliada con funciones concretas y acceso directo.
 - Menú de inicio y navegación compartida: nueva entrada «Estudio de Creadores Premium». Se mantuvo `ORIGINAL_SITE` en Workers que lo usan.
 

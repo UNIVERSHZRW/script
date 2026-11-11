@@ -1,0 +1,25 @@
+name: Economy safety checks
+on:
+  pull_request:
+    paths:
+      - 'economy/**'
+      - '.github/workflows/economy-tests.yml'
+  push:
+    branches: [main]
+    paths:
+      - 'economy/**'
+      - '.github/workflows/economy-tests.yml'
+permissions:
+  contents: read
+jobs:
+  tests:
+    runs-on: ubuntu-latest
+    timeout-minutes: 5
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+      - name: Test economy rules
+        run: npm test
+        working-directory: economy

@@ -9,7 +9,7 @@ function client(){const a=html.indexOf('<script>\n'),b=html.lastIndexOf('</scrip
 test('All three advertised offers match backend rounding rules',()=>{
  for(const [base,bonus,percent] of [[50,5,10],[150,23,15],[500,100,20]]){
   assert.match(html,new RegExp('>'+base+' Coins<'));
-  assert.match(html,new RegExp('Total '+(base+bonus)+' Coins'));
+  assert.match(html,new RegExp('Recibes '+(base+bonus)+' Coins'));
   assert.ok(html.includes('+'+percent+'% EXTRA'));
   assert.match(sql,new RegExp('WHEN '+base+' THEN '+bonus));
  }

@@ -55,7 +55,7 @@ contract INFYNITYTest {
         secondOwner.acceptAsPendingOwner(token);
         assert(token.owner() == address(secondOwner));
         assert(token.pendingOwner() == address(0));
-        assert(!secondOwner.pauseAsNonOwner(token) == false);
+        assert(secondOwner.pauseAsNonOwner(token));
     }
 
     function testCannotRenounceOwnership() public {

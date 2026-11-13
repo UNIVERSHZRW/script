@@ -1,0 +1,30 @@
+name: Shared site shell checks
+on:
+  push:
+    paths: ['shared-ui/shell-v2.js', 'shared-ui/shell-v2.css', '.github/workflows/shared-shell-v2.yml']
+  pull_request:
+    paths: ['shared-ui/shell-v2.js', 'shared-ui/shell-v2.css', '.github/workflows/shared-shell-v2.yml']
+permissions:
+  contents: read
+jobs:
+  check:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+      - name: JavaScript syntax
+        run: node --check shared-ui/shell-v2.js
+      - name: Verify essential features
+        run: |
+          node --input-type=module -e "
+          import fs from 'node:fs';
+          import assert from 'node:assert/strict';
+          const js=fs.readFileSync('shared-ui/shell-v2.js','utf8');
+          const css=fs.readFileSync('shared-ui/shell-v2.css','utf8');
+          for(const x of ['aria-expanded','Escape','uhz-pro-footer','uhz-native-head','DOMContentLoaded'])assert(js.includes(x),x);
+          for(const x of ['prefers-reduced-motion','data-uhz-theme=dark','max-width:800px'])assert(css.includes(x),x);
+          assert(!js.includes('innerHTML='));
+          console.log('Navigation and footer checks passed');
+          "

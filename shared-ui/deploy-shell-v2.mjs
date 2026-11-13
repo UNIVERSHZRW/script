@@ -38,7 +38,7 @@ if(start<5||end<start)throw Error('Unexpected Worker multipart wrapper.');
 let source=raw.slice(start,end);
 const jsKey='const UHZ_UNIFIED_SHELL_JS=', cssKey=';\nconst UHZ_UNIFIED_SHELL_CSS=';
 if(source.includes(jsKey)){
-  const at=source.indexOf(jsKey),mid=source.indexOf(cssKey,at),after=source.indexOf(';\nfunction asset(req,body,type){',mid);
+  const at=source.indexOf(jsKey),mid=source.indexOf(cssKey,at),after=source.indexOf(source.includes('const UHZ_GLOBAL_FOOTER_ONLY_JS=')?';\nconst UHZ_GLOBAL_FOOTER_ONLY_JS=':';\nfunction asset(req,body,type){',mid);
   if(mid<at||after<mid||source.indexOf(jsKey,at+1)>=0)throw Error('Unknown shell configuration.');
   source=source.slice(0,at)+jsKey+JSON.stringify(js)+cssKey+JSON.stringify(css)+source.slice(after);
 }else{
@@ -53,7 +53,7 @@ if(source.includes(jsKey)){
 const assetAnchor='function asset(req,body,type){';
 const footerKey='const UHZ_GLOBAL_FOOTER_ONLY_JS=';
 if(source.includes(footerKey)){
-  const begin=source.indexOf(footerKey),end=source.indexOf(';\n'+assetAnchor,begin);
+  const begin=source.indexOf(footerKey),end=source.indexOf(source.includes('const UHZ_BRAND_THEME_CSS=')?';\nconst UHZ_BRAND_THEME_CSS=':';\n'+assetAnchor,begin);
   if(begin<0||end<begin||source.indexOf(footerKey,begin+1)>=0)
     throw Error('Existing footer-only module changed unexpectedly.');
   source=source.slice(0,begin)+footerKey+JSON.stringify(footerOnly)+source.slice(end);

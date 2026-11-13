@@ -32,6 +32,7 @@ jobs:
           for(const x of ['uhz-global-site-footer','uhz-v4-col-toggle','uhz-pro-footer','uhz-footer-verification','uhz-v4-trust-note','preferencias-de-cookies'])assert(js.includes(x),x);
           for(const x of ['uhz-global-site-footer','site-foot','uhz-v4-col-toggle','uhz-unified-shell-v2-css'])assert(footer.includes(x),x);
           for(const x of ['uhz-v4-footer-active','uhz-v4-bottom','uhz-v4-col-toggle','@media(max-width:719px)'])assert(css.includes(x),x);
+          assert(css.includes('.uhz-v4-col-toggle:not([open]) > .uhz-v4-nav'), 'Closed accordion navigation must be hidden');
           assert(!js.includes('innerHTML='));
           assert(!footer.includes('innerHTML='));
           console.log('Navigation and footer checks passed');

@@ -232,6 +232,7 @@ html.uhz-v4-footer-active body footer.uhz-pro-footer,
 html.uhz-v4-footer-active body footer.uhz-tools-footer,
 html.uhz-v4-footer-active body footer.inft-footer,
 html.uhz-v4-footer-active body footer.uhz-global-footer,
+html.uhz-v4-footer-active body footer.site-foot,
 html.uhz-v4-footer-active body footer.footer[data-uhz-legacy-footer],
 html.uhz-v4-footer-active body footer[data-uhz-legacy-footer="1"]{
   display:none!important;visibility:hidden!important

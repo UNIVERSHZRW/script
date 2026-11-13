@@ -17,6 +17,12 @@ if(!document.getElementById('uhz-brand-theme-css')){
  style.href='/_uhz/shared-header.js?asset=brand-theme-v1&v=20261112-mint-charcoal';
  document.head.append(style);
 }
+if(!document.getElementById('uhz-brand-theme-runtime')){
+ const script=document.createElement('script');
+ script.id='uhz-brand-theme-runtime';
+ script.src='/_uhz/shared-header.js?asset=brand-theme-runtime-v1&v=20261112';
+ script.defer=true;document.head.append(script);
+}
 function syncIndependentTheme(){
  let selected='colorful';
  try{selected=localStorage.getItem('uhz_header_theme')==='dark'?'dark':'colorful'}catch{}

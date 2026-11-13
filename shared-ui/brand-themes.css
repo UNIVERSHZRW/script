@@ -96,8 +96,8 @@ html:is([data-uhz-theme="colorful"],[data-uhz-theme="light"],[data-uhz-theme="da
 html[data-uhz-theme="dark"] body,
 html[data-uhz-theme="colorful"] body,
 html[data-uhz-theme="light"] body {
-  background-color:var(--uhz-canvas)!important;
-  color:var(--uhz-ink);
+  background:var(--uhz-canvas)!important;
+  color:var(--uhz-ink)!important;
 }
 html[data-uhz-theme="dark"] body:not(.uhz-admin),
 html[data-uhz-theme="colorful"] body:not(.uhz-admin),
@@ -225,6 +225,31 @@ html[data-uhz-theme="dark"] body #uhz-global-site-footer .uhz-v4-cta-secondary {
   color:#EDE6D8!important;border-color:#645D53!important;
 }
 
+/* Consistent theme for ordinary editorial / account cards. Intentionally never touches
+   video, image, iframe, code blocks, maps or admin dialogs. */
+html:is([data-uhz-theme="colorful"],[data-uhz-theme="light"],[data-uhz-theme="dark"])
+ body :is(.card,.panel,.content-card,.article-card,.membership,.stat-card,.info-card,.tool-card,
+ .feature-card,.account-card,.section-card,.uhz-economy-card,.uhz-tool-card):not(.hero-card) {
+  border-color:var(--uhz-border)!important;
+}
+html[data-uhz-theme="dark"] body :is(.card,.panel,.content-card,.article-card,.membership,
+ .stat-card,.info-card,.tool-card,.feature-card,.account-card,.section-card)
+ :is(h1,h2,h3,h4,p,small,span,li):not([class*="price"]):not([class*="badge"]) {
+  color:inherit;
+}
+html:is([data-uhz-theme="colorful"],[data-uhz-theme="light"],[data-uhz-theme="dark"])
+ body :is(main .card,main .panel,main .account-card,main .membership,main .stat-card):not(:has(>img)):not(:has(>.image)) {
+  background-color:var(--uhz-surface)!important;
+  color:var(--uhz-ink)!important;
+}
+html:is([data-uhz-theme="colorful"],[data-uhz-theme="light"],[data-uhz-theme="dark"])
+ body :is(main .section-nav,main .table-wrap,main .stat-list) {
+  border-color:var(--uhz-border)!important;
+  color:var(--uhz-ink)!important;
+}
+html[data-uhz-theme="dark"] body :is(main .eyebrow,main .muted,.section-top .section-counter){
+  color:var(--uhz-muted)!important;
+}
 /* Pages built using CSS variables: propagate the selected surfaces to body and cards.
    Excludes media players, iframes, source code and non-public admin interfaces. */
 html:is([data-uhz-theme="colorful"],[data-uhz-theme="light"],[data-uhz-theme="dark"])

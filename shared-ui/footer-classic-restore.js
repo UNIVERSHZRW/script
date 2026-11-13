@@ -108,12 +108,19 @@ async function inject(){
 }
 function mount(){
  if(!document.body)return;
- const existing=[...document.querySelectorAll(selector)]
-  .find(n=>!n.closest('article,dialog')&&!n.hasAttribute('data-uhz-duplicate-footer'));
+ const all=[...document.querySelectorAll(selector)].filter(n=>!n.closest('article,dialog'));
+ const existing=all.find(n=>!n.dataset.uhzImportedFooter&&!n.hasAttribute('data-uhz-duplicate-footer'))
+   ||all.find(n=>!n.hasAttribute('data-uhz-duplicate-footer'));
  if(existing)restore(existing);
  else void inject();
 }
 if(document.readyState==='loading')document.addEventListener('DOMContentLoaded',mount,{once:true});else mount();
 window.addEventListener('load',mount,{once:true});
 window.addEventListener('pageshow',mount);
+const watcher=new MutationObserver(records=>{
+ if(records.some(record=>[...record.addedNodes].some(node=>
+  node.nodeType===1&&(node.matches?.(selector)||node.querySelector?.(selector))
+  )))mount();
+});
+watcher.observe(document.documentElement,{childList:true,subtree:true});
 })();

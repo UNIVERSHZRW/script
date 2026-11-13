@@ -9,6 +9,7 @@ import { spawnSync } from 'node:child_process';
 const root=dirname(fileURLToPath(import.meta.url));
 const js=readFileSync(resolve(root,'shell-v2.js'),'utf8');
 const css=readFileSync(resolve(root,'shell-v2.css'),'utf8');
+const footerOnly=readFileSync(resolve(root,'footer-only-v4.js'),'utf8');
 const apply=process.argv.includes('--apply');
 const account=process.env.CLOUDFLARE_ACCOUNT_ID;
 const token=process.env.CLOUDFLARE_API_TOKEN;
@@ -46,6 +47,19 @@ if(source.includes(jsKey)){
   source=once(source,cssRoute,cssRoute+"url.searchParams.get('asset')==='shell-v2'?asset(req,UHZ_UNIFIED_SHELL_CSS,'text/css'):");
   source=once(source,jsRoute,"asset(req,header+UHZ_ARTICLE_BOOTSTRAP+UHZ_FLOW_ARTICLE_INLINE+UHZ_ARTICLE_FOOTER+UHZ_COIN_TIP_ARTICLE_LOADER+UHZ_UNIFIED_SHELL_JS,'application/javascript')");
 }
+// Preserve/refresh the optional public footer-only asset used by catalog templates.
+const assetAnchor='function asset(req,body,type){';
+const footerKey='const UHZ_GLOBAL_FOOTER_ONLY_JS=';
+if(source.includes(footerKey)){
+  const begin=source.indexOf(footerKey),end=source.indexOf(';\n'+assetAnchor,begin);
+  if(begin<0||end<begin||source.indexOf(footerKey,begin+1)>=0)
+    throw Error('Existing footer-only module changed unexpectedly.');
+  source=source.slice(0,begin)+footerKey+JSON.stringify(footerOnly)+source.slice(end);
+}else source=once(source,assetAnchor,footerKey+JSON.stringify(footerOnly)+';\n'+assetAnchor);
+const cssToken="url.searchParams.get('asset')==='shell-v2'?asset(req,UHZ_UNIFIED_SHELL_CSS,'text/css'):";
+const footerToken="url.searchParams.get('asset')==='footer-v4'?asset(req,UHZ_GLOBAL_FOOTER_ONLY_JS,'application/javascript'):";
+if(!source.includes(footerToken))source=once(source,cssToken,cssToken+footerToken);
+
 // Correct the original header's parameter order without changing any other account logic.
 const match=source.match(/const header=("(?:\\.|[^"\\])*");/);
 if(!match)throw Error('Shared header source marker missing.');
@@ -58,7 +72,8 @@ source=source.replace(match[0],'const header='+JSON.stringify(header)+';');
 
 if(!source.includes('env.ORIGINAL_SITE.fetch(req)')||
    !source.includes("asset(req,UHZ_UNIFIED_SHELL_CSS,'text/css')")||
-   !source.includes("UHZ_COIN_TIP_ARTICLE_LOADER+UHZ_UNIFIED_SHELL_JS"))
+   !source.includes("UHZ_COIN_TIP_ARTICLE_LOADER+UHZ_UNIFIED_SHELL_JS")||
+   !source.includes(footerToken))
    throw Error('Required upstream binding or shared route missing.');
 const lint=spawnSync('node',['--check','-'],{input:source,encoding:'utf8'});
 if(lint.status!==0)throw Error('Worker syntax validation failed: '+lint.stderr.slice(0,1600));

@@ -51,7 +51,7 @@ function applyPublicUI(request, response) {
           (isArticle?'<link rel="stylesheet" href="'+UI_ROOT+'article-flow-css&amp;v=20261112-access-redesign-v3">':'')+
           (isArticle?'<script defer src="'+UI_ROOT+'article-ui-3"></script>':'')+
           (isEnglish?'<script defer src="'+UI_ROOT+'ui-en-4"></script>':'')+
-          '<script defer src="'+UI_ROOT+'ui-js-4"></script>',{html:true});
+          '<script defer src="'+UI_ROOT+'ui-js-5"></script>',{html:true});
       });
     }})
     .on('meta[charset]',{element(e){

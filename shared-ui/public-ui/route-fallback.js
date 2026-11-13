@@ -55,7 +55,7 @@ const UI_MARKUP = {"head":"<header id=\"uhz-ui-desktop\" aria-label=\"Encabezado
       script('article-ui-3');
     }
     if(url.searchParams.get('lang')==='en')script('ui-en-4');
-    script('ui-js-4');
+    script('ui-js-5');
   }
   if(document.readyState==='loading')document.addEventListener('DOMContentLoaded',mount,{once:true});
   else mount();

@@ -8,7 +8,7 @@ import {Ownable2Step} from "@openzeppelin/contracts/access/Ownable2Step.sol";
 
 /**
  * @title INFYNITY (INFT)
- * @notice Fixed-supply ERC-20. No external mint, burn, upgrade, blacklist or transfer-tax function.
+ * @notice Exactly 10,000,000 INFT (18 decimals), no further issuance or transfer tax.
  * @dev Deploy with a separately governed multisignature as initialOwner; deliver all tokens to
  *      a treasury (which may be the same multisignature). The multisignature can pause transfers
  *      during an incident but cannot increase the supply.
@@ -16,23 +16,18 @@ import {Ownable2Step} from "@openzeppelin/contracts/access/Ownable2Step.sol";
  */
 contract INFYNITY is ERC20, ERC20Pausable, Ownable2Step {
     error InvalidTreasury();
-    error InvalidSupply();
     error OwnershipRenunciationDisabled();
 
-    uint256 public immutable initialSupply;
+    uint256 public constant INITIAL_SUPPLY = 10_000_000 * 1e18;
 
     /// @param treasury Address receiving the initial supply.
     /// @param governor Multisignature address controlling pause and two-step ownership transfers.
-    /// @param wholeTokens Initial supply in whole INFT (18 decimals applied on-chain).
-    constructor(address treasury, address governor, uint256 wholeTokens)
+    constructor(address treasury, address governor)
         ERC20("INFYNITY", "INFT")
         Ownable(governor)
     {
         if (treasury == address(0)) revert InvalidTreasury();
-        if (wholeTokens == 0) revert InvalidSupply();
-        uint256 supply = wholeTokens * 10 ** decimals();
-        initialSupply = supply;
-        _mint(treasury, supply);
+        _mint(treasury, INITIAL_SUPPLY);
     }
 
     function pause() external onlyOwner {

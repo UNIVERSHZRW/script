@@ -50,6 +50,9 @@ function header(){
   ];
   const moreLinks=el('div','uhz-v3-menu-links');
   for(const [label,href] of menuItems)moreLinks.append(a(label,href));
+  for(const [label,href] of [['Herramientas','/herramientas'],['Comunichat','/mi-cuenta?section=comunichat']]){
+    const extra=a(label,href);extra.classList.add('uhz-v3-compact-only');moreLinks.prepend(extra);
+  }
   menu.append(moreLinks);
   const options=el('div','uhz-v3-menu-options');
   const themeWrap=el('label','uhz-v3-theme-wrap');

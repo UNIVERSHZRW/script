@@ -37,7 +37,7 @@ const UI_MARKUP = {"head":"<header id=\"uhz-ui-desktop\" aria-label=\"Encabezado
     node.async=false;
     document.head.append(node);
   }
-  style('ui-css-3');
+  style('ui-css-4');
   if(article)style('article-flow-css&v=20261112-access-redesign-v3');
   function mount() {
     if(!document.body||document.getElementById('uhz-ui-desktop'))return;
@@ -54,8 +54,8 @@ const UI_MARKUP = {"head":"<header id=\"uhz-ui-desktop\" aria-label=\"Encabezado
     if(article) {
       script('article-ui-3');
     }
-    if(url.searchParams.get('lang')==='en')script('ui-en-3');
-    script('ui-js-3');
+    if(url.searchParams.get('lang')==='en')script('ui-en-4');
+    script('ui-js-4');
   }
   if(document.readyState==='loading')document.addEventListener('DOMContentLoaded',mount,{once:true});
   else mount();

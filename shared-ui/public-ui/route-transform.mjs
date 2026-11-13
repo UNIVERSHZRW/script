@@ -47,11 +47,11 @@ function applyPublicUI(request, response) {
       e.onEndTag(end=>{
         if(!hasCharset)end.before('<script src="'+UI_ROOT+'ui-boot-2"></script>',{html:true});
         if(!hasViewport)end.before('<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">',{html:true});
-        end.before('<link rel="stylesheet" href="'+UI_ROOT+'ui-css-3">'+
+        end.before('<link rel="stylesheet" href="'+UI_ROOT+'ui-css-4">'+
           (isArticle?'<link rel="stylesheet" href="'+UI_ROOT+'article-flow-css&amp;v=20261112-access-redesign-v3">':'')+
           (isArticle?'<script defer src="'+UI_ROOT+'article-ui-3"></script>':'')+
-          (isEnglish?'<script defer src="'+UI_ROOT+'ui-en-3"></script>':'')+
-          '<script defer src="'+UI_ROOT+'ui-js-3"></script>',{html:true});
+          (isEnglish?'<script defer src="'+UI_ROOT+'ui-en-4"></script>':'')+
+          '<script defer src="'+UI_ROOT+'ui-js-4"></script>',{html:true});
       });
     }})
     .on('meta[charset]',{element(e){

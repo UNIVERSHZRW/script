@@ -301,6 +301,9 @@ html body #uhz-global-site-footer .uhz-v4-nav{
   padding:0!important;margin:0!important;border:0!important;
   background:transparent!important;box-shadow:none!important;
 }
+html body #uhz-global-site-footer .uhz-v4-col-toggle:not([open]) > .uhz-v4-nav{
+  display:none!important;visibility:hidden!important;
+}
 html body #uhz-global-site-footer .uhz-v4-nav a{
   color:#bcd3e0!important;text-decoration:underline!important;text-decoration-color:transparent!important;
   text-underline-offset:3px;

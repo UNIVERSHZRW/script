@@ -1,9 +1,9 @@
 name: Shared site shell checks
 on:
   push:
-    paths: ['shared-ui/shell-v2.js', 'shared-ui/shell-v2.css', 'shared-ui/brand-themes.css', 'shared-ui/footer-only-v4.js', 'shared-ui/deploy-shell-v2.mjs', '.github/workflows/shared-shell-v2.yml']
+    paths: ['shared-ui/shell-v2.js', 'shared-ui/shell-v2.css', 'shared-ui/brand-themes.css', 'shared-ui/theme-runtime.js', 'shared-ui/footer-only-v4.js', 'shared-ui/deploy-shell-v2.mjs', '.github/workflows/shared-shell-v2.yml']
   pull_request:
-    paths: ['shared-ui/shell-v2.js', 'shared-ui/shell-v2.css', 'shared-ui/brand-themes.css', 'shared-ui/footer-only-v4.js', 'shared-ui/deploy-shell-v2.mjs', '.github/workflows/shared-shell-v2.yml']
+    paths: ['shared-ui/shell-v2.js', 'shared-ui/shell-v2.css', 'shared-ui/brand-themes.css', 'shared-ui/theme-runtime.js', 'shared-ui/footer-only-v4.js', 'shared-ui/deploy-shell-v2.mjs', '.github/workflows/shared-shell-v2.yml']
 permissions:
   contents: read
 jobs:
@@ -15,7 +15,7 @@ jobs:
         with:
           node-version: '22'
       - name: JavaScript syntax
-        run: node --check shared-ui/shell-v2.js && node --check shared-ui/footer-only-v4.js && node --check shared-ui/deploy-shell-v2.mjs
+        run: node --check shared-ui/shell-v2.js && node --check shared-ui/footer-only-v4.js && node --check shared-ui/theme-runtime.js && node --check shared-ui/deploy-shell-v2.mjs
       - name: Verify essential features
         run: |
           node --input-type=module -e "
@@ -25,6 +25,7 @@ jobs:
           const css=fs.readFileSync('shared-ui/shell-v2.css','utf8');
           const footer=fs.readFileSync('shared-ui/footer-only-v4.js','utf8');
           const brand=fs.readFileSync('shared-ui/brand-themes.css','utf8');
+          const runtime=fs.readFileSync('shared-ui/theme-runtime.js','utf8');
           for(const x of ['aria-expanded','Escape','uhz-pro-footer','uhz-native-head','DOMContentLoaded'])assert(js.includes(x),x);
           for(const x of ['prefers-reduced-motion','data-uhz-theme=dark','max-width:800px'])assert(css.includes(x),x);
           for(const x of ['uhz_header_account_summary','uhz-v3-balances','uhz-v3-mobile-wallet','data-action','details','hu'])if(x!=='hu')assert(js.includes(x),x);
@@ -42,6 +43,10 @@ jobs:
           assert(footer.includes('asset=brand-theme-v1'));
           assert(footer.includes('uhz_header_theme'));
           assert(!brand.includes('filter:invert('));
+          for(const x of ['data-uhz-theme','uhz:theme-change','uhz-global-site-footer','uhz-global-header','EDE6D8','CFE8E1'])assert(runtime.includes(x),x);
+          assert(js.includes('asset=brand-theme-runtime-v1'));
+          assert(footer.includes('asset=brand-theme-runtime-v1'));
+
 
           console.log('Navigation and footer checks passed');
           "

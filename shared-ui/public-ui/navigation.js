@@ -69,13 +69,14 @@ let accountEpoch=0;
 let pendingAccount;
 let checkedAt=-Infinity;
 let publicCatalogIds=[];
+let plansHistory;
 let dictionary=Object.create(null);
 let pendingDictionary;
 function loadDictionary() {
   if(window.UHZTranslations){dictionary=window.UHZTranslations;return Promise.resolve();}
   if(pendingDictionary)return pendingDictionary;
   const link=document.createElement('script');
-  link.src='/_uhz/shared-header.js?asset=ui-en-4';
+  link.src='/_uhz/shared-header.js?asset=ui-en-5';
   pendingDictionary=new Promise(resolve=>{
     link.addEventListener('load',()=>{
       dictionary=window.UHZTranslations||dictionary;
@@ -337,6 +338,78 @@ function showNotifications(notices,catalog) {
     badge.hidden=!count;
   }
 }
+function showPlansAccount(state,epoch) {
+  if(!root.hasAttribute('data-uhz-plans-account'))return;
+  const tier=document.getElementById('tier');
+  const balance=document.getElementById('balance');
+  const accountLink=document.getElementById('accountLink');
+  const sent=document.getElementById('uhzTipSentList');
+  const received=document.getElementById('uhzTipReceivedList');
+  const sentTotal=document.getElementById('uhzTipSent');
+  const receivedTotal=document.getElementById('uhzTipReceived');
+  if(!tier||!balance||!accountLink||!sent||!received||!sentTotal||!receivedTotal)return;
+  const message=(list,label)=>{
+    const item=document.createElement('li');
+    item.textContent=label;
+    list.replaceChildren(item);
+  };
+  if(state!=='member') {
+    plansHistory=null;
+    accountData=null;
+    updateBalances();
+    const guest=state==='guest';
+    tier.textContent=guest?'Inicia sesión para consultar':'No pudimos consultar tu cuenta.';
+    balance.textContent='—';
+    accountLink.href='/iniciar-sesion?next=%2Fplanes';
+    sentTotal.textContent=receivedTotal.textContent='—';
+    for(const list of [sent,received])message(list,guest?'Inicia sesión para consultar tus apoyos.':'No pudimos consultar tus apoyos.');
+    return;
+  }
+  paintPlansAccount();
+  void value('/rest/v1/rpc/uhz_coin_tip_my_history',{}).then(history=>{
+    if(epoch!==accountEpoch)return;
+    plansHistory=history?.ok===true?history:null;
+    if(plansHistory)paintPlansAccount();
+    else {
+      sentTotal.textContent=receivedTotal.textContent='—';
+      for(const list of [sent,received])message(list,'No pudimos consultar tus apoyos.');
+    }
+  });
+}
+function paintPlansAccount() {
+  if(!root.hasAttribute('data-uhz-plans-account')||!accountData)return;
+  const tier=document.getElementById('tier');
+  const balance=document.getElementById('balance');
+  const accountLink=document.getElementById('accountLink');
+  const sentTotal=document.getElementById('uhzTipSent');
+  const receivedTotal=document.getElementById('uhzTipReceived');
+  if(!tier||!balance||!accountLink||!sentTotal||!receivedTotal)return;
+  const locale=language==='en'?'en-US':'es-MX';
+  const numbers=new Intl.NumberFormat(locale);
+  const number=value=>numbers.format(Number(value)||0);
+  tier.textContent=accountData.plan==='premium'?'Premium':'Gratis';
+  balance.textContent='₡'+number(accountData.coins_balance);
+  accountLink.href='/mi-cuenta';
+  if(!plansHistory)return;
+  const formatter=new Intl.DateTimeFormat(locale,{day:'numeric',month:'short',year:'numeric'});
+  function paint(id,entries,other) {
+    const items=(Array.isArray(entries)&&entries.length?entries.slice(0,10):[null]).map(entry=>{
+      const item=document.createElement('li');
+      if(entry) {
+        const date=new Date(entry.created_at);
+        const day=Number.isNaN(+date)?'':formatter.format(date);
+        item.setAttribute('translate','no');
+        item.textContent=number(entry.amount_coins)+' Coins · '+(entry[other]||'—')+' · '+day;
+      } else item.textContent='Sin movimientos todavía.';
+      return item;
+    });
+    document.getElementById(id)?.replaceChildren(...items);
+  }
+  sentTotal.textContent=number(plansHistory.sent_coins)+' Coins';
+  receivedTotal.textContent=number(plansHistory.received_coins)+' Coins';
+  paint('uhzTipSentList',plansHistory.sent,'recipient');
+  paint('uhzTipReceivedList',plansHistory.received,'donor');
+}
 function refreshAccount(force=false) {
   if(pendingAccount&&!force)return pendingAccount;
   if(!force&&Date.now()-checkedAt<45000)return;
@@ -346,17 +419,20 @@ function refreshAccount(force=false) {
     try {
       const res=await request('/auth/v1/user');
       if(epoch!==accountEpoch)return;
-      if(res.status===401||res.status===403){updateMember(null);return;}
-      if(!res.ok)return;
+      if(res.status===401||res.status===403){updateMember(null);showPlansAccount('guest',epoch);return;}
+      if(!res.ok){showPlansAccount('unavailable',epoch);return;}
       const user=await res.json();
       if(epoch!==accountEpoch)return;
       updateMember(user);
-      if(!member)return;
+      if(!member){showPlansAccount('guest',epoch);return;}
+      if(user.must_change_password){showPlansAccount('unavailable',epoch);return;}
       const id=memberId;
       await Promise.all([
         value('/rest/v1/rpc/uhz_header_account_summary',{}).then(data=>{
-          if(epoch!==accountEpoch||data?.ok!==true)return;
+          if(epoch!==accountEpoch)return;
+          if(data?.ok!==true){showPlansAccount('unavailable',epoch);return;}
           accountData=data;updateBalances();
+          showPlansAccount('member',epoch);
         }),
         value('/rest/v1/community_profiles?select=avatar_key&user_id=eq.'+encodeURIComponent(id)+'&limit=1').then(profile=>{
           if(epoch===accountEpoch)showAvatar(profile,id);
@@ -365,7 +441,7 @@ function refreshAccount(force=false) {
           if(epoch===accountEpoch)showNotifications(notices,catalog);
         })
       ]);
-    } catch {}
+    } catch {if(epoch===accountEpoch)showPlansAccount('unavailable',epoch);}
   })();
   pendingAccount=job;
   void job.finally(()=>{if(pendingAccount===job)pendingAccount=null;});
@@ -502,6 +578,7 @@ function init() {
   for(const event of ['uhz:coins-updated','uhz:coins-changed','uhz:plan-updated','uhz:session']) {
     window.addEventListener(event,()=>{void refreshAccount(true);});
   }
+  if(root.hasAttribute('data-uhz-plans-account'))window.addEventListener('uhz:language-change',paintPlansAccount);
   window.addEventListener('message',event=>{
     if(event.origin===location.origin&&event.data?.type==='uhz:session')void refreshAccount(true);
   });

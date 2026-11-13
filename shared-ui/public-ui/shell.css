@@ -513,15 +513,68 @@ html[data-uhz-ui][data-uhz-home] body #buscador.search-shell.google-search-layou
   color: var(--uhz-ink) !important;
   border-color: var(--uhz-line) !important;
 }
-html[data-uhz-ui][data-uhz-home] body #buscador #googleSearchBox.uhz-search-box-pro {
+@layer uhz-typography.palette {
+  html[data-uhz-ui][data-uhz-home] #buscador.search-shell.google-search-layout #googleSearchBox.search-box.google-search-box.uhz-search-box-pro {
+    background: var(--uhz-surface) !important;
+    color: var(--uhz-ink) !important;
+    border-color: var(--uhz-line) !important;
+  }
+  html[data-uhz-ui][data-uhz-home] #buscador.search-shell.google-search-layout #googleSearchBox #inputBusqueda {
+    color: var(--uhz-ink) !important;
+    background: transparent !important;
+  }
+  html[data-uhz-ui][data-uhz-home] #buscador.search-shell.google-search-layout #googleSearchBox #inputBusqueda::placeholder {
+    color: var(--uhz-muted) !important;
+  }
+  html[data-uhz-ui][data-uhz-home][data-uhz-theme="dark"] #buscador.search-shell.google-search-layout
+    #googleSearchBox.search-box.google-search-box.uhz-search-box-pro .uhz-search-tools > button:not(.google-search-button) {
+    color: var(--uhz-ink) !important;
+  }
+  html[data-uhz-ui][data-uhz-home][data-uhz-theme="dark"] #buscador.search-shell.google-search-layout
+    #googleSearchBox.search-box.google-search-box.uhz-search-box-pro #uhzModoIA.uhz-ai-mode {
+    background: var(--uhz-soft) !important;
+    border-color: var(--uhz-line) !important;
+  }
+  html[data-uhz-ui][data-uhz-home][data-uhz-theme="dark"] #buscador.search-shell.google-search-layout
+    #googleSearchBox.search-box.google-search-box.uhz-search-box-pro .uhz-search-tools .google-search-button.btn-primary,
+  html[data-uhz-ui][data-uhz-home][data-uhz-theme="dark"] #buscador.search-shell.google-search-layout
+    #googleSearchBox.search-box.google-search-box.uhz-search-box-pro #uhzModoIA.uhz-ai-mode[aria-pressed="true"] {
+    background: var(--uhz-action) !important;
+    color: var(--uhz-on-action) !important;
+    border-color: var(--uhz-action) !important;
+  }
+  html[data-uhz-ui][data-uhz-home][data-uhz-theme="dark"] #buscador.search-shell.google-search-layout
+    #googleSearchBox.search-box.google-search-box.uhz-search-box-pro #uhzModoIA.uhz-ai-mode[aria-pressed="true"] > span {
+    color: inherit !important;
+  }
+}
+html[data-uhz-ui][data-uhz-theme="dark"] body #cookieBanner.cookie-banner.cookie-alert-pro {
   background: var(--uhz-surface) !important;
   color: var(--uhz-ink) !important;
   border-color: var(--uhz-line) !important;
 }
-html[data-uhz-ui][data-uhz-home] body #buscador.search-shell #inputBusqueda {
+html[data-uhz-ui][data-uhz-theme="dark"] body #cookieBanner.cookie-banner.cookie-alert-pro :is(h2,h3,p,strong,small,span) {
   color: var(--uhz-ink) !important;
-  background: transparent !important;
 }
+html[data-uhz-ui][data-uhz-theme="dark"] body #cookieBanner.cookie-banner.cookie-alert-pro :is(button,a) {
+  background: var(--uhz-soft) !important;
+  color: var(--uhz-ink) !important;
+  border-color: var(--uhz-line) !important;
+}
+html[data-uhz-ui][data-uhz-theme="dark"] body #cookieBanner.cookie-banner.cookie-alert-pro button#acceptCookies {
+  background: var(--uhz-action) !important;
+  color: var(--uhz-on-action) !important;
+  border-color: var(--uhz-action) !important;
+}
+html[data-uhz-ui][data-uhz-theme="dark"] body[data-page] main#contenido.uhz-contribute :is(.hero, .inft-invite, #guestContributionLayout .panel) {
+  background: var(--uhz-surface) !important;
+  color: var(--uhz-ink) !important;
+  border-color: var(--uhz-line) !important;
+}
+html[data-uhz-ui] .ud-impact [id^="ud-bar-"] { width: var(--ud-impact-share); }
+html[data-uhz-ui] #ud-bar-tech { --ud-impact-share: 40%; }
+html[data-uhz-ui] #ud-bar-content { --ud-impact-share: 35%; }
+html[data-uhz-ui] #ud-bar-tools { --ud-impact-share: 25%; }
 @media (max-width: 800px) {
   html[data-uhz-ui][data-uhz-home] body #buscador.search-shell #inputBusqueda { font-size: 16px !important; }
   html[data-uhz-ui] body #trustedsite-tm-image { bottom: calc(var(--uhz-dock-height) + env(safe-area-inset-bottom,0px) - 8px) !important; }

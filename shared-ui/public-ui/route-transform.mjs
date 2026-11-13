@@ -19,6 +19,10 @@ function applyPublicUI(request, response) {
   const isPortal=portalPath.test(url.pathname);
   const isArticle=/^\/recurso\//i.test(url.pathname);
   const isEnglish=url.searchParams.get('lang')==='en';
+  const isDonation=/^\/donar\/?$/i.test(url.pathname);
+  const isPlans=/^\/planes\/?$/i.test(url.pathname);
+  const newerPalette=isHome||isDonation||/^\/aportar_contenido(?:\/|$)/i.test(url.pathname);
+  const newerLanguage=isHome||isPlans||/^\/herramientas\/?$/i.test(url.pathname);
   const seenScripts=new Set();
   const seenStyles=new Set();
   let hasViewport=false;
@@ -40,6 +44,7 @@ function applyPublicUI(request, response) {
       e.setAttribute('data-uhz-ui','1');
       if(isPortal)e.setAttribute('data-uhz-portal','1');
       if(isHome)e.setAttribute('data-uhz-home','1');
+      if(isPlans&&response.headers.get('x-uhz-plans-account')==='1')e.setAttribute('data-uhz-plans-account','1');
       const theme=e.getAttribute('data-uhz-theme');
       if(!theme||theme==='classic')e.setAttribute('data-uhz-theme','colorful');
     }})
@@ -47,11 +52,11 @@ function applyPublicUI(request, response) {
       e.onEndTag(end=>{
         if(!hasCharset)end.before('<script src="'+UI_ROOT+'ui-boot-2"></script>',{html:true});
         if(!hasViewport)end.before('<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">',{html:true});
-        end.before('<link rel="stylesheet" href="'+UI_ROOT+'ui-css-4">'+
+        end.before('<link rel="stylesheet" href="'+UI_ROOT+(isHome?'ui-css-6':newerPalette?'ui-css-5':'ui-css-4')+'">'+
           (isArticle?'<link rel="stylesheet" href="'+UI_ROOT+'article-flow-css&amp;v=20261112-access-redesign-v3">':'')+
           (isArticle?'<script defer src="'+UI_ROOT+'article-ui-3"></script>':'')+
-          (isEnglish?'<script defer src="'+UI_ROOT+'ui-en-4"></script>':'')+
-          '<script defer src="'+UI_ROOT+'ui-js-5"></script>',{html:true});
+          (isEnglish?'<script defer src="'+UI_ROOT+(newerLanguage?'ui-en-5':'ui-en-4')+'"></script>':'')+
+          '<script defer src="'+UI_ROOT+(newerLanguage?'ui-js-6':'ui-js-5')+'"></script>',{html:true});
       });
     }})
     .on('meta[charset]',{element(e){
@@ -63,6 +68,15 @@ function applyPublicUI(request, response) {
       hasViewport=true;
       const original=e.getAttribute('content')||'width=device-width,initial-scale=1';
       if(!/viewport-fit/i.test(original))e.setAttribute('content',original+',viewport-fit=cover');
+    }})
+    .on('meta[http-equiv="Content-Security-Policy"]',{element(e){
+      if(!isHome)return;
+      const content=e.getAttribute('content')||'';
+      const directives=content.split(';').filter(value=>!/^\s*frame-ancestors(?:\s|$)/i.test(value));
+      e.setAttribute('content',directives.join(';'));
+    }})
+    .on('#ud-bar-tech,#ud-bar-content,#ud-bar-tools',{element(e){
+      if(isDonation)e.removeAttribute('style');
     }})
     .on('script[src]',{element(e){
       const raw=e.getAttribute('src');
@@ -114,6 +128,7 @@ function applyPublicUI(request, response) {
   const transformed=rewriter.transform(response);
   const headers=new Headers(transformed.headers);
   for(const name of ['content-length','etag','last-modified','content-md5','digest','content-digest'])headers.delete(name);
+  if(isHome)headers.append('content-security-policy',"frame-ancestors 'self'");
   headers.set('x-uhz-ui','1');
   return new Response(transformed.body,{status:transformed.status,statusText:transformed.statusText,headers});
 }

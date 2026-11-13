@@ -25,6 +25,9 @@ jobs:
           const css=fs.readFileSync('shared-ui/shell-v2.css','utf8');
           for(const x of ['aria-expanded','Escape','uhz-pro-footer','uhz-native-head','DOMContentLoaded'])assert(js.includes(x),x);
           for(const x of ['prefers-reduced-motion','data-uhz-theme=dark','max-width:800px'])assert(css.includes(x),x);
+          for(const x of ['uhz_header_account_summary','uhz-v3-balances','uhz-v3-mobile-wallet','data-action','details','hu'])if(x!=='hu')assert(js.includes(x),x);
+          assert(!js.includes('const group=el(\'div\',\'uhz-v2-group\')'));
+          for(const x of ['flex-wrap:nowrap','uhz-v3-more-menu','uhz-v3-userbar','uhz-v3-mobile-links'])assert(css.includes(x),x);
           assert(!js.includes('innerHTML='));
           console.log('Navigation and footer checks passed');
           "

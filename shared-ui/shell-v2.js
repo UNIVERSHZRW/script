@@ -12,6 +12,12 @@ if(!document.getElementById('uhz-brand-theme-css')){
  link.href='/_uhz/shared-header.js?asset=brand-theme-v1&v=20261112-mint-charcoal';
  document.head.append(link);
 }
+if(!document.getElementById('uhz-brand-theme-runtime')){
+ const script=document.createElement('script');
+ script.id='uhz-brand-theme-runtime';
+ script.src='/_uhz/shared-header.js?asset=brand-theme-runtime-v1&v=20261112';
+ script.defer=true;document.head.append(script);
+}
 const tools=[['Herramientas','/herramientas'],['Planes','/planes'],['Estudio Premium','/estudio'],['Biblioteca','/biblioteca'],['INFYNITY','/criptomoneda'],['Coins','/economia'],['Ayuda','/centro-de-ayuda']];
 const sections=[
 ['Explorar',[['Inicio','/'],['Biblioteca','/biblioteca'],['Tienda online','/tienda_online'],['Herramientas','/herramientas'],['Peticiones','/peticiones']]],

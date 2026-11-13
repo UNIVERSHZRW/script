@@ -22,3 +22,12 @@ Para publicar sin afectar las conexiones, usar el endpoint content de Cloudflare
 
 ## Verificar
 Home, Aportar, tienda, Planes, Herramientas, Peticiones, INFYNITY, Cuenta, Seguridad; escritorio, 320/390px, menú, teclado/Escape, tema oscuro, idioma, enlaces legales y pie de página.
+
+## Revisión v3 · navegación única y estado autenticado
+La cabecera activa se ha corregido para disponer en una sola fila de Aportar, Tienda, Comunichat, Planes, Herramientas y Más. Se quitan de primera línea Correo, WhatsApp, apariencia e idioma; se conservan dentro de Más. En pantallas intermedias los accesos menos prioritarios pasan al menú.
+
+La consulta segura `public.uhz_header_account_summary()` exige una sesión activa verificada, entrega Coins, membresía y el saldo INFT del registro interno; no incluye balances de billeteras externas. Los visitantes ven Entrar en lugar de cifras simuladas. Los INFT siguen sin compras ni conversiones activadas. El menú móvil muestra secciones compactas y, con sesión, los tres saldos.
+
+Se corrigió en producción el orden de parámetros de `make('a','Free · ₡—','uhzg-wallet')` para evitar la etiqueta literal `uhzg-wallet`.
+
+El Worker original y su binding de servicio fueron preservados, desplegando solo el complemento. Pruebas de sintaxis y estructura en GitHub Actions y visualización DOM en navegador Cloudflare (Planes en escritorio y Herramientas en móvil) aprobadas. La prueba de saldos de usuario requiere una sesión real y se mantiene pendiente.

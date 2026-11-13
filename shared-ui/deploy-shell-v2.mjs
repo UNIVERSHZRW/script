@@ -10,6 +10,7 @@ const root=dirname(fileURLToPath(import.meta.url));
 const js=readFileSync(resolve(root,'shell-v2.js'),'utf8');
 const css=readFileSync(resolve(root,'shell-v2.css'),'utf8');
 const footerOnly=readFileSync(resolve(root,'footer-only-v4.js'),'utf8');
+const brandTheme=readFileSync(resolve(root,'brand-themes.css'),'utf8');
 const apply=process.argv.includes('--apply');
 const account=process.env.CLOUDFLARE_ACCOUNT_ID;
 const token=process.env.CLOUDFLARE_API_TOKEN;
@@ -57,8 +58,20 @@ if(source.includes(footerKey)){
   source=source.slice(0,begin)+footerKey+JSON.stringify(footerOnly)+source.slice(end);
 }else source=once(source,assetAnchor,footerKey+JSON.stringify(footerOnly)+';\n'+assetAnchor);
 const cssToken="url.searchParams.get('asset')==='shell-v2'?asset(req,UHZ_UNIFIED_SHELL_CSS,'text/css'):";
+const themeKey='const UHZ_BRAND_THEME_CSS=';
+if(source.includes(themeKey)){
+  const begin=source.indexOf(themeKey);
+  const end=source.indexOf(';\n'+assetAnchor,begin);
+  if(begin<0||end<begin||source.indexOf(themeKey,begin+1)>=0)
+    throw Error('The theme extension was changed concurrently; refusing.');
+  source=source.slice(0,begin)+themeKey+JSON.stringify(brandTheme)+source.slice(end);
+}else source=once(source,assetAnchor,themeKey+JSON.stringify(brandTheme)+';\n'+assetAnchor);
+const themeToken="url.searchParams.get('asset')==='brand-theme-v1'?asset(req,UHZ_BRAND_THEME_CSS,'text/css'):";
+if(!source.includes(themeToken))source=once(source,cssToken,cssToken+themeToken);
+
 const footerToken="url.searchParams.get('asset')==='footer-v4'?asset(req,UHZ_GLOBAL_FOOTER_ONLY_JS,'application/javascript'):";
-if(!source.includes(footerToken))source=once(source,cssToken,cssToken+footerToken);
+if(!source.includes(footerToken)||
+   !source.includes(themeToken))source=once(source,cssToken,cssToken+footerToken);
 
 // Correct the original header's parameter order without changing any other account logic.
 const match=source.match(/const header=("(?:\\.|[^"\\])*");/);

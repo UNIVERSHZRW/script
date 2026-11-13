@@ -62,3 +62,19 @@ El pie es código original del proyecto sin paquetes ajenos en tiempo de ejecuci
 - No se han hecho pruebas autenticadas en todos los módulos ni auditoría de accesibilidad completa con lector de pantalla; se recomienda revisión final en dispositivos reales.
 
 **Regresión móvil corregida:** los enlaces de `<details>` cerrados se ocultan expresamente con el selector `.uhz-v4-col-toggle:not([open]) > .uhz-v4-nav`. En navegador a 390 px se comprobaron: pie visible (`display:block`), pie anterior oculto (`display:none`), anchura del pie 390 px, cero rectángulos de enlaces al estar cerrado y un rectángulo al expandirlo. Estudio Premium también confirmó pie único. CI de GitHub aprobado.
+
+## Paletas oficiales v1 · Normal y Oscuro (12 nov 2026)
+
+Dos diseños solicitados como referencia visual, implementados con CSS custom properties originales y la API nativa `color-scheme`, sin importar Bootstrap, Tailwind ni hojas de estilo de terceros.
+
+- **Normal:** Pale Mint `#CFE8E1` + Midnight Navy `#002941`; fondo de lectura `#EFF8F5`, tarjetas blancas con texto navy, cabecera/pie navy y menta.
+- **Oscuro:** Charcoal Black `#1C1C1C` + Bone White `#EDE6D8`; tarjetas `#292929`, bordes `#645D53`, cabecera/pie carbón con texto hueso.
+- Reutiliza `uhz_header_theme` y el atributo `data-uhz-theme` existentes, conservando el cambio de idioma, sesión, Coins, INFT y Plan. Los valores almacenados son `colorful` y `dark` por compatibilidad, mientras la interfaz muestra **Normal** y **Oscuro**.
+- Archivos: `shared-ui/brand-themes.css`, `shared-ui/theme-runtime.js`, `shared-ui/shell-v2.js`, `shared-ui/footer-only-v4.js`.
+- Assets Cloudflare: `/_uhz/shared-header.js?asset=brand-theme-v1` (CSS), `?asset=brand-theme-runtime-v1` (JS). La capa JS de colores se limita a superficies de lectura, encabezado, pie, menús y tarjetas sin medios: corrige estilos heredados que bloquean el modo oscuro con reglas de mayor prioridad.
+- El catálogo independiente `/creador/*` hereda la preferencia guardada; no reemplaza sus fichas o su encabezado.
+- No se cambian datos, precios, pagos, conexiones, formularios, ni permisos. No se inyecta en admin, robot, iframes, reproductores o la aplicación Control SD que utiliza un CSP independiente.
+- Comprobado con Cloudflare Browser Rendering: la página Planes cambia de menta/navy a carbón/hueso en fondo, encabezado, tarjetas y pie; el catálogo público también cambia en ambos modos; Inicio carga la paleta normal con encabezado y footer únicos.
+- CI GitHub Actions: pruebas de sintaxis y tokens pasaron. Queda pendiente probar manualmente todas las rutas, navegadores y aplicaciones independientes de UNIVERSHZRW antes de declarar cobertura absoluta.
+
+Referencias: https://developer.mozilla.org/en-US/docs/Web/CSS/Reference/Properties/color-scheme y https://developer.mozilla.org/en-US/docs/Web/CSS/Reference/Values/color_value/light-dark.

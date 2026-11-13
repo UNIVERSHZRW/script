@@ -3,7 +3,7 @@
 **No está desplegado ni autorizado para recibir dinero.** Código fuente para auditoría y pruebas.
 
 - OpenZeppelin Contracts v5.7.0 y Solidity 0.8.28; Polygon PoS (chain ID 137).
-- Token ERC-20 INFYNITY / INFT, 18 decimales, suministro inicial fijo enviado a tesorería.
+- Token ERC-20 INFYNITY / INFT, 18 decimales, exactamente **10,000,000 INFT** creados una sola vez y enviados a la tesorería.
 - Sin función de emisión posterior, cobro de comisión, bloqueo selectivo ni proxy modificable.
 - Pausa de emergencia bajo una dirección de gobierno (usar Safe multifirma) y cambio de gobierno en dos pasos.
 
@@ -26,3 +26,5 @@ forge test -vv
 6. No habilitar compra, venta ni conversiones Coins/INFT sin conciliación, antifraude, liquidez y aprobación final.
 
 **No subir claves privadas ni secretos al repositorio.** Los Coins siguen siendo créditos internos separados del token y la compra de INFT no garantiza una subida de precio.
+
+El suministro de 10 millones está fijado en `INITIAL_SUPPLY`; el constructor únicamente recibe las direcciones de tesorería y gobierno. No acepta un parámetro para crear más o menos unidades. Esta propuesta todavía no se ha desplegado en mainnet.

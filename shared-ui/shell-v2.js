@@ -213,7 +213,7 @@ function footer(){
   // One shared public footer. Preserve specialist and legal footers in the DOM
   // for pre-existing verification/cookie handlers and page-specific notices.
   const id='uhz-global-site-footer';
-  const legacySelector='footer.uhz-pro-footer,footer.uhz-tools-footer,footer.inft-footer,footer.uhz-global-footer,footer.footer';
+  const legacySelector='footer.uhz-pro-footer,footer.uhz-tools-footer,footer.inft-footer,footer.uhz-global-footer,footer.site-foot,footer.footer';
   const legacy=[...document.querySelectorAll(legacySelector)].filter(x=>
     x.id!==id&&!x.closest('#'+id)&&!x.closest('article,dialog'));
   const known=()=>document.getElementById(id);
@@ -242,7 +242,7 @@ function footer(){
       ['Explorar',[['Inicio','/'],['Biblioteca','/biblioteca'],['Tienda online','/tienda_online'],['Herramientas','/herramientas'],['Planes','/planes'],['INFYNITY · INFT','/criptomoneda']]],
       ['Participar',[['Comunichat','/mi-cuenta?section=comunichat'],['Peticiones','/peticiones'],['Creadores','/creadores'],['Estudio Premium','/estudio'],['Donar','/donar'],['Mis contenidos','/mis-contenidos']]],
       ['Ayuda y contacto',[['Centro de ayuda','/centro-de-ayuda'],['Preguntas frecuentes','/preguntas-frecuentes'],['Contacto','/contacto'],['Reportar contenido','/reportar-contenido'],['Seguridad','/seguridad'],['Preferencias de cookies','/preferencias-de-cookies']]],
-      ['Información legal',[['Términos y condiciones','/terminos-y-condiciones'],['Política de privacidad','/politica-de-privacidad'],['Derechos de autor','/derechos-de-autor'],['Documentación legal','/documentacion-legal'],['Enlaces externos','/enlaces-externos'],['Software y licencias','/software-y-licencias'],['Publicidad','/publicidad']]]
+      ['Información legal',[['Términos y condiciones','/terminos-y-condiciones'],['Política de privacidad','/politica-de-privacidad'],['Derechos de autor','/derechos-de-autor'],['Documentación legal','/documentacion-legal'],['Enlaces externos','/enlaces-externos'],['Acerca de UNIVERSHZRW','/acerca-de-univershzrw'],['Software y licencias','/software-y-licencias'],['Publicidad','/publicidad']]]
     ];
     const desktopColumns=matchMedia('(min-width:720px)');
     for(const [heading,links] of cols){

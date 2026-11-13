@@ -1,0 +1,49 @@
+/* UNIVERSHZRW unified shell v2 · MIT. Carefully scoped to shared header/footer. */
+:root{--uhzv-bg:#081c2d;--uhzv-bg2:#12354a;--uhzv-blue:#67d9f5;--uhzv-ink:#e9f6ff}
+@media(min-width:801px){
+html body #uhz-global-header.uhzg-header{background:linear-gradient(105deg,var(--uhzv-bg),var(--uhzv-bg2))!important;border-bottom:1px solid rgba(180,224,242,.2)!important;box-shadow:0 8px 24px rgba(0,15,35,.18)!important}
+html body #uhz-global-header .uhzg-main{align-items:center!important;gap:clamp(3px,.45vw,9px)!important}
+html body #uhz-global-header .uhzg-main .uhzg-link{border-radius:10px!important;white-space:nowrap!important;padding:9px clamp(5px,.55vw,11px)!important}
+html body #uhz-global-header .uhzg-main .uhzg-link:hover{background:rgba(103,217,245,.11)!important}
+}
+html body #uhz-global-header .uhz-v2-group{position:relative;display:flex;align-items:center;z-index:30}
+html body #uhz-global-header .uhz-v2-trigger{display:inline-flex;align-items:center;gap:9px;font:650 13px/1.3 system-ui,sans-serif;color:#e8f5ff;background:transparent;border:1px solid transparent;cursor:pointer;border-radius:10px;padding:9px 10px}
+html body #uhz-global-header .uhz-v2-trigger:hover,html body #uhz-global-header .uhz-v2-group.is-current .uhz-v2-trigger{background:rgba(103,217,245,.16)}
+html body #uhz-global-header .uhz-v2-trigger:after{content:'';width:7px;height:7px;border-bottom:2px solid currentColor;border-right:2px solid currentColor;transform:translateY(-2px) rotate(45deg)}
+html body #uhz-global-header .uhz-v2-trigger[aria-expanded=true]:after{transform:translateY(2px) rotate(225deg)}
+html body #uhz-global-header .uhz-v2-panel{position:absolute;z-index:55;top:calc(100% + 12px);right:0;width:min(330px,90vw);padding:16px;border-radius:16px;border:1px solid #325568;background:#102c41;box-shadow:0 18px 52px #03132155;display:grid;grid-template-columns:1fr 1fr;gap:8px}
+html body #uhz-global-header .uhz-v2-panel[hidden]{display:none!important}
+html body #uhz-global-header .uhz-v2-kicker{grid-column:1/-1;color:#a9dcef;font:750 10px system-ui,sans-serif;letter-spacing:.08em;padding:0 2px 7px}
+html body #uhz-global-header .uhz-v2-panel a{border:1px solid #31536a;border-radius:10px;color:#e4f5ff!important;padding:11px 10px!important;text-decoration:none!important;background:#18384c;font:600 12px/1.4 system-ui,sans-serif;white-space:normal}
+html body #uhz-global-header .uhz-v2-panel a:hover,html body #uhz-global-header .uhz-v2-panel a[aria-current=page]{background:#215a72;color:#fff!important}
+html body #uhz-global-header :is(a,button,select):focus-visible,html body #uhz-native-head :is(a,button,summary):focus-visible,html body .uhz-v2-footer :is(a,button):focus-visible{outline:3px solid #5ce3ff!important;outline-offset:3px!important}
+@media(max-width:800px){
+html body #uhz-native-head details[open]::before{content:'';position:fixed;inset:0;background:#030f20a9;z-index:1;backdrop-filter:blur(2px)}
+html body #uhz-native-head .uhz-app-menu{position:fixed!important;inset:0 0 0 auto!important;top:0!important;left:auto!important;right:0!important;bottom:0!important;width:min(390px,94vw)!important;max-width:none!important;height:100dvh!important;max-height:100dvh!important;margin:0!important;padding:23px 17px calc(28px + env(safe-area-inset-bottom,0px))!important;grid-template-columns:repeat(2,minmax(0,1fr))!important;align-content:start!important;border-radius:22px 0 0 22px!important;overflow-y:auto!important;overscroll-behavior:contain!important;z-index:2!important;box-shadow:-20px 0 60px #06172d55!important}
+html body #uhz-native-head details[open] .uhz-app-menu{animation:uhz-v2-enter .2s ease-out both}
+html body #uhz-native-head .uhz-app-menu .uhz-menu-heading{grid-column:1/-1!important;position:sticky;top:-23px;padding:10px 3px 13px!important;z-index:2;font-size:14px!important}
+html body #uhz-native-head .uhz-app-menu a{min-height:46px!important;padding:10px!important;font-size:12px!important;border-radius:11px!important;white-space:normal!important}
+html body #uhz-native-head .uhz-app-menu .uhz-menu-section-label{grid-column:1/-1!important;padding:12px 2px 4px!important}
+html body #uhz-native-head .uhz-menu-theme,html body #uhz-native-head .uhz-menu-language{grid-column:1/-1!important}
+@keyframes uhz-v2-enter{from{transform:translateX(18px);opacity:.55}to{transform:translateX(0);opacity:1}}
+}
+html[data-uhz-theme=dark] body #uhz-native-head .uhz-app-menu,html[data-theme=dark] body #uhz-native-head .uhz-app-menu{background:#132b3b!important;color:#e9f6ff!important}
+html[data-uhz-theme=dark] body #uhz-native-head .uhz-app-menu .uhz-menu-heading,html[data-theme=dark] body #uhz-native-head .uhz-app-menu .uhz-menu-heading{background:#132b3b!important;color:#e9f6ff!important}
+html body .uhz-v2-footer{width:100%!important;max-width:none!important;clear:both;margin:48px 0 0!important;padding:0!important;border:0!important;border-top:1px solid #345366!important;border-radius:0!important;background:linear-gradient(135deg,#071b2d,#123247)!important;color:#e9f6ff!important;font-family:system-ui,sans-serif!important}
+html body .uhz-v2-footer *{box-sizing:border-box}
+html body .uhz-v2-footer-grid{max-width:1260px;margin:auto;padding:48px 24px 40px;display:grid;grid-template-columns:minmax(200px,1.4fr) repeat(4,minmax(110px,1fr));gap:clamp(15px,2.8vw,40px)}
+html body .uhz-v2-wordmark{display:inline-flex;align-items:center;gap:9px;color:#fff!important;font-size:15px;font-weight:800;text-decoration:none!important;letter-spacing:.04em}
+html body .uhz-v2-wordmark img{width:42px;height:42px;object-fit:contain;border-radius:12px}
+html body .uhz-v2-brand p{color:#8dd8ed;font-size:10px;letter-spacing:.08em}
+html body .uhz-v2-brand>span{display:block;max-width:225px;color:#adc8d8;font-size:13px;line-height:1.7;margin-top:17px}
+html body .uhz-v2-footer-column h2{margin:0 0 16px;color:#ecfaff;font-size:13px;font-weight:750}
+html body .uhz-v2-footer-column nav{display:grid;gap:11px}
+html body .uhz-v2-footer-column a{font-size:12px;line-height:1.45;color:#b8cfdf!important;text-decoration:none!important}
+html body .uhz-v2-footer-column a:hover,html body .uhz-v2-footer-column a[aria-current=page]{color:#6fe0f8!important;text-decoration:underline!important}
+html body .uhz-v2-footer-base{max-width:1260px;margin:auto;border-top:1px solid #345366;padding:20px 24px 26px;display:flex;align-items:center;justify-content:space-between;gap:12px;flex-wrap:wrap;font-size:11px;color:#a8c2d5}
+html body .uhz-v2-footer-base button{background:transparent;border:1px solid #4c7287;border-radius:9px;color:#e9faff;font:600 11px system-ui,sans-serif;padding:10px 13px;cursor:pointer}
+html body .uhz-v2-footer-base button:hover{background:#23536c}
+html body footer.uhz-pro-footer.uhz-v2-legal-footer{clear:both;border-top:1px solid #4d6e86}
+@media(max-width:1090px){html body .uhz-v2-footer-grid{grid-template-columns:repeat(4,minmax(110px,1fr))}html body .uhz-v2-brand{grid-column:1/-1}}
+@media(max-width:720px){html body .uhz-v2-footer-grid{grid-template-columns:repeat(2,minmax(0,1fr));gap:28px 15px;padding:36px 18px}html body .uhz-v2-footer-base{padding:17px 18px 94px}html body .uhz-v2-brand{grid-column:1/-1}}
+@media(prefers-reduced-motion:reduce){html body #uhz-native-head details[open] .uhz-app-menu{animation:none!important}}

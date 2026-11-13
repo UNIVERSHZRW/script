@@ -128,6 +128,8 @@ function textInLanguage(original) {
 }
 function translateText(node) {
   if(!node.parentElement||!node.data.trim()||node.parentElement.closest(ignored))return;
+  const option=node.parentElement.closest('option');
+  if(option&&!option.hasAttribute('value'))option.value=option.value;
   const old=sourceText.get(node);
   const original=old?.output===node.data?old.original:node.data;
   const output=textInLanguage(original);

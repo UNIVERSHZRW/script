@@ -19,18 +19,18 @@ contract INFYNITYTest {
 
     function testNameSymbolAndFixedSupply() public {
         address treasury = address(0x1234);
-        INFYNITY token = new INFYNITY(treasury, address(this), 1_000_000);
+        INFYNITY token = new INFYNITY(treasury, address(this));
         assert(keccak256(bytes(token.name())) == keccak256(bytes("INFYNITY")));
         assert(keccak256(bytes(token.symbol())) == keccak256(bytes("INFT")));
         assert(token.decimals() == 18);
-        assert(token.totalSupply() == 1_000_000 * UNITS);
-        assert(token.initialSupply() == token.totalSupply());
+        assert(token.totalSupply() == 10_000_000 * UNITS);
+        assert(token.INITIAL_SUPPLY() == token.totalSupply());
         assert(token.balanceOf(treasury) == token.totalSupply());
         assert(token.balanceOf(address(this)) == 0);
     }
 
     function testPauseRequiresGovernorAndBlocksTransfers() public {
-        INFYNITY token = new INFYNITY(address(this), address(this), 100);
+        INFYNITY token = new INFYNITY(address(this), address(this));
         ExternalActor outsider = new ExternalActor();
         assert(!outsider.pauseAsNonOwner(token));
         token.transfer(address(0xBEEF), 5 * UNITS);
@@ -43,11 +43,11 @@ contract INFYNITYTest {
         token.unpause();
         assert(!token.paused());
         assert(token.transfer(address(0xCAFE), 1 * UNITS));
-        assert(token.totalSupply() == 100 * UNITS);
+        assert(token.totalSupply() == 10_000_000 * UNITS);
     }
 
     function testOwnershipRequiresAcceptance() public {
-        INFYNITY token = new INFYNITY(address(this), address(this), 20);
+        INFYNITY token = new INFYNITY(address(this), address(this));
         ExternalActor secondOwner = new ExternalActor();
         token.transferOwnership(address(secondOwner));
         assert(token.owner() == address(this));
@@ -59,27 +59,21 @@ contract INFYNITYTest {
     }
 
     function testCannotRenounceOwnership() public {
-        INFYNITY token = new INFYNITY(address(this), address(this), 10);
+        INFYNITY token = new INFYNITY(address(this), address(this));
         (bool allowed,) = address(token).call(abi.encodeCall(token.renounceOwnership, ()));
         assert(!allowed);
         assert(token.owner() == address(this));
     }
 
     function testZeroTreasuryRejected() public {
-        try new INFYNITY(address(0), address(this), 10) returns (INFYNITY) {
-            assert(false);
-        } catch {}
-    }
-
-    function testZeroSupplyRejected() public {
-        try new INFYNITY(address(this), address(this), 0) returns (INFYNITY) {
+        try new INFYNITY(address(0), address(this)) returns (INFYNITY) {
             assert(false);
         } catch {}
     }
 
     function testFuzzSupplyNeverExpands(uint96 amount) public {
-        uint256 initial = 10_000;
-        INFYNITY token = new INFYNITY(address(this), address(this), initial);
+        uint256 initial = 10_000_000;
+        INFYNITY token = new INFYNITY(address(this), address(this));
         uint256 sending = uint256(amount) % (initial * UNITS + 1);
         token.transfer(address(0xBEEF), sending);
         assert(token.totalSupply() == initial * UNITS);

@@ -60,3 +60,5 @@ El pie es código original del proyecto sin paquetes ajenos en tiempo de ejecuci
 - Navegador Cloudflare: Inicio (escritorio), Herramientas (móvil), INFYNITY y catálogo `/creador/univershzrw` (móvil), todos con **un pie corporativo**, enlaces legales y componentes esperados.
 - Verificados los bindings Cloudflare originales del Worker de menú y del catálogo.
 - No se han hecho pruebas autenticadas en todos los módulos ni auditoría de accesibilidad completa con lector de pantalla; se recomienda revisión final en dispositivos reales.
+
+**Regresión móvil corregida:** los enlaces de `<details>` cerrados se ocultan expresamente con el selector `.uhz-v4-col-toggle:not([open]) > .uhz-v4-nav`. En navegador a 390 px se comprobaron: pie visible (`display:block`), pie anterior oculto (`display:none`), anchura del pie 390 px, cero rectángulos de enlaces al estar cerrado y un rectángulo al expandirlo. Estudio Premium también confirmó pie único. CI de GitHub aprobado.

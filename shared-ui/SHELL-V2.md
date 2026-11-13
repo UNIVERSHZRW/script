@@ -78,3 +78,18 @@ Dos diseños solicitados como referencia visual, implementados con CSS custom pr
 - CI GitHub Actions: pruebas de sintaxis y tokens pasaron. Queda pendiente probar manualmente todas las rutas, navegadores y aplicaciones independientes de UNIVERSHZRW antes de declarar cobertura absoluta.
 
 Referencias: https://developer.mozilla.org/en-US/docs/Web/CSS/Reference/Properties/color-scheme y https://developer.mozilla.org/en-US/docs/Web/CSS/Reference/Values/color_value/light-dark.
+
+## Restauración del pie original (última revisión, 12 nov 2026)
+
+Esta sección prevalece sobre las versiones anteriores de pie v4. Se recuperó el pie exacto que el propietario mostró en su captura:
+- Se utiliza la plantilla original footer.uhz-pro-footer, con emblema de candado, UNIVERSHZRW, lema DONDE TODO ES POSIBLE, Plataforma, Recursos, Ayuda y Comparte UNIVERSHZRW.
+- Se conservan los cinco iconos sociales, la verificación del sitio, los enlaces legales, los distintivos de seguridad y el aviso Publicidad responsable.
+- Si el footer clásico existe se reutiliza sin reescribir el resto de la página; el footer v4 se elimina.
+- En otras páginas se importa únicamente el footer original desde /donar, con alternativa /, excluyendo scripts, iframes y formularios. El CSS es el original /_uhz/site-footer.css.
+- Los botones sociales importados tienen controladores explícitos. En páginas con encabezado independiente la verificación se enlaza a /seguridad con el mismo escudo.
+- Se desactiva la clase uhz-v4-footer-active y se habilita uhz-classic-footer-active; se ocultan únicamente los pies duplicados.
+- No se modifican encabezado, sesión, balances, INFYNITY, pagos ni los dos temas de color.
+- Código: shared-ui/footer-classic-restore.js, servido por /_uhz/shared-header.js?asset=footer-classic-v1. Los archivos shell-v2.js y footer-only-v4.js ahora solo cargan ese complemento, no generan el antiguo v4.
+- Browser Rendering: Inicio y Planes con un solo footer clásico, cinco botones sociales y cero footer v4. También comprobado el catálogo de creadores con la plantilla importada.
+- Las versiones anteriores del Worker de Cloudflare siguen disponibles para revertir; la conexión ORIGINAL_SITE se preservó.
+- PR en borrador para evitar que una futura fusión sobrescriba scripts de producción.

@@ -39,6 +39,7 @@ if(community){community.textContent='Comunichat';community.href='/mi-cuenta?sect
 function mobile(){
 const menu=document.querySelector('#uhz-native-head .uhz-app-menu');
 if(!menu||menu.dataset.unifiedV2)return;menu.dataset.unifiedV2='1';
+const disclosure=menu.closest('details');if(disclosure)disclosure.addEventListener('click',e=>{if(e.target===disclosure&&disclosure.open)disclosure.open=false});
 const paths=new Set([...menu.querySelectorAll('a')].map(x=>{try{return new URL(x.href).pathname.toLowerCase()}catch{return''}}));
 const before=menu.querySelector('.uhz-menu-section-label'),label=el('span','uhz-menu-section-label uhz-v2-mobile-title','Herramientas y servicios');
 menu.insertBefore(label,before);
@@ -48,6 +49,7 @@ function footer(){
 const existing=document.querySelector('footer.uhz-pro-footer'),injected=document.querySelector('#uhz-v2-footer');
 if(existing){existing.classList.add('uhz-v2-legal-footer');if(injected)injected.remove();return}
 if(injected)return;
+if(document.querySelector('script[src*="site-footer.js"]')&&document.readyState!=='complete')return;
 const foot=el('footer','uhz-v2-footer');foot.id='uhz-v2-footer';foot.setAttribute('aria-label','Pie de página UNIVERSHZRW');
 const inner=el('div','uhz-v2-footer-grid');
 const brand=el('div','uhz-v2-brand');const home=a('UNIVERSHZRW','/');home.className='uhz-v2-wordmark';

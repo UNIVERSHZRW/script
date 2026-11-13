@@ -38,6 +38,7 @@ function header(){
   const more=el('details','uhz-v3-more');
   const summary=el('summary','uhz-v3-more-trigger','Más');
   summary.setAttribute('aria-label','Más secciones de UNIVERSHZRW');
+  summary.setAttribute('aria-expanded','false');
   const menu=el('div','uhz-v3-more-menu');
   const menuLabel=el('strong','uhz-v3-menu-label','EXPLORAR Y PARTICIPAR');
   menu.append(menuLabel);
@@ -81,6 +82,7 @@ function header(){
   if(whatsapp){whatsapp.textContent='WhatsApp';contact.append(whatsapp)}
   menu.append(contact);
   more.append(summary,menu);primary.append(more);
+  more.addEventListener('toggle',()=>summary.setAttribute('aria-expanded',String(more.open)));
   document.addEventListener('pointerdown',event=>{if(more.open&&!more.contains(event.target))more.open=false},true);
   more.addEventListener('keydown',event=>{if(event.key==='Escape'){more.open=false;summary.focus();event.preventDefault()}});
   more.addEventListener('click',event=>{if(event.target.closest('a'))more.open=false});

@@ -244,13 +244,29 @@ function footer(){
       ['Ayuda y contacto',[['Centro de ayuda','/centro-de-ayuda'],['Preguntas frecuentes','/preguntas-frecuentes'],['Contacto','/contacto'],['Reportar contenido','/reportar-contenido'],['Seguridad','/seguridad'],['Preferencias de cookies','/preferencias-de-cookies']]],
       ['Información legal',[['Términos y condiciones','/terminos-y-condiciones'],['Política de privacidad','/politica-de-privacidad'],['Derechos de autor','/derechos-de-autor'],['Documentación legal','/documentacion-legal'],['Enlaces externos','/enlaces-externos'],['Software y licencias','/software-y-licencias'],['Publicidad','/publicidad']]]
     ];
+    const desktopColumns=matchMedia('(min-width:720px)');
     for(const [heading,links] of cols){
       const sec=el('section','uhz-v4-col');
-      const h=el('h2','uhz-v4-heading',heading);
+      const collapsible=el('details','uhz-v4-col-toggle');
+      collapsible.open=desktopColumns.matches;
+      const title=el('summary','uhz-v4-heading',heading);
+      title.tabIndex=desktopColumns.matches?-1:0;
+      title.setAttribute('aria-disabled',String(desktopColumns.matches));
+      collapsible.addEventListener('click',event=>{
+        if(desktopColumns.matches&&event.target.closest('summary'))event.preventDefault()
+      });
       const nav=el('nav','uhz-v4-nav');nav.setAttribute('aria-label',heading);
       for(const [name,href]of links)nav.append(a(name,href));
-      sec.append(h,nav);top.append(sec);
+      collapsible.append(title,nav);sec.append(collapsible);top.append(sec);
     }
+    desktopColumns.addEventListener('change',()=>{
+      for(const item of top.querySelectorAll('.uhz-v4-col-toggle')){
+        item.open=desktopColumns.matches;
+        const summary=item.querySelector('summary');
+        summary.tabIndex=desktopColumns.matches?-1:0;
+        summary.setAttribute('aria-disabled',String(desktopColumns.matches));
+      }
+    });
     foot.append(top);
     const trust=el('div','uhz-v4-trust');
     const note=el('p','uhz-v4-trust-note',

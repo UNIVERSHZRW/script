@@ -55,8 +55,17 @@ function verificationFallback(footer){
  const sec=footer.querySelector('.uhz-footer-social');
  if(!sec)return;
  const a=document.createElement('a');a.className='uhz-footer-verification';a.href='/seguridad';
- a.textContent='Verificación del sitio';a.setAttribute('aria-label','Consultar verificación y seguridad del sitio');
- sec.append(a);
+ a.id='uhz-footer-verification';a.title='Centro de verificación y confianza de UNIVERSHZRW';
+ a.setAttribute('aria-label','Consultar verificación y seguridad del sitio');
+ const svg=document.createElementNS('http://www.w3.org/2000/svg','svg');
+ svg.setAttribute('viewBox','0 0 24 24');svg.setAttribute('aria-hidden','true');
+ svg.setAttribute('fill','none');svg.setAttribute('stroke','currentColor');
+ svg.setAttribute('stroke-width','1.8');svg.setAttribute('stroke-linecap','round');svg.setAttribute('stroke-linejoin','round');
+ for(const d of ['M12 2 4 5v7c0 5 3 8 8 10 5-2 8-5 8-10V5z','m8.5 12 2.5 2.6 4.7-5.3']){
+  const path=document.createElementNS('http://www.w3.org/2000/svg','path');path.setAttribute('d',d);svg.append(path);
+ }
+ const text=document.createElement('span');text.textContent='Verificación del sitio';
+ a.append(svg,text);sec.append(a);
 }
 function restore(footer){
  if(!footer||!document.body)return false;

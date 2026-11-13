@@ -46,6 +46,16 @@ if(source.includes(jsKey)){
   source=once(source,cssRoute,cssRoute+"url.searchParams.get('asset')==='shell-v2'?asset(req,UHZ_UNIFIED_SHELL_CSS,'text/css'):");
   source=once(source,jsRoute,"asset(req,header+UHZ_ARTICLE_BOOTSTRAP+UHZ_FLOW_ARTICLE_INLINE+UHZ_ARTICLE_FOOTER+UHZ_COIN_TIP_ARTICLE_LOADER+UHZ_UNIFIED_SHELL_JS,'application/javascript')");
 }
+// Correct the original header's parameter order without changing any other account logic.
+const match=source.match(/const header=("(?:\\.|[^"\\])*");/);
+if(!match)throw Error('Shared header source marker missing.');
+let header=JSON.parse(match[1]);
+const incorrect="const wallet=make('a','uhzg-wallet','Free · ₡—')";
+const correct="const wallet=make('a','Free · ₡—','uhzg-wallet')";
+if(header.includes(incorrect))header=header.replace(incorrect,correct);
+else if(!header.includes(correct))throw Error('Unknown wallet factory; refusing to overwrite.');
+source=source.replace(match[0],'const header='+JSON.stringify(header)+';');
+
 if(!source.includes('env.ORIGINAL_SITE.fetch(req)')||
    !source.includes("asset(req,UHZ_UNIFIED_SHELL_CSS,'text/css')")||
    !source.includes("UHZ_COIN_TIP_ARTICLE_LOADER+UHZ_UNIFIED_SHELL_JS"))

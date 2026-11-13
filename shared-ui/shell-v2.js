@@ -6,6 +6,12 @@ if(window.__uhzUnifiedShellV2)return;window.__uhzUnifiedShellV2=true;
 const p=location.pathname.toLowerCase(),q=new URLSearchParams(location.search);
 if(top!==self||q.get('embed')==='1'||q.get('_uhz_robot')==='1'||/\/(?:robot|archivos|control-sd)(?:\/|$)/.test(p))return;
 if(!document.getElementById('uhz-unified-shell-v2-css')){const s=document.createElement('link');s.id='uhz-unified-shell-v2-css';s.rel='stylesheet';s.href='/_uhz/shared-header.js?asset=shell-v2&v=20261112';document.head.append(s)}
+if(!document.getElementById('uhz-brand-theme-css')){
+ const link=document.createElement('link');
+ link.id='uhz-brand-theme-css';link.rel='stylesheet';
+ link.href='/_uhz/shared-header.js?asset=brand-theme-v1&v=20261112-mint-charcoal';
+ document.head.append(link);
+}
 const tools=[['Herramientas','/herramientas'],['Planes','/planes'],['Estudio Premium','/estudio'],['Biblioteca','/biblioteca'],['INFYNITY','/criptomoneda'],['Coins','/economia'],['Ayuda','/centro-de-ayuda']];
 const sections=[
 ['Explorar',[['Inicio','/'],['Biblioteca','/biblioteca'],['Tienda online','/tienda_online'],['Herramientas','/herramientas'],['Peticiones','/peticiones']]],
@@ -59,6 +65,8 @@ function header(){
   const themeWrap=el('label','uhz-v3-theme-wrap');
   themeWrap.append(el('span',null,'Apariencia'));
   theme.style.cssText='';theme.classList.add('uhz-v3-theme');
+  for(const option of theme.options){if(option.value==='colorful')option.textContent='Normal';if(option.value==='dark')option.textContent='Oscuro'}
+  theme.title='Modo Normal u Oscuro';
   themeWrap.append(theme);options.append(themeWrap);
   const langWrap=el('div','uhz-v3-language');
   langWrap.append(el('span',null,'Idioma'));
@@ -199,6 +207,7 @@ function mobile(){
     for(const [name,href] of links)group.append(a(name,href));
     menu.append(group);
   }
+  existingTheme.querySelectorAll('[data-uhz-choice=colorful]').forEach(button=>{button.textContent='Normal'});
   menu.append(el('span','uhz-v3-mobile-heading','Preferencias'),existingTheme,existingLanguage);
   const contact=el('div','uhz-v3-mobile-contact');
   const mail=a('Correo','mailto:univershzrw@gmail.com');

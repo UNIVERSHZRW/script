@@ -12,6 +12,20 @@ if(!document.getElementById('uhz-unified-shell-v2-css')){
  style.href='/_uhz/shared-header.js?asset=shell-v2&v=footer-20261112-v4';
  document.head.append(style);
 }
+if(!document.getElementById('uhz-brand-theme-css')){
+ const style=document.createElement('link');style.rel='stylesheet';style.id='uhz-brand-theme-css';
+ style.href='/_uhz/shared-header.js?asset=brand-theme-v1&v=20261112-mint-charcoal';
+ document.head.append(style);
+}
+function syncIndependentTheme(){
+ let selected='colorful';
+ try{selected=localStorage.getItem('uhz_header_theme')==='dark'?'dark':'colorful'}catch{}
+ document.documentElement.dataset.uhzTheme=selected;
+ document.documentElement.dataset.theme=selected==='dark'?'dark':'light';
+ document.documentElement.style.colorScheme=selected==='dark'?'dark':'light';
+}
+syncIndependentTheme();
+window.addEventListener('storage',event=>{if(event.key==='uhz_header_theme')syncIndependentTheme()});
 const p=path;
 const el=(tag,cls,text)=>{const x=document.createElement(tag);if(cls)x.className=cls;if(text)x.textContent=text;return x};
 const active=href=>{try{const x=new URL(href,location.origin);return x.pathname.toLowerCase()===p&&(!x.search||x.search===location.search)}catch{return false}};

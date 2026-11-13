@@ -507,3 +507,34 @@ html[data-uhz-ui][data-uhz-portal] .uhz-account-navigation .uhz-sidebar-link {
 html[data-uhz-ui] body :is(#uhz-ui-desktop,#uhz-ui-mobile) .uhz-ui-user [data-uhz-member][hidden] { display:none !important; }
 html[data-uhz-ui][data-uhz-portal] .uhz-account-navigation .uhz-more-account { margin: 5px 0; }
 html[data-uhz-ui][data-uhz-home] :is(.search-brand-subtitle,#buscador .uhz-logo-copy) { color: var(--uhz-ink); }
+
+html[data-uhz-ui][data-uhz-home] body #buscador.search-shell.google-search-layout {
+  background: var(--uhz-surface) !important;
+  color: var(--uhz-ink) !important;
+  border-color: var(--uhz-line) !important;
+}
+html[data-uhz-ui][data-uhz-home] body #buscador #googleSearchBox.uhz-search-box-pro {
+  background: var(--uhz-surface) !important;
+  color: var(--uhz-ink) !important;
+  border-color: var(--uhz-line) !important;
+}
+html[data-uhz-ui][data-uhz-home] body #buscador.search-shell #inputBusqueda {
+  color: var(--uhz-ink) !important;
+  background: transparent !important;
+}
+@media (max-width: 800px) {
+  html[data-uhz-ui][data-uhz-home] body #buscador.search-shell #inputBusqueda { font-size: 16px !important; }
+  html[data-uhz-ui] body #trustedsite-tm-image { bottom: calc(var(--uhz-dock-height) + env(safe-area-inset-bottom,0px) - 8px) !important; }
+}
+html[data-uhz-ui][data-uhz-theme="dark"] body :is(#uhzFooterAdBanner,#popupAnuncio) {
+  --surface: var(--uhz-surface);
+  --surface-2: var(--uhz-soft);
+  --surface-3: var(--uhz-soft);
+  --text: var(--uhz-ink);
+  --muted: var(--uhz-muted);
+  --border: var(--uhz-line);
+  background: var(--uhz-surface) !important;
+  color: var(--uhz-ink) !important;
+  border-color: var(--uhz-line) !important;
+  color-scheme: dark !important;
+}

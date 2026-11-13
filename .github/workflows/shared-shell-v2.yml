@@ -1,9 +1,9 @@
 name: Shared site shell checks
 on:
   push:
-    paths: ['shared-ui/shell-v2.js', 'shared-ui/shell-v2.css', '.github/workflows/shared-shell-v2.yml']
+    paths: ['shared-ui/shell-v2.js', 'shared-ui/shell-v2.css', 'shared-ui/deploy-shell-v2.mjs', '.github/workflows/shared-shell-v2.yml']
   pull_request:
-    paths: ['shared-ui/shell-v2.js', 'shared-ui/shell-v2.css', '.github/workflows/shared-shell-v2.yml']
+    paths: ['shared-ui/shell-v2.js', 'shared-ui/shell-v2.css', 'shared-ui/deploy-shell-v2.mjs', '.github/workflows/shared-shell-v2.yml']
 permissions:
   contents: read
 jobs:
@@ -15,7 +15,7 @@ jobs:
         with:
           node-version: '22'
       - name: JavaScript syntax
-        run: node --check shared-ui/shell-v2.js
+        run: node --check shared-ui/shell-v2.js && node --check shared-ui/deploy-shell-v2.mjs
       - name: Verify essential features
         run: |
           node --input-type=module -e "

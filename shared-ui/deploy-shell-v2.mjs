@@ -10,6 +10,7 @@ const root=dirname(fileURLToPath(import.meta.url));
 const js=readFileSync(resolve(root,'shell-v2.js'),'utf8');
 const css=readFileSync(resolve(root,'shell-v2.css'),'utf8');
 const footerOnly=readFileSync(resolve(root,'footer-only-v4.js'),'utf8');
+const classicFooter=readFileSync(resolve(root,'footer-classic-restore.js'),'utf8');
 const brandTheme=readFileSync(resolve(root,'brand-themes.css'),'utf8');
 const themeRuntime=readFileSync(resolve(root,'theme-runtime.js'),'utf8');
 const apply=process.argv.includes('--apply');
@@ -68,11 +69,10 @@ if(source.includes(themeKey)){
   source=source.slice(0,begin)+themeKey+JSON.stringify(brandTheme)+source.slice(end);
 }else source=once(source,assetAnchor,themeKey+JSON.stringify(brandTheme)+';\n'+assetAnchor);
 const themeToken="url.searchParams.get('asset')==='brand-theme-v1'?asset(req,UHZ_BRAND_THEME_CSS,'text/css'):";
-if(!source.includes(themeToken)||
-   !source.includes(runtimeToken))source=once(source,cssToken,cssToken+themeToken);
+if(!source.includes(themeToken))source=once(source,cssToken,cssToken+themeToken);
 const runtimeKey='const UHZ_BRAND_THEME_RUNTIME_JS=';
 if(source.includes(runtimeKey)){
-  const begin=source.indexOf(runtimeKey),end=source.indexOf(';\n'+assetAnchor,begin);
+  const begin=source.indexOf(runtimeKey),end=source.indexOf(source.includes('const UHZ_CLASSIC_FOOTER_JS=')?';\nconst UHZ_CLASSIC_FOOTER_JS=':';\n'+assetAnchor,begin);
   if(begin<0||end<begin||source.indexOf(runtimeKey,begin+1)>=0)
     throw Error('The theme runtime was changed concurrently; refusing.');
   source=source.slice(0,begin)+runtimeKey+JSON.stringify(themeRuntime)+source.slice(end);
@@ -80,6 +80,17 @@ if(source.includes(runtimeKey)){
 const runtimeToken="url.searchParams.get('asset')==='brand-theme-runtime-v1'?asset(req,UHZ_BRAND_THEME_RUNTIME_JS,'application/javascript'):";
 if(!source.includes(runtimeToken))source=once(source,themeToken,themeToken+runtimeToken);
 
+
+
+const classicKey='const UHZ_CLASSIC_FOOTER_JS=';
+if(source.includes(classicKey)){
+  const begin=source.indexOf(classicKey),end=source.indexOf(';\n'+assetAnchor,begin);
+  if(begin<0||end<begin||source.indexOf(classicKey,begin+1)>=0)
+    throw Error('The original footer loader was changed concurrently; refusing.');
+  source=source.slice(0,begin)+classicKey+JSON.stringify(classicFooter)+source.slice(end);
+}else source=once(source,assetAnchor,classicKey+JSON.stringify(classicFooter)+';\n'+assetAnchor);
+const classicToken="url.searchParams.get('asset')==='footer-classic-v1'?asset(req,UHZ_CLASSIC_FOOTER_JS,'application/javascript'):";
+if(!source.includes(classicToken))source=once(source,runtimeToken,runtimeToken+classicToken);
 
 const footerToken="url.searchParams.get('asset')==='footer-v4'?asset(req,UHZ_GLOBAL_FOOTER_ONLY_JS,'application/javascript'):";
 if(!source.includes(footerToken))source=once(source,cssToken,cssToken+footerToken);
@@ -97,7 +108,9 @@ source=source.replace(match[0],'const header='+JSON.stringify(header)+';');
 if(!source.includes('env.ORIGINAL_SITE.fetch(req)')||
    !source.includes("asset(req,UHZ_UNIFIED_SHELL_CSS,'text/css')")||
    !source.includes("UHZ_COIN_TIP_ARTICLE_LOADER+UHZ_UNIFIED_SHELL_JS")||
-   !source.includes(footerToken))
+   !source.includes(footerToken)||
+   !source.includes(classicToken)||
+   !source.includes(runtimeToken))
    throw Error('Required upstream binding or shared route missing.');
 const lint=spawnSync('node',['--check','-'],{input:source,encoding:'utf8'});
 if(lint.status!==0)throw Error('Worker syntax validation failed: '+lint.stderr.slice(0,1600));

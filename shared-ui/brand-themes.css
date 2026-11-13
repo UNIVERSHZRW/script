@@ -312,3 +312,74 @@ html[data-uhz-theme="dark"] body .site-head {
     transition-duration:0.01ms!important;
   }
 }
+
+
+/* Literal high-contrast fallback. Some legacy styles redeclare --bg, --ink
+ * and --panel during theme-change. These selectors protect the visual shell
+ * even when a page-specific var() declaration cannot compute. */
+html[data-uhz-theme="dark"] body {
+  background:#1C1C1C!important;
+  color:#EDE6D8!important;
+}
+html[data-uhz-theme="dark"] body #uhz-global-header.uhz-v3-header {
+  background:#1C1C1C!important;
+  color:#EDE6D8!important;
+  border-color:#645D53!important;
+}
+html[data-uhz-theme="dark"] body #uhz-global-header :is(.uhzg-brand,.uhzg-brand strong,.uhzg-brand small,.uhz-v3-nav-link,.uhz-v3-more-trigger,.uhzg-notifications) {
+  color:#EDE6D8!important;
+}
+html[data-uhz-theme="dark"] body #uhz-global-header .uhz-v3-more-menu {
+  background:#292929!important;
+  color:#EDE6D8!important;
+  border-color:#645D53!important;
+}
+html[data-uhz-theme="dark"] body #uhz-global-header :is(.uhz-v3-menu-links a,.uhz-v3-chip,.uhz-v3-theme) {
+  background:#373431!important;
+  color:#EDE6D8!important;
+  border-color:#645D53!important;
+}
+html[data-uhz-theme="dark"] body #uhz-global-header :is(.uhz-v3-chip-label,.uhz-v3-chip-value) {
+  color:#EDE6D8!important;
+}
+html[data-uhz-theme="dark"] body #uhz-global-site-footer.uhz-v4-footer {
+  background:#1C1C1C!important;
+  color:#EDE6D8!important;
+  border-color:#645D53!important;
+}
+html[data-uhz-theme="dark"] body #uhz-global-site-footer .uhz-v4-bottom {
+  background:#1C1C1C!important;
+  color:#C7BFAF!important;
+  border-color:#504A43!important;
+}
+html[data-uhz-theme="dark"] body #uhz-global-site-footer :is(.uhz-v4-wordmark strong,.uhz-v4-heading,.uhz-v4-logo,.uhz-v4-col-toggle summary) {
+  color:#EDE6D8!important;
+}
+html[data-uhz-theme="dark"] body #uhz-global-site-footer :is(.uhz-v4-desc,.uhz-v4-trust-note,.uhz-v4-nav a,.uhz-v4-specific-note) {
+  color:#C7BFAF!important;
+}
+html[data-uhz-theme="dark"] body #uhz-global-site-footer .uhz-v4-action {
+  background:#373431!important;color:#EDE6D8!important;border-color:#645D53!important;
+}
+html[data-uhz-theme="dark"] body :is(.uhz-plans .membership,.uhz-plans .account,.uhz-plans .compare,
+.uhz-plans .content-section .panel,main .card,main .panel,main .account-card,
+main .membership,main .stat-card):not(:has(>img)):not(:has(>.image)) {
+  background:#292929!important;color:#EDE6D8!important;border-color:#645D53!important;
+}
+html[data-uhz-theme="dark"] body :is(.uhz-plans .hero,.hero-shop) {
+  background:#292929!important;color:#EDE6D8!important;border-color:#645D53!important;
+}
+html[data-uhz-theme="dark"] body :is(.uhz-plans .hero h1,.uhz-plans .hero p,.hero-shop h1,.hero-shop p) {
+  color:#EDE6D8!important;
+}
+html[data-uhz-theme="dark"] body :is(.site-head,.uhz-v3-menu-contact) {
+  color:#EDE6D8!important;
+}
+html[data-uhz-theme="colorful"] body #uhz-global-header.uhz-v3-header,
+html[data-uhz-theme="light"] body #uhz-global-header.uhz-v3-header {
+  background:#002941!important;color:#CFE8E1!important;
+}
+html[data-uhz-theme="colorful"] body #uhz-global-site-footer.uhz-v4-footer,
+html[data-uhz-theme="light"] body #uhz-global-site-footer.uhz-v4-footer {
+  background:#002941!important;color:#CFE8E1!important;
+}

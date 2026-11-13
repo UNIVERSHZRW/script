@@ -75,7 +75,7 @@ function loadDictionary() {
   if(window.UHZTranslations){dictionary=window.UHZTranslations;return Promise.resolve();}
   if(pendingDictionary)return pendingDictionary;
   const link=document.createElement('script');
-  link.src='/_uhz/shared-header.js?asset=ui-en-3';
+  link.src='/_uhz/shared-header.js?asset=ui-en-4';
   pendingDictionary=new Promise(resolve=>{
     link.addEventListener('load',()=>{
       dictionary=window.UHZTranslations||dictionary;

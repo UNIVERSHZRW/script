@@ -1,0 +1,421 @@
+/* UNIVERSHZRW Shared Header v3: one row, no duplicate menus, session-scoped account chips. */
+/* MIT, responsive disclosure navigation. Existing footer preserved below. */
+:root{--uhzv-bg:#081d2e;--uhzv-panel:#102c41;--uhzv-card:#163c51;--uhzv-accent:#67d9f5}
+html body #uhz-global-header.uhzg-header.uhz-v3-header{
+  background:linear-gradient(110deg,#071c2e,#12354a)!important;
+  border-bottom:1px solid rgba(180,222,240,.19)!important;
+  box-shadow:0 6px 22px rgba(3,20,39,.16)!important;
+  z-index:2147482500!important;
+  box-sizing:border-box!important;
+}
+html body #uhz-global-header .uhz-v3-nav{min-width:0!important}
+html body #uhz-global-header .uhz-v3-primary{display:flex;align-items:center;gap:clamp(2px,.35vw,7px);min-width:0;flex:1 1 auto}
+html body #uhz-global-header .uhz-v3-nav-link{
+  display:inline-flex!important;align-items:center!important;justify-content:center!important;
+  white-space:nowrap!important;text-decoration:none!important;
+  font:650 clamp(11px,.88vw,13px)/1.2 system-ui,sans-serif!important;
+  padding:11px clamp(6px,.7vw,12px)!important;
+  min-width:0!important;max-width:none!important;min-height:39px!important;
+  color:#d8e9f3!important;border-radius:10px!important;border:0!important;
+  background:transparent!important;
+}
+html body #uhz-global-header .uhz-v3-nav-link:hover,
+html body #uhz-global-header .uhz-v3-nav-link[aria-current=page]{
+  background:rgba(132,212,235,.14)!important;color:#fff!important
+}
+html body #uhz-global-header .uhz-v3-userbar{display:flex;align-items:center;justify-content:flex-end;gap:9px;flex:0 0 auto;min-width:0}
+html body #uhz-global-header .uhz-v3-balances{display:flex;align-items:center;gap:5px}
+html body #uhz-global-header .uhz-v3-balances[hidden]{display:none!important}
+html body #uhz-global-header .uhz-v3-chip{
+  display:flex;flex-direction:column;align-items:flex-start;justify-content:center;
+  gap:3px;min-height:46px;min-width:67px;padding:7px 10px;
+  border:1px solid #37566d;border-radius:12px;background:#13394d;
+  text-decoration:none!important;white-space:nowrap;line-height:1.12;
+  box-sizing:border-box;
+}
+html body #uhz-global-header .uhz-v3-chip:hover{background:#1a4b61;border-color:#5b94a8}
+html body #uhz-global-header .uhz-v3-chip-label{font:650 10px/1.1 system-ui,sans-serif;color:#9fc1d2}
+html body #uhz-global-header .uhz-v3-chip-value{font:800 12px/1.15 system-ui,sans-serif;color:#eefaff;max-width:100px;overflow:hidden;text-overflow:ellipsis}
+html body #uhz-global-header .uhz-v3-coins .uhz-v3-chip-value{color:#f6d27c}
+html body #uhz-global-header .uhz-v3-inft .uhz-v3-chip-value{color:#8ce5fd}
+html body #uhz-global-header .uhz-v3-plan .uhz-v3-chip-value{color:#c8e2fc}
+html body #uhz-global-header .uhz-v3-sr-only{
+  position:absolute!important;width:1px!important;height:1px!important;overflow:hidden!important;
+  clip-path:inset(50%)!important;white-space:nowrap!important
+}
+html body #uhz-global-header .uhz-v3-legacy-wallet{display:none!important}
+html body #uhz-global-header .uhz-v3-account{display:flex;align-items:center;flex:0 0 auto}
+html body #uhz-global-header .uhzg-account{display:flex!important;align-items:center!important;flex:0 0 auto!important;min-width:0!important;position:relative!important;flex-wrap:nowrap!important}
+html body #uhz-global-header .uhzg-login{
+  display:inline-flex!important;justify-content:center!important;align-items:center!important;
+  flex:0 0 auto!important;min-height:39px!important;min-width:39px!important;
+  font:650 12px/1.1 system-ui,sans-serif!important;white-space:nowrap!important;
+  padding:7px 10px!important;border-radius:12px!important;
+}
+html body #uhz-global-header .uhzg-account.is-member .uhzg-login{
+  width:40px!important;height:40px!important;min-height:40px!important;
+  max-width:40px!important;min-width:40px!important;border-radius:50%!important;padding:0!important
+}
+html body #uhz-global-header .uhzg-notifications{
+  width:41px!important;height:41px!important;min-width:41px!important;
+  min-height:41px!important;border-radius:12px!important;display:grid!important;
+  place-items:center!important;flex:0 0 41px!important;position:relative!important
+}
+html body #uhz-global-header .uhz-v3-more{position:relative;display:block;flex:0 0 auto}
+html body #uhz-global-header .uhz-v3-more-trigger{
+  list-style:none;display:inline-flex;align-items:center;gap:9px;
+  min-height:39px;padding:9px 12px;border-radius:10px;
+  border:1px solid #37566d;cursor:pointer;
+  font:700 12px/1.2 system-ui,sans-serif;color:#e8f5fd;
+  background:#ffffff0c;box-sizing:border-box
+}
+html body #uhz-global-header .uhz-v3-more-trigger::-webkit-details-marker{display:none}
+html body #uhz-global-header .uhz-v3-more-trigger:after{content:'';width:7px;height:7px;border:solid #b7dbe9;border-width:0 2px 2px 0;transform:translateY(-2px) rotate(45deg)}
+html body #uhz-global-header details[open]>.uhz-v3-more-trigger{background:#26566d;border-color:#6ba9c0}
+html body #uhz-global-header details[open]>.uhz-v3-more-trigger:after{transform:translateY(2px) rotate(225deg)}
+html body #uhz-global-header .uhz-v3-more-menu{
+  position:absolute;right:0;top:calc(100% + 13px);z-index:2147483600;
+  width:min(375px,calc(100vw - 26px));max-height:min(650px,80vh);
+  overflow:auto;box-sizing:border-box;padding:17px;
+  border:1px solid #355973;border-radius:16px;background:#102d40;
+  box-shadow:0 22px 60px #05172899;color:#f3fbff
+}
+html body #uhz-global-header .uhz-v3-menu-label{display:block;font:750 10px/1.5 system-ui,sans-serif;letter-spacing:.09em;color:#93c4d9;margin:0 0 12px}
+html body #uhz-global-header .uhz-v3-menu-links{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:7px}
+html body #uhz-global-header .uhz-v3-menu-links a{
+  display:flex;align-items:center;min-height:41px;padding:9px 11px;
+  border:1px solid #30536b;border-radius:10px;background:#183d51;
+  color:#e4f3fb!important;text-decoration:none!important;
+  font:650 12px/1.25 system-ui,sans-serif
+}
+html body #uhz-global-header .uhz-v3-menu-links a:hover,
+html body #uhz-global-header .uhz-v3-menu-links a[aria-current=page]{background:#205c72;color:#fff!important}
+html body #uhz-global-header .uhz-v3-menu-options{display:grid;grid-template-columns:1fr 1fr;gap:10px;border-top:1px solid #31536a;margin-top:14px;padding-top:13px}
+html body #uhz-global-header .uhz-v3-menu-options :is(label,.uhz-v3-language){display:grid;gap:6px;font:650 11px system-ui,sans-serif;color:#b8d6e3}
+html body #uhz-global-header .uhz-v3-theme{
+  appearance:auto!important;color:#eefaff!important;background:#163c51!important;
+  border:1px solid #40657d!important;border-radius:9px!important;
+  width:100%!important;height:35px!important;min-height:35px!important;
+  padding:5px 8px!important;font:600 12px system-ui,sans-serif!important;
+}
+html body #uhz-global-header .uhz-v3-language-buttons{display:flex;gap:6px}
+html body #uhz-global-header .uhz-v3-language-buttons button{
+  flex:1;border-radius:9px;border:1px solid #40657d;background:#163c51;
+  color:#d6eef9;padding:7px 6px;font:700 11px system-ui,sans-serif;cursor:pointer
+}
+html body #uhz-global-header .uhz-v3-language-buttons button[aria-pressed=true]{background:#ceeaf6;color:#0a364d;border-color:#8bd9f0}
+html body #uhz-global-header .uhz-v3-menu-contact{display:flex;gap:16px;margin-top:14px;padding-top:12px;border-top:1px solid #30536b}
+html body #uhz-global-header .uhz-v3-menu-contact a{color:#a9d4e8!important;font:650 12px system-ui,sans-serif;text-decoration:none!important}
+html body #uhz-global-header :is(a,button,summary,select):focus-visible,
+html body #uhz-native-head :is(a,button,summary):focus-visible{outline:3px solid #64dff8!important;outline-offset:3px!important}
+@media(min-width:801px){
+ html body #uhz-global-header.uhzg-header.uhz-v3-header{
+   display:flex!important;flex-direction:row!important;align-items:center!important;
+   flex-wrap:nowrap!important;height:74px!important;min-height:74px!important;
+   padding:0 clamp(12px,2vw,32px)!important;
+   gap:clamp(9px,1vw,19px)!important;overflow:visible!important
+ }
+ html body #uhz-global-header .uhzg-brand{
+   display:flex!important;flex-direction:row!important;align-items:center!important;
+   justify-content:flex-start!important;flex:0 0 auto!important;min-width:0!important;
+   max-width:210px!important;gap:8px!important;margin:0!important;padding:0!important;white-space:nowrap!important
+ }
+ html body #uhz-global-header .uhzg-brand img{width:41px!important;height:41px!important;max-height:41px!important;flex:0 0 41px!important;object-fit:contain!important}
+ html body #uhz-global-header .uhzg-brand strong{font-size:clamp(13px,1.2vw,17px)!important;line-height:1.15!important}
+ html body #uhz-global-header .uhzg-brand small{font-size:clamp(7px,.56vw,9px)!important;letter-spacing:.03em!important}
+ html body #uhz-global-header .uhzg-main.uhz-v3-nav{
+   display:flex!important;flex-direction:row!important;justify-content:space-between!important;
+   align-items:center!important;flex:1 1 auto!important;min-width:0!important;
+   flex-wrap:nowrap!important;gap:clamp(6px,1vw,16px)!important;
+   width:auto!important;max-width:none!important;overflow:visible!important
+ }
+ html body #uhz-global-header .uhz-v3-primary,html body #uhz-global-header .uhz-v3-userbar{align-self:center!important;flex-wrap:nowrap!important}
+}
+@media(min-width:801px) and (max-width:1170px){
+ html body #uhz-global-header .uhzg-brand small{display:none!important}
+ html body #uhz-global-header .uhz-v3-primary a[data-action=tools],
+ html body #uhz-global-header .uhz-v3-primary a[data-action=comunidad]{display:none!important}
+ html body #uhz-global-header .uhz-v3-menu-links .uhz-v3-compact-only{display:flex!important}
+ html body #uhz-global-header .uhz-v3-chip{min-width:62px;padding:6px 8px}
+ html body #uhz-global-header .uhz-v3-userbar{gap:5px}
+}
+@media(min-width:1171px){html body #uhz-global-header .uhz-v3-menu-links .uhz-v3-compact-only{display:none!important}}
+@media(max-width:800px){
+ html body #uhz-native-head details[open]::before{
+  content:'';position:fixed;inset:0;background:#031426a9;z-index:1;backdrop-filter:blur(2px)
+ }
+ html body #uhz-native-head details:not([open]) .uhz-app-menu{display:none!important}
+ html body #uhz-native-head .uhz-app-menu{
+   position:fixed!important;top:0!important;right:0!important;bottom:0!important;left:auto!important;
+   width:min(376px,94vw)!important;max-width:none!important;height:100dvh!important;
+   max-height:100dvh!important;margin:0!important;
+   padding:20px 17px calc(35px + env(safe-area-inset-bottom,0px))!important;
+   display:block!important;overflow-y:auto!important;
+   border-radius:20px 0 0 20px!important;z-index:2!important;
+   box-shadow:-16px 0 60px #05152588!important;
+   background:#f8fcfe!important;color:#15364b!important
+ }
+ html body #uhz-native-head details[open] .uhz-app-menu{animation:uhz-v3-enter .18s ease-out both}
+ html body #uhz-native-head .uhz-app-menu .uhz-menu-heading{
+   position:sticky!important;top:-20px!important;z-index:3!important;
+   display:flex!important;background:#f8fcfe!important;color:#143448!important;
+   font-size:14px!important;padding:8px 0 15px!important
+ }
+ html body #uhz-native-head .uhz-app-menu .uhz-v3-mobile-heading{
+   display:block!important;color:#4d7388!important;border-top:1px solid #dbe9f1;
+   font:750 10px/1.3 system-ui,sans-serif!important;letter-spacing:.07em!important;
+   text-transform:uppercase!important;padding:17px 2px 9px!important;margin:12px 0 0!important
+ }
+ html body #uhz-native-head .uhz-app-menu .uhz-v3-mobile-links{
+   display:grid!important;grid-template-columns:repeat(2,minmax(0,1fr))!important;gap:7px!important
+ }
+ html body #uhz-native-head .uhz-app-menu .uhz-v3-mobile-links a{
+   display:flex!important;align-items:center!important;min-height:42px!important;
+   padding:10px 11px!important;border-radius:10px!important;
+   background:#eef5f9!important;border:1px solid #dce9f0!important;
+   color:#193a4d!important;text-decoration:none!important;
+   font:650 12px/1.35 system-ui,sans-serif!important
+ }
+ html body #uhz-native-head .uhz-app-menu .uhz-v3-mobile-links a[aria-current=page]{
+   color:#075a7c!important;background:#dceff8!important;border-color:#7db7d0!important
+ }
+ html body #uhz-native-head .uhz-v3-mobile-wallet{
+   margin:7px 0 16px!important;padding:13px 11px!important;border-radius:14px!important;
+   border:1px solid #bcdde9!important;background:linear-gradient(120deg,#e7f8ff,#eff5ff)!important
+ }
+ html body #uhz-native-head .uhz-v3-mobile-wallet[hidden]{display:none!important}
+ html body #uhz-native-head .uhz-v3-mobile-wallet-title{
+   font:750 10px/1.1 system-ui,sans-serif;color:#4e7f91;letter-spacing:.06em
+ }
+ html body #uhz-native-head .uhz-v3-mobile-chips{
+   display:grid!important;grid-template-columns:repeat(3,minmax(0,1fr))!important;gap:6px!important;margin-top:9px!important
+ }
+ html body #uhz-native-head .uhz-v3-mobile-chip{
+   display:flex!important;flex-direction:column!important;gap:5px!important;
+   min-width:0!important;min-height:54px!important;padding:8px!important;
+   border-radius:9px!important;border:1px solid #cbdfe9!important;
+   background:#fff!important;color:#153f53!important;text-decoration:none!important
+ }
+ html body #uhz-native-head .uhz-v3-mobile-chip span{
+   font:650 10px system-ui,sans-serif;color:#618092!important
+ }
+ html body #uhz-native-head .uhz-v3-mobile-chip strong{
+   font:800 12px/1.2 system-ui,sans-serif;color:#124966!important;
+   overflow:hidden;text-overflow:ellipsis;white-space:nowrap
+ }
+ html body #uhz-native-head .uhz-app-menu .uhz-menu-theme,
+ html body #uhz-native-head .uhz-app-menu .uhz-menu-language{
+   display:block!important;margin:8px 0!important;width:100%!important;
+   box-sizing:border-box!important
+ }
+ html body #uhz-native-head .uhz-v3-mobile-contact{
+   display:flex!important;gap:14px!important;margin:20px 0!important;justify-content:center!important
+ }
+ html body #uhz-native-head .uhz-v3-mobile-contact a{color:#275c77!important;text-decoration:underline!important;font:650 12px system-ui,sans-serif!important}
+ @keyframes uhz-v3-enter{from{transform:translateX(14px);opacity:.8}to{transform:translateX(0);opacity:1}}
+ html[data-uhz-theme=dark] body #uhz-native-head .uhz-app-menu,
+ html[data-theme=dark] body #uhz-native-head .uhz-app-menu{background:#102838!important;color:#e5f5fd!important}
+ html[data-uhz-theme=dark] body #uhz-native-head .uhz-app-menu .uhz-menu-heading,
+ html[data-theme=dark] body #uhz-native-head .uhz-app-menu .uhz-menu-heading{background:#102838!important;color:#e8f7ff!important}
+ html[data-uhz-theme=dark] body #uhz-native-head .uhz-app-menu .uhz-v3-mobile-links a,
+ html[data-theme=dark] body #uhz-native-head .uhz-app-menu .uhz-v3-mobile-links a{background:#1b4154!important;color:#e4f7ff!important;border-color:#355a6d!important}
+ html[data-uhz-theme=dark] body #uhz-native-head .uhz-v3-mobile-wallet{background:#163d50!important;border-color:#3c667c!important}
+ html[data-uhz-theme=dark] body #uhz-native-head .uhz-v3-mobile-chip{background:#1d475c!important;border-color:#476f82!important}
+ html[data-uhz-theme=dark] body #uhz-native-head .uhz-v3-mobile-chip :is(span,strong){color:#e8f8ff!important}
+}
+@media(prefers-reduced-motion:reduce){html body #uhz-native-head details[open] .uhz-app-menu{animation:none!important}}
+
+/* UNIVERSHZRW FOOTER v4 · shared semantic component
+   Pattern: USWDS big footer, native mobile disclosures, no external runtime.
+   Legacy footers stay in DOM for their original handlers and legal references. */
+html.uhz-v4-footer-active body footer.uhz-pro-footer,
+html.uhz-v4-footer-active body footer.uhz-tools-footer,
+html.uhz-v4-footer-active body footer.inft-footer,
+html.uhz-v4-footer-active body footer.uhz-global-footer,
+html.uhz-v4-footer-active body footer.site-foot,
+html.uhz-v4-footer-active body footer.footer[data-uhz-legacy-footer],
+html.uhz-v4-footer-active body footer[data-uhz-legacy-footer="1"]{
+  display:none!important;visibility:hidden!important
+}
+html body footer#uhz-global-site-footer.uhz-v4-footer{
+  --uhz-v4-ink:#e6f5fd;--uhz-v4-soft:#afcbdb;--uhz-v4-accent:#7ad5f1;
+  display:block!important;visibility:visible!important;grid-column:1/-1!important;
+  clear:both!important;flex:0 0 auto!important;
+  width:100%!important;min-width:0!important;max-width:none!important;
+  margin:clamp(38px,5vw,64px) 0 0!important;padding:0!important;
+  border:0!important;border-top:1px solid #436479!important;
+  border-radius:0!important;box-shadow:none!important;
+  background:linear-gradient(115deg,#081d2e,#0e3044 62%,#102c41)!important;
+  color:var(--uhz-v4-ink)!important;
+  font-family:system-ui,-apple-system,"Segoe UI",sans-serif!important;
+  font-size:13px!important;line-height:1.55!important;text-align:left!important;
+  position:relative!important;z-index:1!important;
+  isolation:isolate!important;
+}
+html body #uhz-global-site-footer *{box-sizing:border-box!important}
+html body #uhz-global-site-footer .uhz-v4-top{
+  width:100%;max-width:1320px;margin:auto;padding:clamp(34px,4vw,54px) clamp(17px,3vw,36px) 38px;
+  display:grid;grid-template-columns:minmax(210px,1.6fr) repeat(4,minmax(115px,1fr));
+  column-gap:clamp(18px,2.6vw,44px);row-gap:20px;align-items:start;
+}
+html body #uhz-global-site-footer .uhz-v4-brand{display:grid;gap:13px;align-content:start;min-width:0}
+html body #uhz-global-site-footer .uhz-v4-logo{
+  display:inline-flex!important;gap:12px;align-items:center;text-decoration:none!important;
+  max-width:max-content;color:#f5fcff!important
+}
+html body #uhz-global-site-footer .uhz-v4-logo img{
+  flex:0 0 46px;width:46px!important;height:46px!important;max-width:46px!important;object-fit:contain
+}
+html body #uhz-global-site-footer .uhz-v4-wordmark{display:grid;gap:3px}
+html body #uhz-global-site-footer .uhz-v4-wordmark strong{
+  letter-spacing:.035em;font:800 clamp(14px,1.3vw,17px)/1.2 system-ui,sans-serif;color:#eaf9ff
+}
+html body #uhz-global-site-footer .uhz-v4-wordmark small{
+  font:650 9px/1.4 system-ui,sans-serif;letter-spacing:.1em;color:#81cde3
+}
+html body #uhz-global-site-footer .uhz-v4-desc{
+  padding:0!important;margin:0!important;max-width:245px;color:var(--uhz-v4-soft)!important;
+  font:400 12px/1.7 system-ui,sans-serif!important
+}
+html body #uhz-global-site-footer .uhz-v4-cta{display:flex;flex-wrap:wrap;gap:8px;margin:6px 0 0}
+html body #uhz-global-site-footer .uhz-v4-cta a{
+  display:inline-flex!important;align-items:center;justify-content:center;min-height:36px;
+  border-radius:10px;padding:8px 11px!important;text-decoration:none!important;
+  font:750 11px/1.25 system-ui,sans-serif!important;transition:background-color .12s ease;
+}
+html body #uhz-global-site-footer .uhz-v4-cta-primary{color:#0a3246!important;background:#a8e8f8!important;border:1px solid #a8e8f8!important}
+html body #uhz-global-site-footer .uhz-v4-cta-primary:hover{background:#def8ff!important}
+html body #uhz-global-site-footer .uhz-v4-cta-secondary{color:#e8f8ff!important;background:transparent!important;border:1px solid #537489!important}
+html body #uhz-global-site-footer .uhz-v4-cta-secondary:hover{background:#1a4961!important}
+html body #uhz-global-site-footer .uhz-v4-col{display:block;min-width:0}
+html body #uhz-global-site-footer .uhz-v4-col-toggle{border:0;background:transparent;padding:0;margin:0}
+html body #uhz-global-site-footer .uhz-v4-col-toggle>summary.uhz-v4-heading{
+  display:block!important;list-style:none;margin:4px 0 17px!important;padding:0!important;
+  color:#f0fbff!important;cursor:default;
+  font:800 12px/1.4 system-ui,sans-serif!important;letter-spacing:.005em
+}
+html body #uhz-global-site-footer .uhz-v4-col-toggle>summary::-webkit-details-marker{display:none}
+html body #uhz-global-site-footer .uhz-v4-col-toggle>summary::marker{content:''}
+html body #uhz-global-site-footer .uhz-v4-nav{
+  display:flex!important;flex-direction:column!important;gap:10px!important;
+  padding:0!important;margin:0!important;border:0!important;
+  background:transparent!important;box-shadow:none!important;
+}
+html body #uhz-global-site-footer .uhz-v4-col-toggle:not([open]) > .uhz-v4-nav{
+  display:none!important;visibility:hidden!important;
+}
+html body #uhz-global-site-footer .uhz-v4-nav a{
+  color:#bcd3e0!important;text-decoration:underline!important;text-decoration-color:transparent!important;
+  text-underline-offset:3px;
+  font:500 12px/1.4 system-ui,sans-serif!important;
+  word-break:normal;overflow-wrap:anywhere;
+  padding:1px 0!important;margin:0!important;border:0!important;background:transparent!important;
+  min-height:0!important;max-width:none!important
+}
+html body #uhz-global-site-footer .uhz-v4-nav a:hover,
+html body #uhz-global-site-footer .uhz-v4-nav a[aria-current=page]{
+  color:#8ceaff!important;text-decoration-color:currentColor!important
+}
+html body #uhz-global-site-footer .uhz-v4-trust{
+  max-width:1320px;margin:0 auto;
+  padding:20px clamp(17px,3vw,36px);
+  border-top:1px solid #345668;
+  display:flex;align-items:center;justify-content:space-between;gap:20px;flex-wrap:wrap
+}
+html body #uhz-global-site-footer .uhz-v4-trust-note{
+  flex:1 1 370px;max-width:700px;margin:0!important;padding:0!important;
+  color:#a7c8d9!important;font:500 11px/1.65 system-ui,sans-serif!important
+}
+html body #uhz-global-site-footer .uhz-v4-actions{
+  display:flex;gap:8px;align-items:center;justify-content:flex-end;flex-wrap:wrap
+}
+html body #uhz-global-site-footer .uhz-v4-action{
+  border:1px solid #416a80!important;background:#163b51!important;color:#dff6ff!important;
+  border-radius:10px!important;padding:8px 11px!important;cursor:pointer!important;
+  min-height:35px!important;min-width:0!important;max-width:none!important;
+  font:650 11px/1.25 system-ui,sans-serif!important;
+  text-decoration:none!important;box-shadow:none!important
+}
+html body #uhz-global-site-footer .uhz-v4-action:hover{background:#215a72!important;color:#fff!important}
+html body #uhz-global-site-footer .uhz-v4-status:not(:empty){color:#b9f3cf;font:500 11px system-ui,sans-serif}
+html body #uhz-global-site-footer .uhz-v4-context{
+  max-width:1320px;margin:0 auto;padding:0 clamp(17px,3vw,36px) 12px;
+  color:#c0dce8!important
+}
+html body #uhz-global-site-footer .uhz-v4-context[hidden]{display:none!important}
+html body #uhz-global-site-footer .uhz-v4-context>summary{
+  display:list-item;cursor:pointer;padding:11px 0;
+  border-top:1px solid #2e5064;color:#abd7e8!important;
+  font:650 11px/1.5 system-ui,sans-serif!important
+}
+html body #uhz-global-site-footer .uhz-v4-context-links{
+  display:flex;align-items:flex-start;flex-wrap:wrap;gap:9px 16px;padding:7px 0 12px
+}
+html body #uhz-global-site-footer .uhz-v4-context-links a{
+  color:#c4e5f1!important;text-decoration:underline!important;
+  text-underline-offset:3px;font:500 11px/1.35 system-ui,sans-serif!important
+}
+html body #uhz-global-site-footer .uhz-v4-specific-note{
+  flex:1 1 100%;margin:0;padding:0;color:#b7d2df!important;
+  font:500 11px/1.5 system-ui,sans-serif!important
+}
+html body #uhz-global-site-footer .uhz-v4-bottom{
+  border-top:1px solid #25495e;background:#071c2d!important;
+  display:flex!important;align-items:center!important;justify-content:space-between!important;
+  gap:12px 25px;flex-wrap:wrap!important;
+  width:100%!important;padding:17px max(18px,calc((100vw - 1248px)/2)) 22px!important;
+  color:#99b9cc!important;font:500 11px/1.5 system-ui,sans-serif!important
+}
+html body #uhz-global-site-footer :is(a,button,summary):focus-visible{
+  outline:3px solid #6be1fb!important;outline-offset:4px!important;border-radius:5px
+}
+@media(min-width:720px){
+ html body #uhz-global-site-footer .uhz-v4-col-toggle>summary{
+   pointer-events:none;cursor:default!important
+ }
+}
+@media(max-width:1160px){
+ html body #uhz-global-site-footer .uhz-v4-top{
+   grid-template-columns:repeat(4,minmax(0,1fr));row-gap:30px
+ }
+ html body #uhz-global-site-footer .uhz-v4-brand{grid-column:1/-1}
+ html body #uhz-global-site-footer .uhz-v4-desc{max-width:460px}
+}
+@media(max-width:719px){
+ html body #uhz-global-site-footer .uhz-v4-top{
+   grid-template-columns:minmax(0,1fr);padding:30px 18px 12px;gap:0
+ }
+ html body #uhz-global-site-footer .uhz-v4-brand{grid-column:1;margin-bottom:26px}
+ html body #uhz-global-site-footer .uhz-v4-col{
+   border-top:1px solid #35566a;margin:0;padding:0
+ }
+ html body #uhz-global-site-footer .uhz-v4-col-toggle>summary.uhz-v4-heading{
+   display:flex!important;align-items:center;justify-content:space-between;
+   min-height:49px;margin:0!important;padding:12px 3px!important;
+   cursor:pointer!important;font-size:13px!important
+ }
+ html body #uhz-global-site-footer .uhz-v4-col-toggle>summary::after{
+   content:'';display:block;width:8px;height:8px;margin-right:4px;
+   border-right:2px solid #a4cedc;border-bottom:2px solid #a4cedc;
+   transform:translateY(-2px) rotate(45deg);transition:transform .15s ease
+ }
+ html body #uhz-global-site-footer .uhz-v4-col-toggle[open]>summary::after{
+   transform:translateY(2px) rotate(225deg)
+ }
+ html body #uhz-global-site-footer .uhz-v4-nav{
+   padding:0 5px 18px!important;display:grid!important;
+   grid-template-columns:repeat(2,minmax(0,1fr))!important;gap:13px 10px!important
+ }
+ html body #uhz-global-site-footer .uhz-v4-nav a{
+   padding:4px 0!important;font-size:11px!important
+ }
+ html body #uhz-global-site-footer .uhz-v4-trust{padding:20px 18px;gap:13px}
+ html body #uhz-global-site-footer .uhz-v4-actions{justify-content:flex-start}
+ html body #uhz-global-site-footer .uhz-v4-bottom{
+   flex-direction:column!important;align-items:flex-start!important;gap:5px!important;
+   padding:17px 18px calc(98px + env(safe-area-inset-bottom,0px))!important
+ }
+}
+@media(prefers-reduced-motion:reduce){
+ html body #uhz-global-site-footer .uhz-v4-col-toggle>summary::after{transition:none!important}
+}

@@ -1,0 +1,385 @@
+/* UNIVERSHZRW · Two official palettes, 12 November 2026.
+ * Normal: Pale Mint #CFE8E1 / Midnight Navy #002941.
+ * Dark: Charcoal Black #1C1C1C / Bone White #EDE6D8.
+ * Original open-source CSS custom property design-token implementation (MIT).
+ * No external CSS framework, remote fonts or image filters.
+ * Uses existing data-uhz-theme persisted by UNIVERSHZRW.
+ */
+
+/* Palette tokens are semantic; derivatives maintain legibility on form surfaces. */
+:root,
+html[data-uhz-theme="colorful"],
+html[data-uhz-theme="light"],
+html:not([data-uhz-theme]):not([data-theme="dark"]) {
+  color-scheme:light;
+  --uhz-palette-mint:#CFE8E1;
+  --uhz-palette-navy:#002941;
+  --uhz-palette-charcoal:#1C1C1C;
+  --uhz-palette-bone:#EDE6D8;
+  --uhz-canvas:#EFF8F5;
+  --uhz-surface:#FFFFFF;
+  --uhz-surface-soft:#E2F2ED;
+  --uhz-surface-alt:#CFE8E1;
+  --uhz-ink:#002941;
+  --uhz-muted:#42616F;
+  --uhz-border:#9ABEB6;
+  --uhz-accent:#006178;
+  --uhz-accent-ink:#FFFFFF;
+  --uhz-header-bg:#002941;
+  --uhz-header-ink:#CFE8E1;
+  --uhz-header-border:#447C84;
+  --uhz-footer-bg:#002941;
+  --uhz-footer-ink:#CFE8E1;
+  --uhz-footer-muted:#B2D3CF;
+  --uhz-menu-bg:#08394D;
+  --uhz-menu-card:#10475A;
+  --uhz-menu-ink:#E8FAF7;
+  --uhz-focus:#047D87;
+  --uhz-shadow:0 12px 32px rgba(0,41,65,.10);
+}
+html[data-uhz-theme="dark"],
+html:not([data-uhz-theme])[data-theme="dark"] {
+  color-scheme:dark;
+  --uhz-canvas:#1C1C1C;
+  --uhz-surface:#292929;
+  --uhz-surface-soft:#32302E;
+  --uhz-surface-alt:#343230;
+  --uhz-ink:#EDE6D8;
+  --uhz-muted:#C8BFB1;
+  --uhz-border:#645D53;
+  --uhz-accent:#EDE6D8;
+  --uhz-accent-ink:#1C1C1C;
+  --uhz-header-bg:#1C1C1C;
+  --uhz-header-ink:#EDE6D8;
+  --uhz-header-border:#504A43;
+  --uhz-footer-bg:#1C1C1C;
+  --uhz-footer-ink:#EDE6D8;
+  --uhz-footer-muted:#C7BFAF;
+  --uhz-menu-bg:#292929;
+  --uhz-menu-card:#373431;
+  --uhz-menu-ink:#EDE6D8;
+  --uhz-focus:#EDE6D8;
+  --uhz-shadow:0 12px 32px rgba(0,0,0,.24);
+}
+
+/* Map existing per-page design tokens to the shared palette. */
+html:is([data-uhz-theme="colorful"],[data-uhz-theme="light"],[data-uhz-theme="dark"]) {
+  --bg:var(--uhz-canvas);
+  --paper:var(--uhz-canvas);
+  --p-bg:var(--uhz-canvas);
+  --p-surface:var(--uhz-surface);
+  --p-surface2:var(--uhz-surface-soft);
+  --p-border:var(--uhz-border);
+  --p-text:var(--uhz-ink);
+  --p-muted:var(--uhz-muted);
+  --p-blue:var(--uhz-accent);
+  --p-mint:var(--uhz-accent);
+  --panel:var(--uhz-surface);
+  --panel2:var(--uhz-surface-soft);
+  --surface:var(--uhz-surface);
+  --soft:var(--uhz-surface-soft);
+  --white:var(--uhz-surface);
+  --line:var(--uhz-border);
+  --ink:var(--uhz-ink);
+  --text:var(--uhz-ink);
+  --muted:var(--uhz-muted);
+  --blue:var(--uhz-accent);
+  --accent:var(--uhz-accent);
+  --body:var(--uhz-muted);
+  --deep:var(--uhz-header-bg);
+  --green:var(--uhz-accent);
+  --green-soft:var(--uhz-surface-soft);
+  --border:var(--uhz-border);
+}
+
+/* Keep the browser native form controls consistent. Preserve original button semantics. */
+html[data-uhz-theme="dark"] body,
+html[data-uhz-theme="colorful"] body,
+html[data-uhz-theme="light"] body {
+  background:var(--uhz-canvas)!important;
+  color:var(--uhz-ink)!important;
+}
+html[data-uhz-theme="dark"] body:not(.uhz-admin),
+html[data-uhz-theme="colorful"] body:not(.uhz-admin),
+html[data-uhz-theme="light"] body:not(.uhz-admin) {
+  /* Existing page-level gradients may remain; high contrast text is scoped below. */
+  accent-color:var(--uhz-accent);
+}
+html:is([data-uhz-theme="colorful"],[data-uhz-theme="light"],[data-uhz-theme="dark"]) body :is(input,textarea,select):not(.uhzg-theme-picker):not(.uhz-v3-theme) {
+  color-scheme:inherit;
+}
+html:is([data-uhz-theme="colorful"],[data-uhz-theme="light"],[data-uhz-theme="dark"]) body :is(a,button,summary,input,select,textarea):focus-visible {
+  outline:3px solid var(--uhz-focus)!important;
+  outline-offset:3px!important;
+}
+
+/* Unified desktop header stays a single cohesive strip. */
+html:is([data-uhz-theme="colorful"],[data-uhz-theme="light"],[data-uhz-theme="dark"])
+ body #uhz-global-header.uhz-v3-header {
+  background:var(--uhz-header-bg)!important;
+  border-bottom:1px solid var(--uhz-header-border)!important;
+  box-shadow:var(--uhz-shadow)!important;
+  color:var(--uhz-header-ink)!important;
+}
+html:is([data-uhz-theme="colorful"],[data-uhz-theme="light"],[data-uhz-theme="dark"])
+ body #uhz-global-header :is(.uhzg-brand,.uhzg-brand strong,.uhzg-brand small,.uhz-v3-nav-link,.uhz-v3-more-trigger,.uhzg-notifications) {
+  color:var(--uhz-header-ink)!important;
+}
+html:is([data-uhz-theme="colorful"],[data-uhz-theme="light"],[data-uhz-theme="dark"])
+ body #uhz-global-header .uhz-v3-more-trigger {
+  border-color:var(--uhz-header-border)!important;
+  background:transparent!important;
+}
+html:is([data-uhz-theme="colorful"],[data-uhz-theme="light"],[data-uhz-theme="dark"])
+ body #uhz-global-header .uhz-v3-more-menu {
+  background:var(--uhz-menu-bg)!important;
+  color:var(--uhz-menu-ink)!important;
+  border:1px solid var(--uhz-header-border)!important;
+}
+html:is([data-uhz-theme="colorful"],[data-uhz-theme="light"],[data-uhz-theme="dark"])
+ body #uhz-global-header .uhz-v3-menu-links a {
+  background:var(--uhz-menu-card)!important;
+  color:var(--uhz-menu-ink)!important;
+  border-color:var(--uhz-header-border)!important;
+}
+html:is([data-uhz-theme="colorful"],[data-uhz-theme="light"],[data-uhz-theme="dark"])
+ body #uhz-global-header .uhz-v3-chip {
+  background:var(--uhz-menu-card)!important;
+  border-color:var(--uhz-header-border)!important;
+}
+html:is([data-uhz-theme="colorful"],[data-uhz-theme="light"],[data-uhz-theme="dark"])
+ body #uhz-global-header :is(.uhz-v3-chip-label,.uhz-v3-chip-value) {
+  color:var(--uhz-menu-ink)!important;
+}
+html[data-uhz-theme="dark"] body #uhz-global-header .uhz-v3-menu-label {
+  color:#D8CEBF!important;
+}
+html:is([data-uhz-theme="colorful"],[data-uhz-theme="light"],[data-uhz-theme="dark"])
+ body #uhz-global-header .uhz-v3-theme {
+  background:var(--uhz-menu-card)!important;
+  border-color:var(--uhz-header-border)!important;
+  color:var(--uhz-menu-ink)!important;
+}
+html:is([data-uhz-theme="colorful"],[data-uhz-theme="light"],[data-uhz-theme="dark"])
+ body #uhz-global-header .uhz-v3-language-buttons button:not([aria-pressed="true"]) {
+  background:var(--uhz-menu-card)!important;
+  color:var(--uhz-menu-ink)!important;
+  border-color:var(--uhz-header-border)!important;
+}
+html:is([data-uhz-theme="colorful"],[data-uhz-theme="light"],[data-uhz-theme="dark"])
+ body #uhz-global-header .uhz-v3-language-buttons button[aria-pressed="true"] {
+  background:var(--uhz-palette-mint)!important;
+  color:var(--uhz-palette-navy)!important;
+}
+html[data-uhz-theme="dark"] body #uhz-native-head .uhz-app-menu {
+  background:#292929!important;
+  color:#EDE6D8!important;
+}
+html[data-uhz-theme="dark"] body #uhz-native-head .uhz-app-menu .uhz-menu-heading {
+  background:#292929!important;
+  color:#EDE6D8!important;
+}
+html[data-uhz-theme="dark"] body #uhz-native-head .uhz-v3-mobile-links a {
+  background:#373431!important;color:#EDE6D8!important;border-color:#645D53!important;
+}
+html[data-uhz-theme="dark"] body #uhz-native-head .uhz-v3-mobile-wallet {
+  background:#343230!important;border-color:#645D53!important;
+}
+html[data-uhz-theme="dark"] body #uhz-native-head .uhz-v3-mobile-chip {
+  background:#292929!important;border-color:#645D53!important;
+}
+html[data-uhz-theme="dark"] body #uhz-native-head .uhz-v3-mobile-chip :is(span,strong) {
+  color:#EDE6D8!important;
+}
+
+/* Shared footer: same structure in both themes; only its design tokens change. */
+html:is([data-uhz-theme="colorful"],[data-uhz-theme="light"],[data-uhz-theme="dark"])
+ body #uhz-global-site-footer.uhz-v4-footer {
+  background:var(--uhz-footer-bg)!important;
+  color:var(--uhz-footer-ink)!important;
+  border-top:1px solid var(--uhz-header-border)!important;
+}
+html:is([data-uhz-theme="colorful"],[data-uhz-theme="light"],[data-uhz-theme="dark"])
+ body #uhz-global-site-footer :is(.uhz-v4-wordmark strong,.uhz-v4-heading,.uhz-v4-logo,.uhz-v4-col-toggle summary){
+  color:var(--uhz-footer-ink)!important;
+}
+html:is([data-uhz-theme="colorful"],[data-uhz-theme="light"],[data-uhz-theme="dark"])
+ body #uhz-global-site-footer :is(.uhz-v4-desc,.uhz-v4-trust-note,.uhz-v4-nav a,.uhz-v4-specific-note,.uhz-v4-bottom){
+  color:var(--uhz-footer-muted)!important;
+}
+html:is([data-uhz-theme="colorful"],[data-uhz-theme="light"],[data-uhz-theme="dark"])
+ body #uhz-global-site-footer .uhz-v4-bottom {
+  background:var(--uhz-footer-bg)!important;
+  border-top:1px solid var(--uhz-header-border)!important;
+}
+html:is([data-uhz-theme="colorful"],[data-uhz-theme="light"],[data-uhz-theme="dark"])
+ body #uhz-global-site-footer .uhz-v4-action {
+  background:var(--uhz-menu-card)!important;
+  color:var(--uhz-menu-ink)!important;
+  border-color:var(--uhz-header-border)!important;
+}
+html[data-uhz-theme="dark"] body #uhz-global-site-footer .uhz-v4-cta-primary {
+  background:#EDE6D8!important;border-color:#EDE6D8!important;color:#1C1C1C!important;
+}
+html[data-uhz-theme="dark"] body #uhz-global-site-footer .uhz-v4-cta-secondary {
+  color:#EDE6D8!important;border-color:#645D53!important;
+}
+
+/* Consistent theme for ordinary editorial / account cards. Intentionally never touches
+   video, image, iframe, code blocks, maps or admin dialogs. */
+html:is([data-uhz-theme="colorful"],[data-uhz-theme="light"],[data-uhz-theme="dark"])
+ body :is(.card,.panel,.content-card,.article-card,.membership,.stat-card,.info-card,.tool-card,
+ .feature-card,.account-card,.section-card,.uhz-economy-card,.uhz-tool-card):not(.hero-card) {
+  border-color:var(--uhz-border)!important;
+}
+html[data-uhz-theme="dark"] body :is(.card,.panel,.content-card,.article-card,.membership,
+ .stat-card,.info-card,.tool-card,.feature-card,.account-card,.section-card)
+ :is(h1,h2,h3,h4,p,small,span,li):not([class*="price"]):not([class*="badge"]) {
+  color:inherit;
+}
+html:is([data-uhz-theme="colorful"],[data-uhz-theme="light"],[data-uhz-theme="dark"])
+ body :is(main .card,main .panel,main .account-card,main .membership,main .stat-card):not(:has(>img)):not(:has(>.image)) {
+  background-color:var(--uhz-surface)!important;
+  color:var(--uhz-ink)!important;
+}
+html:is([data-uhz-theme="colorful"],[data-uhz-theme="light"],[data-uhz-theme="dark"])
+ body :is(main .section-nav,main .table-wrap,main .stat-list) {
+  border-color:var(--uhz-border)!important;
+  color:var(--uhz-ink)!important;
+}
+html[data-uhz-theme="dark"] body :is(main .eyebrow,main .muted,.section-top .section-counter){
+  color:var(--uhz-muted)!important;
+}
+/* Pages built using CSS variables: propagate the selected surfaces to body and cards.
+   Excludes media players, iframes, source code and non-public admin interfaces. */
+html:is([data-uhz-theme="colorful"],[data-uhz-theme="light"],[data-uhz-theme="dark"])
+ body :is(main.uhz-plans,main.container,main.inft-main,main.uhz-tools-main,main.studio-main) {
+  color:var(--uhz-ink);
+}
+html:is([data-uhz-theme="colorful"],[data-uhz-theme="light"],[data-uhz-theme="dark"])
+ body :is(.uhz-plans .membership,.uhz-plans .account,.uhz-plans .compare,
+ .uhz-plans .content-section .panel,.tool-directory .tool-card,
+ .studio-main .panel,.inft-main .panel) {
+  background:var(--uhz-surface)!important;
+  border-color:var(--uhz-border)!important;
+  color:var(--uhz-ink)!important;
+}
+html:is([data-uhz-theme="colorful"],[data-uhz-theme="light"],[data-uhz-theme="dark"])
+ body :is(.uhz-plans .hero,.hero-shop) {
+  background:var(--uhz-header-bg)!important;
+  border-color:var(--uhz-header-border)!important;
+  color:var(--uhz-header-ink)!important;
+}
+html:is([data-uhz-theme="colorful"],[data-uhz-theme="light"],[data-uhz-theme="dark"])
+ body :is(.uhz-plans .hero h1,.uhz-plans .hero p,.hero-shop h1,.hero-shop p) {
+  color:var(--uhz-header-ink)!important;
+}
+html[data-uhz-theme="colorful"] body :is(.hero-shop .btn-primary,.uhz-plans .btn-primary),
+html[data-uhz-theme="light"] body :is(.hero-shop .btn-primary,.uhz-plans .btn-primary) {
+  background:#CFE8E1!important;color:#002941!important;
+}
+html[data-uhz-theme="dark"] body :is(.hero-shop .btn-primary,.uhz-plans .btn-primary) {
+  background:#EDE6D8!important;color:#1C1C1C!important;
+}
+html[data-uhz-theme="dark"] body :is(.uhz-plans .hero,.hero-shop) {
+  background:#292929!important;border-color:#645D53!important;
+}
+/* Stay readable on cards with unthemed inline accents and previously dark-only components. */
+html[data-uhz-theme="dark"] body :is(.uhz-plans .membership,.uhz-plans .account,.uhz-plans .compare,
+ .uhz-plans .content-section,.uhz-plans .content-section h2,.uhz-plans .membership h3) {
+  color:var(--uhz-ink)!important;
+}
+html[data-uhz-theme="colorful"] body .uhz-plans,
+html[data-uhz-theme="light"] body .uhz-plans {
+  --p-bg:#EFF8F5;--p-surface:#FFFFFF;--p-surface2:#E2F2ED;
+  --p-text:#002941;--p-muted:#42616F;--p-border:#9ABEB6;
+}
+html[data-uhz-theme="dark"] body .uhz-plans {
+  --p-bg:#1C1C1C;--p-surface:#292929;--p-surface2:#343230;
+  --p-text:#EDE6D8;--p-muted:#C8BFB1;--p-border:#645D53;
+}
+/* Public creator catalog (independent heading) uses its original CSS var names. */
+html[data-uhz-theme="colorful"] body .site-head,
+html[data-uhz-theme="light"] body .site-head {
+  background:#002941!important;color:#CFE8E1!important;
+}
+html[data-uhz-theme="dark"] body .site-head {
+  background:#1C1C1C!important;color:#EDE6D8!important;
+}
+/* User prefers fewer effects: no cross-page color animation on switch. */
+@media(prefers-reduced-motion:reduce) {
+  html body #uhz-global-site-footer *,html body #uhz-global-header *{
+    transition-duration:0.01ms!important;
+  }
+}
+
+
+/* Literal high-contrast fallback. Some legacy styles redeclare --bg, --ink
+ * and --panel during theme-change. These selectors protect the visual shell
+ * even when a page-specific var() declaration cannot compute. */
+html[data-uhz-theme="dark"] body {
+  background:#1C1C1C!important;
+  color:#EDE6D8!important;
+}
+html[data-uhz-theme="dark"] body #uhz-global-header.uhz-v3-header {
+  background:#1C1C1C!important;
+  color:#EDE6D8!important;
+  border-color:#645D53!important;
+}
+html[data-uhz-theme="dark"] body #uhz-global-header :is(.uhzg-brand,.uhzg-brand strong,.uhzg-brand small,.uhz-v3-nav-link,.uhz-v3-more-trigger,.uhzg-notifications) {
+  color:#EDE6D8!important;
+}
+html[data-uhz-theme="dark"] body #uhz-global-header .uhz-v3-more-menu {
+  background:#292929!important;
+  color:#EDE6D8!important;
+  border-color:#645D53!important;
+}
+html[data-uhz-theme="dark"] body #uhz-global-header :is(.uhz-v3-menu-links a,.uhz-v3-chip,.uhz-v3-theme) {
+  background:#373431!important;
+  color:#EDE6D8!important;
+  border-color:#645D53!important;
+}
+html[data-uhz-theme="dark"] body #uhz-global-header :is(.uhz-v3-chip-label,.uhz-v3-chip-value) {
+  color:#EDE6D8!important;
+}
+html[data-uhz-theme="dark"] body #uhz-global-site-footer.uhz-v4-footer {
+  background:#1C1C1C!important;
+  color:#EDE6D8!important;
+  border-color:#645D53!important;
+}
+html[data-uhz-theme="dark"] body #uhz-global-site-footer .uhz-v4-bottom {
+  background:#1C1C1C!important;
+  color:#C7BFAF!important;
+  border-color:#504A43!important;
+}
+html[data-uhz-theme="dark"] body #uhz-global-site-footer :is(.uhz-v4-wordmark strong,.uhz-v4-heading,.uhz-v4-logo,.uhz-v4-col-toggle summary) {
+  color:#EDE6D8!important;
+}
+html[data-uhz-theme="dark"] body #uhz-global-site-footer :is(.uhz-v4-desc,.uhz-v4-trust-note,.uhz-v4-nav a,.uhz-v4-specific-note) {
+  color:#C7BFAF!important;
+}
+html[data-uhz-theme="dark"] body #uhz-global-site-footer .uhz-v4-action {
+  background:#373431!important;color:#EDE6D8!important;border-color:#645D53!important;
+}
+html[data-uhz-theme="dark"] body :is(.uhz-plans .membership,.uhz-plans .account,.uhz-plans .compare,
+.uhz-plans .content-section .panel,main .card,main .panel,main .account-card,
+main .membership,main .stat-card):not(:has(>img)):not(:has(>.image)) {
+  background:#292929!important;color:#EDE6D8!important;border-color:#645D53!important;
+}
+html[data-uhz-theme="dark"] body :is(.uhz-plans .hero,.hero-shop) {
+  background:#292929!important;color:#EDE6D8!important;border-color:#645D53!important;
+}
+html[data-uhz-theme="dark"] body :is(.uhz-plans .hero h1,.uhz-plans .hero p,.hero-shop h1,.hero-shop p) {
+  color:#EDE6D8!important;
+}
+html[data-uhz-theme="dark"] body :is(.site-head,.uhz-v3-menu-contact) {
+  color:#EDE6D8!important;
+}
+html[data-uhz-theme="colorful"] body #uhz-global-header.uhz-v3-header,
+html[data-uhz-theme="light"] body #uhz-global-header.uhz-v3-header {
+  background:#002941!important;color:#CFE8E1!important;
+}
+html[data-uhz-theme="colorful"] body #uhz-global-site-footer.uhz-v4-footer,
+html[data-uhz-theme="light"] body #uhz-global-site-footer.uhz-v4-footer {
+  background:#002941!important;color:#CFE8E1!important;
+}

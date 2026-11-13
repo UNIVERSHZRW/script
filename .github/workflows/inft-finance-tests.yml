@@ -1,0 +1,26 @@
+name: INFT finance unit checks
+on:
+  push:
+    paths: ['infynity/finance/**', '.github/workflows/inft-finance-tests.yml']
+  pull_request:
+    paths: ['infynity/finance/**', '.github/workflows/inft-finance-tests.yml']
+permissions:
+  contents: read
+jobs:
+  unit:
+    runs-on: ubuntu-latest
+    timeout-minutes: 8
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+      - name: Install pinned dependencies
+        working-directory: infynity/finance
+        run: npm ci
+      - name: Test finance guard and ledger
+        working-directory: infynity/finance
+        run: npm test
+      - name: Package portal
+        working-directory: infynity/finance
+        run: npm run build

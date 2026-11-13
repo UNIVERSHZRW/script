@@ -1,0 +1,22 @@
+name: INFT Solidity checks
+on:
+  push:
+    paths: ['infynity/token/**', '.github/workflows/inft-token.yml']
+  pull_request:
+    paths: ['infynity/token/**', '.github/workflows/inft-token.yml']
+permissions:
+  contents: read
+jobs:
+  test:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          persist-credentials: false
+      - uses: foundry-rs/foundry-toolchain@v1
+      - name: Pinned dependencies
+        working-directory: infynity/token
+        run: forge install --no-git OpenZeppelin/openzeppelin-contracts@v5.7.0
+      - name: Build and test
+        working-directory: infynity/token
+        run: forge build && forge test -vv

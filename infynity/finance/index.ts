@@ -1,6 +1,6 @@
 import { createClient } from 'npm:@supabase/supabase-js@2.80.0';
 import { verifyMessage, formatUnits } from 'npm:viem@2.57.16';
-import { userActions, adminActions, validClabe, paymentLink, fileType, safePayload, validateTransfer, isInftSymbol } from './core.mjs';
+import { userActions, adminActions, validClabe, paymentLink, fileType, safePayload, validateTransfer, isInftSymbol, validateInftSupply } from './core.mjs';
 
 const project=Deno.env.get('SUPABASE_URL')!;
 const service=Deno.env.get('SUPABASE_SERVICE_ROLE_KEY')!;
@@ -24,6 +24,8 @@ async function reserveProof(cfg:any,r:any,p:any) {
   const code=await chainCall('eth_getCode',[cfg.token_address,block]);if(code==='0x')throw Error('El contrato no existe en Polygon.');
   const decimals=Number(BigInt(await chainCall('eth_call',[{to:cfg.token_address,data:'0x313ce567'},block])));
   if(decimals!==cfg.token_decimals)throw Error('La precisión del contrato cambió. Revisa la configuración.');
+  validateInftSupply(await chainCall('eth_call',[{to:cfg.token_address,data:'0x18160ddd'},block]),decimals);
+  validateInftSupply(await chainCall('eth_call',[{to:cfg.token_address,data:'0x18160ddd'},'latest']),decimals);
   const balance=BigInt(await chainCall('eth_call',[{to:cfg.token_address,data:'0x70a08231'+cfg.treasury_address.slice(2).padStart(64,'0')},block]));
   // Both a confirmed snapshot and the current reserve must cover custody liabilities.
   const current=BigInt(await chainCall('eth_call',[{to:cfg.token_address,data:'0x70a08231'+cfg.treasury_address.slice(2).padStart(64,'0')},'latest']));
@@ -63,7 +65,9 @@ Deno.serve(async(req)=>{
         if(!address.test(p.token_address)||!address.test(p.treasury_address||'')||/^0x0{40}$/i.test(p.token_address)||/^0x0{40}$/i.test(p.treasury_address))throw Error('Revisa las direcciones del contrato y la tesorería.');
         if(BigInt(await chainCall('eth_chainId',[]))!==137n)throw Error('Red incorrecta.');
         const symbol=await chainCall('eth_call',[{to:p.token_address,data:'0x95d89b41'},'latest']);if(!isInftSymbol(symbol))throw Error('El contrato debe corresponder al token INFT.');
-        const decimals=Number(BigInt(await chainCall('eth_call',[{to:p.token_address,data:'0x313ce567'},'latest'])));if(decimals<0||decimals>18)throw Error('Precisión de contrato incompatible.');p.token_decimals=decimals;
+        const decimals=Number(BigInt(await chainCall('eth_call',[{to:p.token_address,data:'0x313ce567'},'latest'])));if(decimals<0||decimals>18)throw Error('Precisión de contrato incompatible.');
+        validateInftSupply(await chainCall('eth_call',[{to:p.token_address,data:'0x18160ddd'},'latest']),decimals);
+        p.token_decimals=decimals;
       }
     }
     if(action==='create_request') {

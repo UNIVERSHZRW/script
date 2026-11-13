@@ -13,7 +13,7 @@ El CSS se solicita por /_uhz/shared-header.js?asset=shell-v2 y el JavaScript ext
 Conserva el buscador, CAPTCHA, sesión, notificaciones, selector de tema e idioma.
 En escritorio crea Herramientas desplegable y enlaza Planes, Biblioteca, Estudio, INFYNITY, Coins y Ayuda.
 En móvil convierte el menú actual en panel lateral y añade los enlaces faltantes.
-El pie legal existente se conserva; cuando una página carece de pie corporativo se genera el pie unificado.
+Los pies de página anteriores se conservan en el DOM para no romper acciones y avisos; visualmente se muestra un único pie corporativo v4 y los enlaces adicionales se trasladan a una sección contextual accesible. Las notas internas de módulos y el panel administrativo se respetan.
 
 ## Protecciones
 No se aplica a vistas embed/robot, Archivos ni control-sd. El panel admin es independiente.
@@ -31,3 +31,32 @@ La consulta segura `public.uhz_header_account_summary()` exige una sesión activ
 Se corrigió en producción el orden de parámetros de `make('a','Free · ₡—','uhzg-wallet')` para evitar la etiqueta literal `uhzg-wallet`.
 
 El Worker original y su binding de servicio fueron preservados, desplegando solo el complemento. Pruebas de sintaxis y estructura en GitHub Actions y visualización DOM en navegador Cloudflare (Planes en escritorio y Herramientas en móvil) aprobadas. La prueba de saldos de usuario requiere una sesión real y se mantiene pendiente.
+
+## Revisión v4 · unificación completa del pie público (12 nov 2026)
+
+### Referencias abiertas
+
+- U.S. Web Design System, componente **Big Footer**, guía de accesibilidad, agrupación de enlaces y accordions móviles: https://designsystem.digital.gov/components/footer/
+- Ejemplos de pie de página Bootstrap 5.3 y contenedores responsive: https://getbootstrap.com/docs/5.3/examples/#snippets
+- Landmarks semánticos de W3C: https://www.w3.org/WAI/WCAG21/Techniques/html/H101
+
+El pie es código original del proyecto sin paquetes ajenos en tiempo de ejecución.
+
+### Publicado
+
+- **Un único pie** `#uhz-global-site-footer` en las páginas que utilizan el encabezado compartido: marca UNIVERSHZRW, Exploración, Participación, Ayuda y contacto e Información legal.
+- En móviles, cuatro bloques `<details>` nativos y accesibles para abrir/cerrar navegación; en escritorio, columnas desplegadas.
+- Enlaces visibles a términos, privacidad, derechos, reportes, cookies, documentación legal, licencias y otras páginas vigentes.
+- Acciones de compartir, volver arriba y verificación. La verificación aprovecha el control original cuando está disponible, sin cambiar su integración.
+- Los footers anteriores `.uhz-pro-footer`, `.uhz-tools-footer`, `.inft-footer`, `.uhz-global-footer` y `.footer` siguen en el DOM, pero se ocultan solo después de que el nuevo pie se haya montado correctamente. Los enlaces singulares se muestran en un apartado contextual.
+- **Catálogo público de creadores** `/creador/*`: script de pie independiente `shared-ui/footer-only-v4.js` servido por `/_uhz/shared-header.js?asset=footer-v4`; el Worker `univershzrw-creator-catalog` añade este script y el CSS. Conserva intactos encabezado propio, catálogo y bindings SUPABASE_URL/SUPABASE_PUBLISHABLE.
+- `/_uhz/shared-header.js?asset=shell-v2` distribuye los estilos comunes y el Worker original mantiene su binding `ORIGINAL_SITE`.
+- Las notas internas de Economía y del panel INFT siguen visibles cuando forman parte del contenido de una herramienta, sin sustituir el pie de página corporativo.
+- Excluidos intencionalmente los visores, iframes, robot, respuestas de redirección/API, aplicaciones especializadas `/control-sd` y administración; no introducir scripts adicionales en esas interfaces sin evaluar su CSP y compatibilidad.
+
+### Validación
+
+- GitHub Actions: comprobaciones de sintaxis JavaScript y existencia de enlaces, componentes y puntos de integración.
+- Navegador Cloudflare: Inicio (escritorio), Herramientas (móvil), INFYNITY y catálogo `/creador/univershzrw` (móvil), todos con **un pie corporativo**, enlaces legales y componentes esperados.
+- Verificados los bindings Cloudflare originales del Worker de menú y del catálogo.
+- No se han hecho pruebas autenticadas en todos los módulos ni auditoría de accesibilidad completa con lector de pantalla; se recomienda revisión final en dispositivos reales.

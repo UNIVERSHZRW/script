@@ -76,7 +76,7 @@ function loadDictionary() {
   if(window.UHZTranslations){dictionary=window.UHZTranslations;return Promise.resolve();}
   if(pendingDictionary)return pendingDictionary;
   const link=document.createElement('script');
-  link.src='/_uhz/shared-header.js?asset=ui-en-8';
+  link.src='/_uhz/shared-header.js?asset=ui-en-9';
   pendingDictionary=new Promise(resolve=>{
     link.addEventListener('load',()=>{
       dictionary=window.UHZTranslations||dictionary;
@@ -134,14 +134,31 @@ function filterLabel(original) {
   const translated=(remove?'Remove filter ':'')+textInLanguage(label)+(suffix||'');
   return original.replace(original.trim(),()=>translated);
 }
+function searchStatusLabel(original) {
+  if(language!=='en')return original;
+  const label=original.trim();
+  const results=label.match(/^(\d+) resultados?(?: · (\d+) coincidencias? relacionadas?)?$/i);
+  if(results) {
+    const [,count,related]=results;
+    const total=count+(count==='1'?' result':' results');
+    return related?total+' · '+related+(related==='1'?' related match':' related matches'):total;
+  }
+  const more=label.match(/^Mostrar (\d+) resultados más$/);
+  if(more)return 'Show '+more[1]+' more results';
+  const showing=label.match(/^Mostrando (\d+) de (\d+)$/);
+  if(showing)return 'Showing '+showing[1]+' of '+showing[2];
+  return textInLanguage(original);
+}
 function translateText(node) {
   if(!node.parentElement||!node.data.trim()||node.parentElement.closest(ignored))return;
   const option=node.parentElement.closest('option');
   if(option&&!option.hasAttribute('value'))option.value=option.value;
   const old=sourceText.get(node);
   const original=old?.output===node.data?old.original:node.data;
-  const output=node.parentElement.closest('#uhzSearchFilters :is(option,.uhz-search-filter-chip)')?
-    filterLabel(original):textInLanguage(original);
+  let output;
+  if(node.parentElement.closest('#uhzSearchFilters :is(option,.uhz-search-filter-chip)'))output=filterLabel(original);
+  else if(node.parentElement.closest('#estadoResultados,.uhz-search-query-count,.uhz-search-filter-summary,.uhz-search-pro-more'))output=searchStatusLabel(original);
+  else output=textInLanguage(original);
   if(output!==original||old)sourceText.set(node,{original,output});
   if(output!==node.data)node.data=output;
 }

@@ -35,6 +35,8 @@ function applyPublicUI(request, response) {
      excludedPath.test(url.pathname)||url.searchParams.get('embed')==='1'||url.searchParams.get('_uhz_robot')==='1'||
      request.headers.get('sec-fetch-dest')==='iframe')return response;
   const isHome=url.pathname==='/'||url.pathname.toLowerCase()==='/index.html';
+  const englishAsset=isHome?'ui-en-9':sharedAssets.english;
+  const navigationAsset=isHome?'ui-js-10':sharedAssets.navigation;
   const isPortal=portalPath.test(url.pathname);
   const isArticle=/^\/recurso\//i.test(url.pathname);
   const isEnglish=url.searchParams.get('lang')==='en';
@@ -75,8 +77,8 @@ function applyPublicUI(request, response) {
         end.before('<link rel="stylesheet" href="'+UI_ROOT+sharedAssets.style+'">'+
           (isArticle?'<link rel="stylesheet" href="'+UI_ROOT+'article-flow-css&amp;v=20261112-access-redesign-v3">':'')+
           (isArticle?'<script defer src="'+UI_ROOT+'article-ui-3"></script>':'')+
-          (isEnglish?'<script defer src="'+UI_ROOT+sharedAssets.english+'"></script>':'')+
-          '<script defer src="'+UI_ROOT+sharedAssets.navigation+'"></script>',{html:true});
+          (isEnglish?'<script defer src="'+UI_ROOT+englishAsset+'"></script>':'')+
+          '<script defer src="'+UI_ROOT+navigationAsset+'"></script>',{html:true});
       });
     }})
     .on('meta[charset]',{element(e){

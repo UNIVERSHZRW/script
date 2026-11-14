@@ -1,8 +1,9 @@
 import{readFile,writeFile,mkdir}from'node:fs/promises';import{createHash}from'node:crypto';import*as esbuild from'../admin/node_modules/esbuild/lib/main.js';
+import { repairAccountEndpoints } from '../shared-ui/public-ui/repair-account-endpoints.mjs';
 await mkdir('connectors/generated',{recursive:true});await mkdir('connectors/dist',{recursive:true});
 const contribution=await esbuild.build({entryPoints:['connectors/contribution.js'],bundle:true,minify:true,format:'iife',target:['es2022'],write:false});
 const client=contribution.outputFiles[0].text;await writeFile('connectors/generated/contribution.txt',client);
-let core=await readFile('connectors/original/univershzrw-comunidad.mjs','utf8');
+let core=repairAccountEndpoints(await readFile('connectors/original/univershzrw-comunidad.mjs','utf8'));
 function replaceOnce(source,old,value){if(source.split(old).length!==2)throw Error('Patch target changed: '+old.slice(0,90));return source.replace(old,value);}
 core=replaceOnce(core,'async function backend(req,env) {','async function backend(req,env) {\n if(new URL(req.url).pathname.startsWith(MEDIA_PATH))return mediaHandler(req,env,{sessionFor,ownerUser,trustedWrite,limited,jsonBody});');
 core=replaceOnce(core,"const out=new Response(upstream.body,{status:upstream.status,headers:{'Content-Type':'application/json','Cache-Control':'no-store','X-Content-Type-Options':'nosniff'}});for(const cookie of session.cookies)out.headers.append('Set-Cookie',cookie);return out;", "const data=await upstream.json();const wrapped=upstream.ok?await mediaLinks(data,{request:req,env,user:session.u}):data;const out=new Response(JSON.stringify(wrapped),{status:upstream.status,headers:{'Content-Type':'application/json','Cache-Control':'no-store','X-Content-Type-Options':'nosniff'}});for(const cookie of session.cookies)out.headers.append('Set-Cookie',cookie);return out;");

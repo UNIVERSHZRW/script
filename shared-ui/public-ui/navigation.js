@@ -76,7 +76,7 @@ function loadDictionary() {
   if(window.UHZTranslations){dictionary=window.UHZTranslations;return Promise.resolve();}
   if(pendingDictionary)return pendingDictionary;
   const link=document.createElement('script');
-  link.src='/_uhz/shared-header.js?asset=ui-en-6';
+  link.src='/_uhz/shared-header.js?asset=ui-en-8';
   pendingDictionary=new Promise(resolve=>{
     link.addEventListener('load',()=>{
       dictionary=window.UHZTranslations||dictionary;
@@ -127,13 +127,21 @@ function textInLanguage(original) {
   }
   return value?original.replace(/\S[\s\S]*\S|\S/,value):original;
 }
+function filterLabel(original) {
+  const match=original.trim().match(/^(Quitar filtro )?(.+?)( \(\d+\)| ×)?$/);
+  if(language!=='en'||!match)return original;
+  const [,remove,label,suffix]=match;
+  const translated=(remove?'Remove filter ':'')+textInLanguage(label)+(suffix||'');
+  return original.replace(original.trim(),()=>translated);
+}
 function translateText(node) {
   if(!node.parentElement||!node.data.trim()||node.parentElement.closest(ignored))return;
   const option=node.parentElement.closest('option');
   if(option&&!option.hasAttribute('value'))option.value=option.value;
   const old=sourceText.get(node);
   const original=old?.output===node.data?old.original:node.data;
-  const output=textInLanguage(original);
+  const output=node.parentElement.closest('#uhzSearchFilters :is(option,.uhz-search-filter-chip)')?
+    filterLabel(original):textInLanguage(original);
   if(output!==original||old)sourceText.set(node,{original,output});
   if(output!==node.data)node.data=output;
 }
@@ -145,7 +153,8 @@ function translateAttributes(node) {
     if(value===null)continue;
     const previous=record?.[name];
     const original=previous?.output===value?previous.original:value;
-    const output=textInLanguage(original);
+    const output=name==='aria-label'&&node.matches('#uhzSearchFilters .uhz-search-filter-chip')?
+      filterLabel(original):textInLanguage(original);
     if(output!==original||previous) {
       if(!record){record={};sourceAttributes.set(node,record);}
       record[name]={original,output};

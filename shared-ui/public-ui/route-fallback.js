@@ -14,9 +14,23 @@ const UI_MARKUP = {"head":"<header id=\"uhz-ui-desktop\" aria-label=\"Encabezado
   marker.id='uhz-ui-bridge';
   document.head.append(marker);
   root.dataset.uhzUi='1';
-  const isPortal=/^\/(?:mi-cuenta|perfil|iniciar-sesion|registrarse|recuperar-contrasena|coins|notificaciones)(?:\/|$)/i.test(pathname);
+  const isPortal=/^\/(?:mi-cuenta|perfil|iniciar-sesion|registrarse|recuperar-contrasena|nueva-contrasena|verificar-cuenta|coins|notificaciones)\/?$/i.test(pathname);
   const article=/^\/recurso\//i.test(pathname);
   if(isPortal)root.dataset.uhzPortal='1';
+  const sectionIcon=/^\/criptomoneda(?:\/|$)/i.test(pathname);
+  const icons=[...document.head.querySelectorAll('link[rel~="icon" i]')];
+  if(!sectionIcon||!icons.some(icon=>{
+    const source=new URL(icon.href,location.href);
+    return source.origin===location.origin&&source.pathname.startsWith('/criptomoneda/');
+  })) {
+    for(const icon of icons)icon.remove();
+    const icon=document.createElement('link');
+    icon.rel='icon';
+    icon.type='image/svg+xml';
+    icon.setAttribute('sizes','any');
+    icon.href='/_uhz/univershzrw-favicon.svg';
+    document.head.append(icon);
+  }
   const dark=(()=>{try{
     const stored=localStorage.getItem('uhz_header_theme');
     return stored==='dark'||(!stored&&localStorage.getItem('modo_oscuro_univershzrw')==='1');
@@ -37,7 +51,7 @@ const UI_MARKUP = {"head":"<header id=\"uhz-ui-desktop\" aria-label=\"Encabezado
     node.async=false;
     document.head.append(node);
   }
-  style('ui-css-4');
+  style('ui-css-10');
   if(article)style('article-flow-css&v=20261112-access-redesign-v3');
   function mount() {
     if(!document.body||document.getElementById('uhz-ui-desktop'))return;
@@ -54,8 +68,8 @@ const UI_MARKUP = {"head":"<header id=\"uhz-ui-desktop\" aria-label=\"Encabezado
     if(article) {
       script('article-ui-3');
     }
-    if(url.searchParams.get('lang')==='en')script('ui-en-6');
-    script('ui-js-7');
+    if(url.searchParams.get('lang')==='en')script('ui-en-8');
+    script('ui-js-9');
   }
   if(document.readyState==='loading')document.addEventListener('DOMContentLoaded',mount,{once:true});
   else mount();

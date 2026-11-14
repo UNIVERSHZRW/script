@@ -12,6 +12,10 @@ export function repairAccountEndpoints(source) {
     [
       'JSON.stringify(rpcName === "uhz_eco_catalog" ? {} : { p_content_id: String(publicBody.p_content_id) })',
       'JSON.stringify(rpcName === "uhz_eco_public_free" ? { p_content_id: String(publicBody.p_content_id) } : {})'
+    ],
+    [
+      'new Response(ADDON_JS + GUARDIAN_ADMIN_JS + CHATBOT_ADMIN_JS,',
+      'new Response(ADDON_JS + (isAdminHost(req) ? GUARDIAN_ADMIN_JS + CHATBOT_ADMIN_JS : ""),'
     ]
   ] : [
     [
@@ -25,6 +29,10 @@ export function repairAccountEndpoints(source) {
     [
       "JSON.stringify(rpcName==='uhz_eco_catalog'?{}:{p_content_id:String(publicBody.p_content_id)})",
       "JSON.stringify(rpcName==='uhz_eco_public_free'?{p_content_id:String(publicBody.p_content_id)}:{})"
+    ],
+    [
+      'new Response(ADDON_JS+GUARDIAN_ADMIN_JS+CHATBOT_ADMIN_JS,',
+      'new Response(ADDON_JS+(isAdminHost(req)?GUARDIAN_ADMIN_JS+CHATBOT_ADMIN_JS:""),'
     ]
   ];
   for (const [before, after] of replacements) {

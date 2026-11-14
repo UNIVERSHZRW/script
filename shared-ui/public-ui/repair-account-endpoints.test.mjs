@@ -58,4 +58,15 @@ test('community gateway serves the new public status and protects account summar
     assert.deepEqual(upstream.slice(-3).map(call => call.path), ['/auth/v1/user', `${rpcPath}uhz_account_status`, `${rpcPath}${name}`]);
     assert.equal(upstream.at(-1).authorization, 'Bearer test-session');
   }
+
+  const publicUpgrade = await worker.fetch(new Request(`${origin}/upgrade.js`), env);
+  const adminUpgrade = await worker.fetch(new Request('https://admin.univershzrw.com/upgrade.js'), env);
+  assert.equal(publicUpgrade.status, 200);
+  assert.equal(adminUpgrade.status, 200);
+  const publicScript = await publicUpgrade.text();
+  const adminScript = await adminUpgrade.text();
+  assert.doesNotMatch(publicScript, /verifyGuardianAccess|chatbotAdminClient/);
+  assert.ok(adminScript.startsWith(publicScript));
+  assert.match(adminScript, /verifyGuardianAccess/);
+  assert.match(adminScript, /chatbotAdminClient/);
 });

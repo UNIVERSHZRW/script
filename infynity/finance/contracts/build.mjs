@@ -26,4 +26,3 @@ const code = result.contracts[name].INFYNITY.evm.bytecode.object;
 writeFileSync(new URL('creation-code.mjs', import.meta.url),
   '// Generated from INFYNITY.sol with Solidity 0.8.38 and OpenZeppelin 5.6.1.\n'
   + 'export const creationCode = ' + JSON.stringify('0x' + code) + ';\n');
-

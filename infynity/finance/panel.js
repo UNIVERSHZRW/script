@@ -11,7 +11,7 @@ const names={deposit_mxn:'Depósito en pesos',withdraw_mxn:'Retiro en pesos',dep
 const statuses={requested:'Solicitud recibida',quoted:'Por confirmar',review:'En revisión',processing:'En proceso',completed:'Liquidada',rejected:'Rechazada',cancelled:'Cancelada'};
 const events={funds_reserved:'Saldo reservado',reservation_released:'Reserva liberada',deposit_confirmed:'Depósito confirmado',withdrawal_settled:'Retiro liquidado',crypto_deposit_confirmed:'Depósito INFT confirmado',crypto_withdrawal_settled:'Retiro INFT liquidado',exchange_settled:'Conversión liquidada',exchange_received:'Conversión recibida',request_created:'Solicitud creada',proof_attached:'Comprobante adjunto',transaction_attached:'Transferencia registrada',quote_confirmed:'Cotización confirmada',settled:'Operación liquidada',configuration_updated:'Configuración actualizada',price_published:'Cotización publicada',wallet_linked:'Cartera vinculada',destination_viewed:'Consulta de cuenta de retiro',cancelled:'Cancelación',rejected:'Rechazo'};
 let state=null,tab=admin?'review':'overview',selected=null,filter='pending',search='';
-let selectedDepositOrder=null,detailSequence=0;
+let selectedDepositOrder=null,detailSequence=0,loadSequence=0;
 const currentDepositCopy=()=>depositCopy(document.documentElement.lang);
 const intent=new URLSearchParams(location.search);
 if(!admin&&['overview','exchange','deposit','withdraw','history','security'].includes(intent.get('view')))tab=intent.get('view');
@@ -21,6 +21,27 @@ const status=r=>`<span class="status ${esc(r.status)}">${esc(statuses[r.status]|
 const field=(label,name,type='text',attrs='',hint='')=>`<label class="field"><span>${label}</span><input name="${name}" type="${type}" ${attrs}>${hint?`<small>${hint}</small>`:''}</label>`;
 const wallet=asset=>state?.wallets?.find(w=>w.asset===asset)||{available:'0',reserved:'0'};
 const price=()=>admin?state?.prices?.[0]:state?.price;
+function renderMenuMxn(){
+ if(admin)return;
+ const amount=state?money(wallet('MXN').available):null;
+ for(const menu of document.querySelectorAll(':is(#uhz-ui-desktop,#uhz-ui-mobile) .uhz-ui-wallet')){
+  let badge=menu.querySelector('[data-uhz-mxn]');
+  if(amount===null){badge?.remove();continue;}
+  if(!badge){
+   badge=document.createElement('a');
+   badge.href='/criptomoneda/panel?view=overview';
+   badge.dataset.uhzMxn='';
+   badge.setAttribute('translate','no');
+   const label=document.createElement('small');
+   label.textContent='MXN';
+   badge.append(label,document.createElement('strong'));
+   const inft=menu.querySelector('[data-uhz-balance="inft"]')?.closest('a');
+   if(inft)inft.after(badge);
+   else menu.append(badge);
+  }
+  badge.lastElementChild.textContent=amount;
+ }
+}
 function notice(message,error=false){const el=$('#notice');el.hidden=false;el.classList.toggle('error',error);el.textContent=message;}
 async function api(action,payload={}){
  const r=await fetch('/_uhz/portal/backend/functions/v1/uhz-inft-wallet',{method:'POST',credentials:'same-origin',headers:{'content-type':'application/json'},body:JSON.stringify({action,payload})});
@@ -108,8 +129,26 @@ function prices(){return `<div class="grid-two"><section class="box"><p class="e
 function priceHistory(){return state.prices.length?`<div class="table-wrap"><table><thead><tr><th>Fecha</th><th>1 INFT / MXN</th><th>Coins / INFT</th><th>Motivo publicado</th></tr></thead><tbody>${[...state.prices].sort((a,b)=>Number(b.id)-Number(a.id)).map(p=>`<tr><td class="tiny">${esc(date(p.created_at))}</td><td><b>${money(p.price_mxn)}</b></td><td>${num(p.coins_per_inft,8)}</td><td class="history-reason">${esc(p.reason)}</td></tr>`).join('')}</tbody></table></div>`:'<div class="empty">Publica la primera cotización para iniciar el historial.</div>';}
 function settings(){const c=state.config;return `<section class="box"><div class="box-head"><div><p class="eyebrow">DATOS DE OPERACIÓN</p><h2 class="section-title">Configuración de INFYNITY</h2></div><span class="admin-badge">SOLO ADMINISTRACIÓN</span></div><form data-form="admin-settings"><h3>Cuenta receptora para depósitos</h3><div class="form-grid">${field('Banco','bank_name','text',`maxlength="100" value="${esc(c.bank_name)}"`)}${field('Titular de la cuenta','bank_holder','text',`maxlength="160" value="${esc(c.bank_holder)}"`)}${field('CLABE interbancaria','bank_clabe','text',`pattern="[0-9]{18}" maxlength="18" inputmode="numeric" value="${esc(c.bank_clabe)}"`)}${field('Comisión de conversión (puntos base)','fee_bps','number',`min="0" max="1000" step="1" required value="${c.fee_bps}"`,'100 puntos base = 1 %. Se muestra antes de confirmar.')}</div><h3 class="section-title">Tesorería de INFT · Polygon</h3><div class="form-grid">${field('Contrato del token INFT','token_address','text',`pattern="0x[0-9a-fA-F]{40}" maxlength="42" value="${esc(c.token_address||'')}" autocomplete="off"`)}${field('Dirección de la tesorería','treasury_address','text',`pattern="0x[0-9a-fA-F]{40}" maxlength="42" value="${esc(c.treasury_address||'')}" autocomplete="off"`)}</div><p class="sub">El contrato y su precisión se verifican en Polygon. La cartera de tesorería debe contener las unidades que respaldan los saldos INFT.</p><div class="form-foot"><p>Los cambios quedan registrados en la auditoría.</p><button class="primary" type="submit">Guardar configuración →</button></div></form></section><section class="box"><h3>Pagos con tarjeta</h3><p class="sub">Asigna el enlace oficial de Mercado Pago desde cada solicitud de depósito. Revisa que el importe recibido coincida con el solicitado antes de liquidar.</p></section>`;}
 function audit(){return `<section class="box"><p class="eyebrow">PMC / REGISTRO ENCADENADO</p><h2 class="section-title">Auditoría de operaciones</h2><p class="sub">Cada evento conserva su huella SHA-256 y la del evento anterior. Los movimientos liquidados y las cotizaciones publicadas son inmutables.</p>${state.audit.length?`<div class="table-wrap section-title"><table><thead><tr><th>Fecha</th><th>Evento</th><th>Huella SHA-256</th><th>Huella anterior</th></tr></thead><tbody>${state.audit.map(a=>`<tr><td class="tiny">${esc(date(a.created_at))}</td><td>${esc(events[a.event]||a.event)}</td><td><div class="mono audit-hash" title="${esc(a.event_hash)}">${esc(a.event_hash)}</div></td><td><div class="mono audit-hash" title="${esc(a.previous_hash)}">${esc(a.previous_hash)}</div></td></tr>`).join('')}</tbody></table></div>`:'<div class="empty">El registro comienza con tu primera operación administrativa.</div>'}</section>`;}
-function render(){renderNav();if(!state){login();return;}const views={overview,exchange,deposit,withdraw,history,security,review,treasury,prices,settings,audit};$('#content').innerHTML=views[tab]();if(tab==='exchange'&&['buy_inft','sell_inft','coins_to_inft','inft_to_coins'].includes(intent.get('operation'))){$('#exchangeKind').value=intent.get('operation');preview();}}
-async function load(){try{state=await api(admin?'admin_dashboard':'dashboard');render();return state;}catch(e){if([401,403].includes(e.status)){state=null;render();}else{notice(e.message,true);if(!state)$('#content').innerHTML='<section class="box empty">No se pudo actualizar tu cuenta. Pulsa Actualizar para reintentar.</section>';}}}
+function render(){renderNav();renderMenuMxn();if(!state){login();return;}const views={overview,exchange,deposit,withdraw,history,security,review,treasury,prices,settings,audit};$('#content').innerHTML=views[tab]();if(tab==='exchange'&&['buy_inft','sell_inft','coins_to_inft','inft_to_coins'].includes(intent.get('operation'))){$('#exchangeKind').value=intent.get('operation');preview();}}
+async function load(){
+ const sequence=++loadSequence;
+ try{
+  const next=await api(admin?'admin_dashboard':'dashboard');
+  if(sequence!==loadSequence)return state;
+  state=next;
+  render();
+  return state;
+ }catch(e){
+  if(sequence!==loadSequence)return state;
+  if([401,403].includes(e.status)){
+   state=null;
+   render();
+  }else{
+   notice(e.message,true);
+   if(!state)$('#content').innerHTML='<section class="box empty">No se pudo actualizar tu cuenta. Pulsa Actualizar para reintentar.</section>';
+  }
+ }
+}
 function changeTab(id){if(!tabs.some(t=>t[0]===id))return;tab=id;$('#notice').hidden=true;render();$('#main').focus({preventScroll:true});window.scrollTo({top:0,behavior:'instant'});}
 function preview(){const kind=$('#exchangeKind')?.value,amount=Number($('#exchangeAmount')?.value||0),p=price();if(!kind)return;const factor=1-state.config.fee_bps/10000;let output=0,asset='INFT',input='MXN';if(p){if(kind==='buy_inft')output=amount/Number(p.price_mxn)*factor;if(kind==='sell_inft'){output=amount*Number(p.price_mxn)*factor;asset='MXN';input='INFT';}if(kind==='coins_to_inft'){output=amount/Number(p.coins_per_inft)*factor;input='COIN';}if(kind==='inft_to_coins'){output=Math.floor(amount*Number(p.coins_per_inft)*factor);asset='COIN';input='INFT';}}
  $('#preview').innerHTML=`<small>Recibes aproximadamente</small><b>${p&&amount?esc(units(output,asset)):'— '+(asset==='COIN'?'Coins':asset)}</b><small>${amount?esc(units(amount,input))+' de origen · ':''}${p?'Comisión incluida. Revisa la cotización final.':'Solicita la cotización de la mesa.'}</small>`;
@@ -210,4 +249,20 @@ document.addEventListener('change',e=>{
  if(e.target.id==='depositMethod')syncDepositAvailability(e.target.form);
  if(e.target.id==='requestFilter'){filter=e.target.value;render();}if(e.target.id==='exchangeKind')preview();if(e.target.id==='withdrawKind'){const crypto=e.target.value==='withdraw_inft';$('#bankWithdrawal').hidden=crypto;$('#cryptoWithdrawal').hidden=!crypto;$('#bankWithdrawal').querySelectorAll('input').forEach(i=>{i.disabled=crypto;i.required=!crypto;});}});
 $('#refresh').addEventListener('click',async()=>{const b=$('#refresh');b.disabled=true;await load();b.disabled=false;});$('#closeDetail').addEventListener('click',()=>$('#detail').close());
+if(!admin){
+ const refreshSession=()=>{
+  state=null;
+  selected=null;
+  selectedDepositOrder=null;
+  detailSequence++;
+  if($('#detail').open)$('#detail').close();
+  render();
+  void load();
+ };
+ window.addEventListener('uhz:session',refreshSession);
+ window.addEventListener('pageshow',event=>{if(event.persisted)refreshSession();});
+ window.addEventListener('message',event=>{
+  if(event.origin===location.origin&&event.data?.type==='uhz:session')refreshSession();
+ });
+}
 renderNav();load();

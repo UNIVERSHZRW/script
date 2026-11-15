@@ -48,3 +48,13 @@ export function validateTransfer(receipt,canonical,cfg,r,tx,latest) {
 }
 export const morseMap={A:'.-',B:'-...',C:'-.-.',D:'-..',E:'.',F:'..-.',G:'--.',H:'....',I:'..',J:'.---',K:'-.-',L:'.-..',M:'--',N:'-.',O:'---',P:'.--.',Q:'--.-',R:'.-.',S:'...',T:'-',U:'..-',V:'...-',W:'.--',X:'-..-',Y:'-.--',Z:'--..',0:'-----',1:'.----',2:'..---',3:'...--',4:'....-',5:'.....',6:'-....',7:'--...',8:'---..',9:'----.','-':'-....-'};
 export const toMorse=text=>String(text).toUpperCase().split('').map(x=>morseMap[x]||'/').join(' ');
+
+// Strict Polygon PoS supply filter; do not confuse proposal with minted on-chain tokens.
+export const INFT_FIXED_SUPPLY = 10000000n;
+export function validateInftSupply(hexValue, decimals) {
+  if (!Number.isInteger(decimals) || decimals < 0 || decimals > 18) throw Error('Decimales INFT inválidos.');
+  const actual = BigInt(hexValue);
+  const expected = INFT_FIXED_SUPPLY * 10n ** BigInt(decimals);
+  if (actual !== expected) throw Error('El contrato INFT no respeta el suministro fijo de 10,000,000 unidades.');
+  return true;
+}

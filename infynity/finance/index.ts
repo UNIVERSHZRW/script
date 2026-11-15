@@ -1,6 +1,7 @@
 import { createClient } from 'npm:@supabase/supabase-js@2.80.0';
 import { verifyMessage, formatUnits } from 'npm:viem@2.57.16';
-import { userActions, adminActions, validClabe, paymentLink, fileType, safePayload, validateTransfer, isInftSymbol } from './core.mjs';
+import { userActions, adminActions, validClabe, paymentLink, fileType, safePayload, validateTransfer, isInftSymbol, validateInftSupply } from './core.mjs';
+import { depositReceiver } from './deposit-order.mjs';
 
 const project=Deno.env.get('SUPABASE_URL')!;
 const service=Deno.env.get('SUPABASE_SERVICE_ROLE_KEY')!;
@@ -24,6 +25,8 @@ async function reserveProof(cfg:any,r:any,p:any) {
   const code=await chainCall('eth_getCode',[cfg.token_address,block]);if(code==='0x')throw Error('El contrato no existe en Polygon.');
   const decimals=Number(BigInt(await chainCall('eth_call',[{to:cfg.token_address,data:'0x313ce567'},block])));
   if(decimals!==cfg.token_decimals)throw Error('La precisión del contrato cambió. Revisa la configuración.');
+  validateInftSupply(await chainCall('eth_call',[{to:cfg.token_address,data:'0x18160ddd'},block]),decimals);
+  validateInftSupply(await chainCall('eth_call',[{to:cfg.token_address,data:'0x18160ddd'},'latest']),decimals);
   const balance=BigInt(await chainCall('eth_call',[{to:cfg.token_address,data:'0x70a08231'+cfg.treasury_address.slice(2).padStart(64,'0')},block]));
   // Both a confirmed snapshot and the current reserve must cover custody liabilities.
   const current=BigInt(await chainCall('eth_call',[{to:cfg.token_address,data:'0x70a08231'+cfg.treasury_address.slice(2).padStart(64,'0')},'latest']));
@@ -55,7 +58,15 @@ Deno.serve(async(req)=>{
     const rpc=async(a:string,data:any={})=>{const {data:out,error}=await sb.rpc('uhz_finance',{p_actor:user.id,p_session:session,p_action:a,p_payload:data});if(error){if(error.code==='23505')throw Error('La referencia o el comprobante ya está registrado.');if(error.code==='23514')throw Error('Revisa el importe y el saldo disponible.');if(['P0001','42501'].includes(error.code))throw Error(error.message);throw Error('No se pudo registrar la operación. Revisa los datos.');}return out;};
     // Fresh DB session and owner role are checked on every request, including uploads.
     const dash=await rpc(adminActions.has(action)?'admin_dashboard':'dashboard');
-    if(action==='dashboard'||action==='admin_dashboard')return response(dash);
+    if(action==='admin_dashboard') {
+      const existingSpei=depositReceiver({
+        name:Deno.env.get('SPEI_BANK_NAME'),
+        holder:Deno.env.get('SPEI_BENEFICIARY_NAME'),
+        clabe:Deno.env.get('SPEI_CLABE')?.replace(/\D/g,'')
+      });
+      return response({...dash,existing_spei:existingSpei});
+    }
+    if(action==='dashboard')return response(dash);
     if(action==='admin_config') {
       if(p.bank_clabe&&!validClabe(p.bank_clabe))throw Error('La CLABE receptora no es válida.');
       if(p.bank_clabe&&(!p.bank_name?.trim()||String(p.bank_holder||'').trim().length<4))throw Error('Registra el banco y el titular de la cuenta receptora.');
@@ -63,7 +74,9 @@ Deno.serve(async(req)=>{
         if(!address.test(p.token_address)||!address.test(p.treasury_address||'')||/^0x0{40}$/i.test(p.token_address)||/^0x0{40}$/i.test(p.treasury_address))throw Error('Revisa las direcciones del contrato y la tesorería.');
         if(BigInt(await chainCall('eth_chainId',[]))!==137n)throw Error('Red incorrecta.');
         const symbol=await chainCall('eth_call',[{to:p.token_address,data:'0x95d89b41'},'latest']);if(!isInftSymbol(symbol))throw Error('El contrato debe corresponder al token INFT.');
-        const decimals=Number(BigInt(await chainCall('eth_call',[{to:p.token_address,data:'0x313ce567'},'latest'])));if(decimals<0||decimals>18)throw Error('Precisión de contrato incompatible.');p.token_decimals=decimals;
+        const decimals=Number(BigInt(await chainCall('eth_call',[{to:p.token_address,data:'0x313ce567'},'latest'])));if(decimals<0||decimals>18)throw Error('Precisión de contrato incompatible.');
+        validateInftSupply(await chainCall('eth_call',[{to:p.token_address,data:'0x18160ddd'},'latest']),decimals);
+        p.token_decimals=decimals;
       }
     }
     if(action==='create_request') {

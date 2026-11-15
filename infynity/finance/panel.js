@@ -48,24 +48,25 @@ function market(){const p=price(),all=[...(state.prices||[])].sort((a,b)=>Number
  return `<section class="box"><div class="box-head"><div><p class="eyebrow">COTIZACIÓN DE LA MESA</p><h2 class="section-title">INFYNITY <span class="muted unit">/ MXN</span></h2></div>${change!==null?`<span class="change ${change<0?'down':''}">${change>=0?'+':''}${num(change,2)} %</span>`:'<span class="status">INFT</span>'}</div><div class="price">${p?money(p.price_mxn):'—'} <span class="unit">MXN / INFT</span></div><p class="sub">${p?esc(p.source)+' · '+esc(date(p.created_at)):'Cotización pendiente de publicación'}</p>${chart(all)}${p?`<div class="reason"><strong>Motivo de la última cotización</strong>${esc(p.reason)}</div>`:''}</section>`;
 }
 function requestsTable(requests,short=false){if(!requests.length)return '<div class="empty">Tu historial comienza con tu primera operación.</div>';return `<div class="table-wrap"><table><thead><tr><th>Operación / Folio</th>${admin?'<th>Cuenta</th>':''}<th>Importe</th><th>Estado</th>${short?'':'<th>Fecha</th>'}<th></th></tr></thead><tbody>${requests.map(r=>`<tr><td><b>${esc(names[r.kind])}</b><br><span class="mono tiny muted">${esc(r.folio)}</span></td>${admin?`<td>${esc(r.email)}</td>`:''}<td>${esc(units(r.amount,['deposit_mxn','withdraw_mxn','buy_inft'].includes(r.kind)?'MXN':r.kind==='coins_to_inft'?'COIN':'INFT'))}</td><td>${status(r)}</td>${short?'':`<td class="muted tiny">${esc(date(r.created_at))}</td>`}<td><button type="button" class="row-link" data-detail="${esc(r.id)}">${admin?'Revisar':needsDepositOrder(r)?currentDepositCopy().view:'Ver detalle'} →</button></td></tr>`).join('')}</tbody></table></div>`;}
-function overview(){return cards()+`<div class="grid-two">${market()}<section class="box"><div class="box-head"><h2>Tu siguiente movimiento</h2></div><div class="quick"><button data-tab="deposit"><span>↓</span>Depositar</button><button data-tab="withdraw"><span>↑</span>Retirar</button><button data-tab="exchange"><span>⇄</span>Comprar / vender</button><button data-go="coins_to_inft"><span>◈</span>Canjear Coins</button></div><div class="highlight-line"><strong>${(state.requests||[]).filter(r=>['review','processing'].includes(r.status)).length} operaciones en seguimiento</strong><span class="muted">Consulta el estado de tus solicitudes en Movimientos.</span></div>${state.admin?'<a class="login-path" href="https://admin.univershzrw.com/inft">Abrir mesa de administración ↗</a>':''}</section></div><section class="box"><div class="box-head"><h2>Últimos movimientos</h2><button class="secondary" data-tab="history">Ver todos →</button></div>${requestsTable(state.requests.slice(0,5),true)}</section>`;}
+function overview(){return cards()+`<div class="grid-two">${market()}<section class="box"><div class="box-head"><h2>Tu siguiente movimiento</h2></div><div class="quick"><button data-tab="deposit"><span>↓</span>Depositar</button><button data-tab="withdraw"><span>↑</span>Retirar</button><button data-tab="exchange"><span>⇄</span>Comprar / vender</button><button data-go="coins_to_inft"><span>◈</span>Canjear Coins</button></div></section></div><section class="box"><div class="box-head"><h2>Últimos movimientos</h2><button class="secondary" data-tab="history">Ver todos →</button></div>${requestsTable(state.requests.slice(0,5),true)}</section>`;}
 function exchange(){const p=price();return `<div class="grid-two"><section class="box"><p class="eyebrow">MESA DE CONVERSIÓN</p><h2 class="section-title">Elige tu operación</h2><form data-form="exchange"><div class="form-grid"><label class="field full"><span>Quiero</span><select name="kind" id="exchangeKind"><option value="buy_inft">Comprar INFT con pesos</option><option value="sell_inft">Vender INFT por pesos</option><option value="coins_to_inft">Canjear Coins por INFT</option><option value="inft_to_coins">Comprar Coins con INFT</option></select></label>${field('Cantidad de origen','amount','number','min="0.00000001" max="1000000" step="any" required inputmode="decimal" id="exchangeAmount"','La unidad se indica en la estimación.')}<label class="field"><span>Comisión de conversión</span><input readonly value="${num(state.config.fee_bps/100,2)} %"></label></div><div class="quote-preview" id="preview"><small>Recibes aproximadamente</small><b>— INFT</b><small>Introduce una cantidad para consultar el cálculo.</small></div><div class="form-foot"><p>Revisa el importe final de la cotización antes de confirmar. La confirmación reserva el saldo de origen.</p><button class="primary" type="submit">Solicitar cotización →</button></div></form></section><div>${market()}<section class="box"><h3>Tus referencias de conversión</h3><div class="mini-list"><div class="mini-row"><span>1 INFT en pesos</span><b>${p?money(p.price_mxn)+' MXN':'—'}</b></div><div class="mini-row"><span>1 INFT en Coins</span><b>${p?num(p.coins_per_inft,8)+' Coins':'—'}</b></div><div class="mini-row"><span>Límite de canje por solicitud</span><b>1,000 Coins</b></div></div><p class="sub">Cotización de la mesa UNIVERSHZRW. Los Coins se utilizan dentro del ecosistema.</p></section></div></div>`;}
-function depositInstructions(order, copy) {
- return `<section aria-labelledby="depositOrderTitle">
+function depositInstructions(request, order, copy) {
+ const receiver=order?.receiver;
+ return `<section class="deposit-instructions" aria-labelledby="depositOrderTitle">
   <h3 class="section-title" id="depositOrderTitle">${copy.title}</h3>
   <div class="actions section-title">
    <button type="button" class="primary" data-action="download-deposit"${order?'':' disabled aria-describedby="depositOrderFeedback"'}>${copy.download}</button>
    ${order?`<button type="button" class="secondary" data-action="copy-clabe">${copy.copy}</button>`:''}
   </div>
-  ${order?`<div class="bank-data">
-   <div><small>${copy.amount}</small><b>${esc(depositAmount(order.amount,copy.locale))}</b></div>
-   <div><small>${copy.bank}</small><b>${esc(order.receiver.name)}</b></div>
-   <div><small>${copy.holder}</small><b>${esc(order.receiver.holder)}</b></div>
-   <div><small>${copy.clabe}</small><b class="mono">${esc(order.receiver.clabe)}</b></div>
-   <div><small>${copy.reference}</small><b class="mono">${esc(order.folio)}</b></div>
-  </div>
-  <p class="sub">${copy.guidance}</p>`:''}
   <p id="depositOrderFeedback" class="${order?'sub':'reason'}" role="status">${order?'':copy.unavailable}</p>
+  <div class="bank-data">
+   <div><small>${copy.amount}</small><b>${esc(depositAmount(request.amount,copy.locale))}</b></div>
+   <div><small>${copy.bank}</small><b>${esc(receiver?.name??copy.pending)}</b></div>
+   <div><small>${copy.holder}</small><b>${esc(receiver?.holder??copy.pending)}</b></div>
+   <div><small>${copy.clabe}</small><b class="${receiver?'mono':''}">${esc(receiver?.clabe??copy.pending)}</b></div>
+   <div><small>${copy.reference}</small><b class="mono">${esc(request.folio)}</b></div>
+  </div>
+  ${order?`<p class="sub">${copy.guidance}</p>`:''}
  </section>`;
 }
 function deposit(){
@@ -125,7 +126,7 @@ async function openDetail(id,freshBank){
  let extra='';
  const active=['requested','quoted','review','processing'].includes(r.status);
  if(r.status==='quoted'&&!admin){extra+=`<div class="reason"><strong>Revisa tu cotización</strong>Entregas <b>${esc(units(r.debit_amount,r.debit_asset))}</b> y recibes <b>${esc(units(r.credit_amount,r.credit_asset))}</b>.<br>Comisión: ${esc(units(r.fee_amount,r.debit_asset))}. Vigente hasta ${esc(date(r.quote_expires_at))}.</div><div class="actions section-title"><button class="primary" data-action="confirm">Confirmar y reservar saldo →</button></div>`;}
- const depositMarkup=showOrder?depositInstructions(selectedDepositOrder,currentDepositCopy()):'';
+ const depositMarkup=showOrder?depositInstructions(r,selectedDepositOrder,currentDepositCopy()):'';
  if(r.kind==='deposit_mxn'&&r.method==='card'&&active&&!admin){
   extra+=r.payment_link&&paymentLink(r.payment_link)?`<a class="primary section-title" href="${esc(r.payment_link)}" target="_blank" rel="noopener noreferrer">Abrir pago en Mercado Pago ↗</a>`:'<div class="reason"><strong>Solicitud de pago con tarjeta</strong>El enlace de pago se asigna a este folio y aparecerá aquí.</div>';
  }

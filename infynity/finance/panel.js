@@ -1,4 +1,5 @@
 import {toMorse,paymentLink} from './core.mjs';
+import {depositAmount,depositCopy,depositOrder,depositReceiver,needsDepositOrder} from './deposit-order.mjs';
 const admin=location.hostname==='admin.univershzrw.com';
 const $=s=>document.querySelector(s);
 const esc=v=>String(v??'').replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
@@ -10,6 +11,8 @@ const names={deposit_mxn:'Depósito en pesos',withdraw_mxn:'Retiro en pesos',dep
 const statuses={requested:'Solicitud recibida',quoted:'Por confirmar',review:'En revisión',processing:'En proceso',completed:'Liquidada',rejected:'Rechazada',cancelled:'Cancelada'};
 const events={funds_reserved:'Saldo reservado',reservation_released:'Reserva liberada',deposit_confirmed:'Depósito confirmado',withdrawal_settled:'Retiro liquidado',crypto_deposit_confirmed:'Depósito INFT confirmado',crypto_withdrawal_settled:'Retiro INFT liquidado',exchange_settled:'Conversión liquidada',exchange_received:'Conversión recibida',request_created:'Solicitud creada',proof_attached:'Comprobante adjunto',transaction_attached:'Transferencia registrada',quote_confirmed:'Cotización confirmada',settled:'Operación liquidada',configuration_updated:'Configuración actualizada',price_published:'Cotización publicada',wallet_linked:'Cartera vinculada',destination_viewed:'Consulta de cuenta de retiro',cancelled:'Cancelación',rejected:'Rechazo'};
 let state=null,tab=admin?'review':'overview',selected=null,filter='pending',search='';
+let selectedDepositOrder=null,detailSequence=0;
+const currentDepositCopy=()=>depositCopy(document.documentElement.lang);
 const intent=new URLSearchParams(location.search);
 if(!admin&&['overview','exchange','deposit','withdraw','history','security'].includes(intent.get('view')))tab=intent.get('view');
 const tabs=admin?[['review','▤','Solicitudes'],['treasury','◈','Tesorería'],['prices','↗','Cotizaciones'],['settings','⚙','Configuración'],['audit','⌁','Trazabilidad']]:[['overview','◈','Resumen'],['exchange','⇄','Convertir'],['deposit','↓','Depositar'],['withdraw','↑','Retirar'],['history','▤','Movimientos'],['security','⌁','Seguridad']];
@@ -47,8 +50,53 @@ function market(){const p=price(),all=[...(state.prices||[])].sort((a,b)=>Number
 function requestsTable(requests,short=false){if(!requests.length)return '<div class="empty">Tu historial comienza con tu primera operación.</div>';return `<div class="table-wrap"><table><thead><tr><th>Operación / Folio</th>${admin?'<th>Cuenta</th>':''}<th>Importe</th><th>Estado</th>${short?'':'<th>Fecha</th>'}<th></th></tr></thead><tbody>${requests.map(r=>`<tr><td><b>${esc(names[r.kind])}</b><br><span class="mono tiny muted">${esc(r.folio)}</span></td>${admin?`<td>${esc(r.email)}</td>`:''}<td>${esc(units(r.amount,['deposit_mxn','withdraw_mxn','buy_inft'].includes(r.kind)?'MXN':r.kind==='coins_to_inft'?'COIN':'INFT'))}</td><td>${status(r)}</td>${short?'':`<td class="muted tiny">${esc(date(r.created_at))}</td>`}<td><button type="button" class="row-link" data-detail="${esc(r.id)}">${admin?'Revisar':'Ver detalle'} →</button></td></tr>`).join('')}</tbody></table></div>`;}
 function overview(){return cards()+`<div class="grid-two">${market()}<section class="box"><div class="box-head"><h2>Tu siguiente movimiento</h2></div><div class="quick"><button data-tab="deposit"><span>↓</span>Depositar</button><button data-tab="withdraw"><span>↑</span>Retirar</button><button data-tab="exchange"><span>⇄</span>Comprar / vender</button><button data-go="coins_to_inft"><span>◈</span>Canjear Coins</button></div><div class="highlight-line"><strong>${(state.requests||[]).filter(r=>['review','processing'].includes(r.status)).length} operaciones en seguimiento</strong><span class="muted">Consulta el estado de tus solicitudes en Movimientos.</span></div>${state.admin?'<a class="login-path" href="https://admin.univershzrw.com/inft">Abrir mesa de administración ↗</a>':''}</section></div><section class="box"><div class="box-head"><h2>Últimos movimientos</h2><button class="secondary" data-tab="history">Ver todos →</button></div>${requestsTable(state.requests.slice(0,5),true)}</section>`;}
 function exchange(){const p=price();return `<div class="grid-two"><section class="box"><p class="eyebrow">MESA DE CONVERSIÓN</p><h2 class="section-title">Elige tu operación</h2><form data-form="exchange"><div class="form-grid"><label class="field full"><span>Quiero</span><select name="kind" id="exchangeKind"><option value="buy_inft">Comprar INFT con pesos</option><option value="sell_inft">Vender INFT por pesos</option><option value="coins_to_inft">Canjear Coins por INFT</option><option value="inft_to_coins">Comprar Coins con INFT</option></select></label>${field('Cantidad de origen','amount','number','min="0.00000001" max="1000000" step="any" required inputmode="decimal" id="exchangeAmount"','La unidad se indica en la estimación.')}<label class="field"><span>Comisión de conversión</span><input readonly value="${num(state.config.fee_bps/100,2)} %"></label></div><div class="quote-preview" id="preview"><small>Recibes aproximadamente</small><b>— INFT</b><small>Introduce una cantidad para consultar el cálculo.</small></div><div class="form-foot"><p>Revisa el importe final de la cotización antes de confirmar. La confirmación reserva el saldo de origen.</p><button class="primary" type="submit">Solicitar cotización →</button></div></form></section><div>${market()}<section class="box"><h3>Tus referencias de conversión</h3><div class="mini-list"><div class="mini-row"><span>1 INFT en pesos</span><b>${p?money(p.price_mxn)+' MXN':'—'}</b></div><div class="mini-row"><span>1 INFT en Coins</span><b>${p?num(p.coins_per_inft,8)+' Coins':'—'}</b></div><div class="mini-row"><span>Límite de canje por solicitud</span><b>1,000 Coins</b></div></div><p class="sub">Cotización de la mesa UNIVERSHZRW. Los Coins se utilizan dentro del ecosistema.</p></section></div></div>`;}
-function bankBlock(folio='Tu folio de solicitud'){const b=state.bank;return b?.clabe?`<div class="bank-data"><div><small>Banco receptor</small><b>${esc(b.name)}</b></div><div><small>Titular</small>${esc(b.holder)}</div><div><small>CLABE interbancaria</small><b class="mono">${esc(b.clabe)}</b></div><div><small>Concepto / referencia</small><b class="mono">${esc(folio)}</b></div></div>`:'<div class="bank-data"><div><small>Instrucciones de depósito</small>Las instrucciones se vinculan al folio de tu solicitud.</div></div>';}
-function deposit(){return `<div class="grid-two"><section class="box"><p class="eyebrow">INGRESO DE SALDO</p><h2 class="section-title">Registrar un depósito</h2><form data-form="deposit"><div class="form-grid"><label class="field full"><span>Método de depósito</span><select name="depositMethod" id="depositMethod"><option value="transfer">Transferencia bancaria · MXN</option><option value="card">Tarjeta · enlace de pago</option><option value="crypto">Transferencia INFT · Polygon</option></select></label>${field('Cantidad a depositar','amount','number','min="0.00000001" max="1000000" step="any" required inputmode="decimal"')}${field('Referencia de tu pago (opcional)','reference','text','maxlength="160" autocomplete="off"')}<label class="field full"><span>Nota (opcional)</span><textarea name="note" maxlength="800" placeholder="Información para identificar tu depósito"></textarea></label></div><div class="form-foot"><p>Recibirás un folio para adjuntar tu comprobante y seguir la conciliación del depósito.</p><button class="primary" type="submit">Crear solicitud de depósito →</button></div></form></section><section class="box"><h2>Depósitos con seguimiento</h2><ol class="steps"><li><b>Crea tu solicitud</b><p>Indica el importe y el método. El panel genera tu folio.</p></li><li><b>Realiza el pago</b><p>Utiliza los datos bancarios del panel o el enlace de pago asignado a tu solicitud.</p></li><li><b>Adjunta el comprobante</b><p>Registra la referencia bancaria o el hash de tu transferencia INFT.</p></li><li><b>Consulta la liquidación</b><p>El depósito se acredita después de revisar y conciliar el ingreso.</p></li></ol>${bankBlock()}<p class="sub">Tarjeta: el pago se procesa en Mercado Pago. No se capturan números de tarjeta ni códigos de seguridad en este sitio.</p></section></div>`;}
+function depositInstructions(order, copy) {
+ const title=`<h3 class="section-title" id="depositOrderTitle">${copy.title}</h3>`;
+ if(!order)return `<section aria-labelledby="depositOrderTitle">${title}<p class="reason" role="status">${copy.unavailable}</p></section>`;
+ const b=order.receiver;
+ return `<section aria-labelledby="depositOrderTitle">${title}
+  <div class="bank-data">
+   <div><small>${copy.amount}</small><b>${esc(depositAmount(order.amount,copy.locale))}</b></div>
+   <div><small>${copy.bank}</small><b>${esc(b.name)}</b></div>
+   <div><small>${copy.holder}</small><b>${esc(b.holder)}</b></div>
+   <div><small>${copy.clabe}</small><b class="mono">${esc(b.clabe)}</b></div>
+   <div><small>${copy.reference}</small><b class="mono">${esc(order.folio)}</b></div>
+  </div>
+  <p class="sub">${copy.guidance}</p>
+  <div class="actions section-title">
+   <button type="button" class="primary" data-action="download-deposit">${copy.download}</button>
+   <button type="button" class="secondary" data-action="copy-clabe">${copy.copy}</button>
+  </div>
+  <p id="depositOrderFeedback" class="sub" role="status"></p>
+ </section>`;
+}
+function deposit(){
+ const copy=currentDepositCopy(),receiver=depositReceiver(state.bank);
+ return `<div class="grid-two">
+  <section class="box"><p class="eyebrow">INGRESO DE SALDO</p><h2 class="section-title">Registrar un depósito</h2>
+   <form data-form="deposit">
+    <div class="form-grid">
+     <label class="field full"><span>Método de depósito</span><select name="depositMethod" id="depositMethod"><option value="transfer">Transferencia bancaria · MXN</option><option value="card">Tarjeta · enlace de pago</option><option value="crypto">Transferencia INFT · Polygon</option></select></label>
+     ${field('Cantidad a depositar','amount','number','min="0.00000001" max="1000000" step="any" required inputmode="decimal"')}
+     ${field('Referencia de tu pago (opcional)','reference','text','maxlength="160" autocomplete="off"')}
+     <label class="field full"><span>Nota (opcional)</span><textarea name="note" maxlength="800" placeholder="Información para identificar tu depósito"></textarea></label>
+    </div>
+    <p id="depositAvailability" class="reason" role="status"${receiver?' hidden':''}>${copy.unavailable}</p>
+    <div class="form-foot"><p>Recibirás un folio para adjuntar tu comprobante y seguir la conciliación del depósito.</p><button class="primary" type="submit"${receiver?'':' disabled'}>Crear solicitud de depósito →</button></div>
+   </form>
+  </section>
+  <section class="box"><h2>Depósitos con seguimiento</h2>
+   <ol class="steps"><li><b>Crea tu solicitud</b><p>Indica el importe y el método. El panel genera tu folio.</p></li><li><b>Realiza el pago</b><p>Utiliza los datos bancarios del panel o el enlace de pago asignado a tu solicitud.</p></li><li><b>Adjunta el comprobante</b><p>Registra la referencia bancaria o el hash de tu transferencia INFT.</p></li><li><b>Consulta la liquidación</b><p>El depósito se acredita después de revisar y conciliar el ingreso.</p></li></ol>
+   ${receiver?`<p class="sub">${copy.ready}</p>`:''}
+   <p class="sub">Tarjeta: el pago se procesa en Mercado Pago. No se capturan números de tarjeta ni códigos de seguridad en este sitio.</p>
+  </section>
+ </div>`;
+}
+function syncDepositAvailability(form){
+ const unavailable=form.elements.depositMethod.value==='transfer'&&!depositReceiver(state?.bank);
+ form.querySelector('[type="submit"]').disabled=unavailable||form.dataset.submitting==='1';
+ form.querySelector('#depositAvailability').hidden=!unavailable;
+}
 function withdraw(){return `<div class="grid-two"><section class="box"><p class="eyebrow">RETIROS / DESTINO VERIFICADO</p><h2 class="section-title">Solicitar un retiro</h2><form data-form="withdraw"><div class="form-grid"><label class="field full"><span>Saldo de origen</span><select name="kind" id="withdrawKind"><option value="withdraw_mxn">Pesos · transferencia a CLABE</option><option value="withdraw_inft">INFT · cartera vinculada en Polygon</option></select></label>${field('Cantidad a retirar','amount','number','min="0.00000001" max="1000000" step="any" required inputmode="decimal"')}<div></div><div class="field full" id="bankWithdrawal"><div class="form-grid">${field('Nombre del titular','holder','text','minlength="4" maxlength="160" required autocomplete="name"')}${field('Banco de destino','bank','text','maxlength="100" required')}${field('CLABE de destino','clabe','text','pattern="[0-9]{18}" minlength="18" maxlength="18" inputmode="numeric" required autocomplete="off"')}</div></div><div class="field full" id="cryptoWithdrawal" hidden><span>Cartera vinculada</span><div class="wallet-address">${esc(state.wallet_address||'Vincula tu cartera en Seguridad.')}</div></div><label class="field full"><span>Nota (opcional)</span><textarea name="note" maxlength="800"></textarea></label></div><div class="form-foot"><p>El importe se reserva al crear la solicitud. El retiro conserva su referencia de liquidación.</p><button class="primary" type="submit">Solicitar retiro →</button></div></form></section><div><section class="box"><h2>Saldo disponible</h2><div class="mini-list"><div class="mini-row"><span>Pesos</span><b>${money(wallet('MXN').available)} MXN</b></div><div class="mini-row"><span>INFYNITY</span><b>${num(wallet('INFT').available,8)} INFT</b></div></div><p class="sub">Los importes reservados pertenecen a operaciones en seguimiento y no se pueden utilizar dos veces.</p></section><section class="box"><h3>Cuenta de destino protegida</h3><p class="sub">La CLABE de retiro se cifra antes de guardarse. En tu historial se muestran únicamente sus últimos cuatro dígitos.</p><h3 class="section-title">Retiros INFT</h3><p class="sub">Se envían a la cartera vinculada mediante una firma de propiedad. Conserva siempre el folio y el hash de tu transferencia.</p></section></div></div>`;}
 function history(){return `<section class="box"><div class="box-head"><h2>Operaciones</h2><span class="status">${state.requests.length} registros recientes</span></div>${requestsTable(state.requests)}</section><section class="box"><h2>Libro de movimientos</h2>${state.journal.length?`<div class="table-wrap"><table><thead><tr><th>Fecha</th><th>Movimiento</th><th>Disponible</th><th>Reservado</th></tr></thead><tbody>${state.journal.map(j=>`<tr><td class="tiny muted">${esc(date(j.created_at))}</td><td>${esc(events[j.event]||j.event)}</td><td>${Number(j.delta_available)>0?'+':''}${esc(units(j.delta_available,j.asset))}</td><td>${Number(j.delta_reserved)>0?'+':''}${esc(units(j.delta_reserved,j.asset))}</td></tr>`).join('')}</tbody></table></div>`:'<div class="empty">Los movimientos de saldo aparecerán al registrar tus operaciones.</div>'}</section>`;}
 function security(){return `<section class="box"><div class="box-head"><div><p class="eyebrow">CARTERA / POLYGON</p><h2 class="section-title">Vincula tu cartera INFT</h2></div><span class="status ${state.wallet_address?'completed':''}">${state.wallet_address?'Vinculada':'Por vincular'}</span></div><p class="sub">La firma comprueba que controlas la dirección. No autoriza pagos ni transferencias.</p>${state.wallet_address?`<div class="wallet-address mono">${esc(state.wallet_address)}</div>`:''}<button type="button" class="primary section-title" data-action="link-wallet">${state.wallet_address?'Actualizar cartera':'Conectar y firmar'}</button><p class="sub">Usa la extensión o el navegador de tu cartera compatible con Ethereum.</p></section><section class="box"><h2>Protección y trazabilidad</h2><div class="security-grid"><div class="security-item"><b>Acceso con tu cuenta</b><p>Sesión verificada, permisos por cuenta y acceso exclusivo del titular a su historial.</p></div><div class="security-item"><b>Datos bancarios cifrados</b><p>CLABE de retiro cifrada con AES-256. Comprobantes privados con enlaces temporales.</p></div><div class="security-item"><b>Operaciones conciliadas</b><p>Referencias únicas, reserva de saldo y revisión de cada liquidación.</p></div><div class="security-item"><b>Huella de integridad SHA-256</b><p>Cada evento incorpora la huella del anterior en un registro inmutable de auditoría.</p></div></div></section><section class="box"><p class="eyebrow">PMC / EL LENGUAJE DE LAS PARTÍCULAS</p><h2 class="section-title">Pulsaciones con identidad.</h2><p class="sub">Los comprobantes representan su folio con puntos y rayas Morse. Esta representación visual acompaña a la huella criptográfica del registro.</p><div class="morse section-title"><small>INFYNITY EN MORSE</small>${esc(toMorse('INFYNITY'))}</div></section>`;}
@@ -59,14 +107,27 @@ function priceHistory(){return state.prices.length?`<div class="table-wrap"><tab
 function settings(){const c=state.config;return `<section class="box"><div class="box-head"><div><p class="eyebrow">DATOS DE OPERACIÓN</p><h2 class="section-title">Configuración de INFYNITY</h2></div><span class="admin-badge">SOLO ADMINISTRACIÓN</span></div><form data-form="admin-settings"><h3>Cuenta receptora para depósitos</h3><div class="form-grid">${field('Banco','bank_name','text',`maxlength="100" value="${esc(c.bank_name)}"`)}${field('Titular de la cuenta','bank_holder','text',`maxlength="160" value="${esc(c.bank_holder)}"`)}${field('CLABE interbancaria','bank_clabe','text',`pattern="[0-9]{18}" maxlength="18" inputmode="numeric" value="${esc(c.bank_clabe)}"`)}${field('Comisión de conversión (puntos base)','fee_bps','number',`min="0" max="1000" step="1" required value="${c.fee_bps}"`,'100 puntos base = 1 %. Se muestra antes de confirmar.')}</div><h3 class="section-title">Tesorería de INFT · Polygon</h3><div class="form-grid">${field('Contrato del token INFT','token_address','text',`pattern="0x[0-9a-fA-F]{40}" maxlength="42" value="${esc(c.token_address||'')}" autocomplete="off"`)}${field('Dirección de la tesorería','treasury_address','text',`pattern="0x[0-9a-fA-F]{40}" maxlength="42" value="${esc(c.treasury_address||'')}" autocomplete="off"`)}</div><p class="sub">El contrato y su precisión se verifican en Polygon. La cartera de tesorería debe contener las unidades que respaldan los saldos INFT.</p><div class="form-foot"><p>Los cambios quedan registrados en la auditoría.</p><button class="primary" type="submit">Guardar configuración →</button></div></form></section><section class="box"><h3>Pagos con tarjeta</h3><p class="sub">Asigna el enlace oficial de Mercado Pago desde cada solicitud de depósito. Revisa que el importe recibido coincida con el solicitado antes de liquidar.</p></section>`;}
 function audit(){return `<section class="box"><p class="eyebrow">PMC / REGISTRO ENCADENADO</p><h2 class="section-title">Auditoría de operaciones</h2><p class="sub">Cada evento conserva su huella SHA-256 y la del evento anterior. Los movimientos liquidados y las cotizaciones publicadas son inmutables.</p>${state.audit.length?`<div class="table-wrap section-title"><table><thead><tr><th>Fecha</th><th>Evento</th><th>Huella SHA-256</th><th>Huella anterior</th></tr></thead><tbody>${state.audit.map(a=>`<tr><td class="tiny">${esc(date(a.created_at))}</td><td>${esc(events[a.event]||a.event)}</td><td><div class="mono audit-hash" title="${esc(a.event_hash)}">${esc(a.event_hash)}</div></td><td><div class="mono audit-hash" title="${esc(a.previous_hash)}">${esc(a.previous_hash)}</div></td></tr>`).join('')}</tbody></table></div>`:'<div class="empty">El registro comienza con tu primera operación administrativa.</div>'}</section>`;}
 function render(){renderNav();if(!state){login();return;}const views={overview,exchange,deposit,withdraw,history,security,review,treasury,prices,settings,audit};$('#content').innerHTML=views[tab]();if(tab==='exchange'&&['buy_inft','sell_inft','coins_to_inft','inft_to_coins'].includes(intent.get('operation'))){$('#exchangeKind').value=intent.get('operation');preview();}}
-async function load(){try{state=await api(admin?'admin_dashboard':'dashboard');render();}catch(e){if([401,403].includes(e.status)){state=null;render();}else{notice(e.message,true);if(!state)$('#content').innerHTML='<section class="box empty">No se pudo actualizar tu cuenta. Pulsa Actualizar para reintentar.</section>';}}}
+async function load(){try{state=await api(admin?'admin_dashboard':'dashboard');render();return state;}catch(e){if([401,403].includes(e.status)){state=null;render();}else{notice(e.message,true);if(!state)$('#content').innerHTML='<section class="box empty">No se pudo actualizar tu cuenta. Pulsa Actualizar para reintentar.</section>';}}}
 function changeTab(id){if(!tabs.some(t=>t[0]===id))return;tab=id;$('#notice').hidden=true;render();$('#main').focus({preventScroll:true});window.scrollTo({top:0,behavior:'instant'});}
 function preview(){const kind=$('#exchangeKind')?.value,amount=Number($('#exchangeAmount')?.value||0),p=price();if(!kind)return;const factor=1-state.config.fee_bps/10000;let output=0,asset='INFT',input='MXN';if(p){if(kind==='buy_inft')output=amount/Number(p.price_mxn)*factor;if(kind==='sell_inft'){output=amount*Number(p.price_mxn)*factor;asset='MXN';input='INFT';}if(kind==='coins_to_inft'){output=amount/Number(p.coins_per_inft)*factor;input='COIN';}if(kind==='inft_to_coins'){output=Math.floor(amount*Number(p.coins_per_inft)*factor);asset='COIN';input='INFT';}}
  $('#preview').innerHTML=`<small>Recibes aproximadamente</small><b>${p&&amount?esc(units(output,asset)):'— '+(asset==='COIN'?'Coins':asset)}</b><small>${amount?esc(units(amount,input))+' de origen · ':''}${p?'Comisión incluida. Revisa la cotización final.':'Solicita la cotización de la mesa.'}</small>`;
 }
-async function openDetail(id){const d=await api(admin?'admin_detail':'request_detail',{id});selected=d.request;const r=selected;let extra='';const active=['requested','quoted','review','processing'].includes(r.status);
+async function openDetail(id,freshBank){
+ const sequence=++detailSequence;
+ const d=await api(admin?'admin_detail':'request_detail',{id});
+ const r=d.request;
+ const showOrder=!admin&&needsDepositOrder(r);
+ const bank=showOrder&&freshBank===undefined?(await api('dashboard')).bank:freshBank;
+ if(sequence!==detailSequence)return;
+ selected=r;
+ selectedDepositOrder=showOrder?depositOrder(r,bank):null;
+ let extra='';
+ const active=['requested','quoted','review','processing'].includes(r.status);
  if(r.status==='quoted'&&!admin){extra+=`<div class="reason"><strong>Revisa tu cotización</strong>Entregas <b>${esc(units(r.debit_amount,r.debit_asset))}</b> y recibes <b>${esc(units(r.credit_amount,r.credit_asset))}</b>.<br>Comisión: ${esc(units(r.fee_amount,r.debit_asset))}. Vigente hasta ${esc(date(r.quote_expires_at))}.</div><div class="actions section-title"><button class="primary" data-action="confirm">Confirmar y reservar saldo →</button></div>`;}
- if(r.kind==='deposit_mxn'&&active&&!admin){extra+=r.method==='card'?(r.payment_link&&paymentLink(r.payment_link)?`<a class="primary section-title" href="${esc(r.payment_link)}" target="_blank" rel="noopener noreferrer">Abrir pago en Mercado Pago ↗</a>`:'<div class="reason"><strong>Solicitud de pago con tarjeta</strong>El enlace de pago se asigna a este folio y aparecerá aquí.</div>'):bankBlock(r.folio);}
+ if(showOrder)extra+=depositInstructions(selectedDepositOrder,currentDepositCopy());
+ if(r.kind==='deposit_mxn'&&r.method==='card'&&active&&!admin){
+  extra+=r.payment_link&&paymentLink(r.payment_link)?`<a class="primary section-title" href="${esc(r.payment_link)}" target="_blank" rel="noopener noreferrer">Abrir pago en Mercado Pago ↗</a>`:'<div class="reason"><strong>Solicitud de pago con tarjeta</strong>El enlace de pago se asigna a este folio y aparecerá aquí.</div>';
+ }
  if(r.kind==='deposit_inft'&&active&&!admin){extra+=`<div class="bank-data"><div><small>Red / activo</small>Polygon · INFT</div><div><small>Contrato</small><span class="mono">${esc(state.config.token_address||'Por registrar')}</span></div><div><small>Tesorería receptora</small><span class="mono">${esc(state.config.treasury_address||'Por registrar')}</span></div><div><small>Envía desde tu cartera vinculada</small><span class="mono">${esc(r.wallet_address)}</span></div></div><form data-form="crypto-proof">${field('Hash de la transferencia','crypto_hash','text',`pattern="0x[0-9a-fA-F]{64}" maxlength="66" required value="${esc(r.crypto_hash||'')}"`)}<button type="submit" class="primary section-title">Registrar transferencia →</button></form>`;}
  if(['deposit_mxn','deposit_inft'].includes(r.kind)&&['requested','review'].includes(r.status)&&!admin){extra+=`<form data-form="proof" class="section-title"><h3>Adjuntar comprobante</h3><div class="form-grid"><label class="field file-field full"><span>Archivo · máximo 2 MB</span><input type="file" name="proof" accept="application/pdf,image/jpeg,image/png,image/webp" required><small>PDF, JPG, PNG o WebP. El archivo es privado.</small></label>${field('Referencia del pago','reference','text',`maxlength="160" value="${esc(r.payer_reference||'')}"`)}</div><button class="primary section-title" type="submit">Guardar comprobante →</button></form>`;}
  if(r.proof_path)extra+=`<button type="button" class="secondary section-title" data-action="proof">Descargar comprobante ↗</button>`;
@@ -77,7 +138,7 @@ async function openDetail(id){const d=await api(admin?'admin_detail':'request_de
  if(!$('#detail').open)$('#detail').showModal();
 }
 function adminReviewForm(r){return `<form data-form="admin-review" class="section-title"><h3>Revisión y conciliación</h3><div class="form-grid"><label class="field full"><span>Acción de la mesa</span><select name="decision"><option value="complete">Conciliar y liquidar operación</option><option value="processing">Marcar en proceso</option>${['requested','quoted'].includes(r.status)?'<option value="requote">Emitir cotización vigente</option>':''}${r.kind==='deposit_mxn'&&r.method==='card'?'<option value="payment_link">Asignar enlace de pago</option>':''}<option value="reject">Rechazar y liberar reserva</option></select></label>${field('Referencia bancaria / folio del pago','external_reference','text','maxlength="160"')}${field('Hash de transferencia INFT','crypto_hash','text',`maxlength="66" value="${esc(r.crypto_hash||'')}"`)}${r.kind==='deposit_mxn'&&r.method==='card'?field('Enlace oficial de Mercado Pago','payment_link','url',`value="${esc(r.payment_link||'')}"`):''}<label class="field full"><span>Nota para el cliente</span><textarea name="note" maxlength="800">${esc(r.admin_note||'')}</textarea></label></div><label class="check section-title"><input name="verified" type="checkbox"><span>Verifiqué el ingreso o realicé el retiro por el importe solicitado y concilié su referencia. En conversiones INFT, autorizo la liquidación contra la reserva verificada.</span></label><button type="submit" class="primary section-title">Registrar decisión →</button></form>`;}
-async function afterMutation(message,id){notice(message);await load();if(id)await openDetail(id);else if($('#detail').open)$('#detail').close();}
+async function afterMutation(message,id){notice(message);const fresh=await load();if(id)await openDetail(id,fresh?.bank);else if($('#detail').open)$('#detail').close();}
 document.addEventListener('click',async e=>{
  const target=e.target.closest('button,a');if(!target)return;
  if(target.dataset.tab){changeTab(target.dataset.tab);return;}
@@ -86,6 +147,21 @@ document.addEventListener('click',async e=>{
  e.preventDefault();target.disabled=true;
  try{
   if(detail)await openDetail(detail);
+  else if(action==='download-deposit'||action==='copy-clabe'){
+   const order=selectedDepositOrder;
+   if(!order||!$('#detail').open)return;
+   const feedback=$('#depositOrderFeedback'),copy=currentDepositCopy();
+   feedback.textContent='';
+   if(action==='copy-clabe'){
+    try{await navigator.clipboard.writeText(order.receiver.clabe);feedback.textContent=copy.copied;}
+    catch{feedback.textContent=copy.copyFailed;}
+   }else{
+    try{
+     const {downloadDepositPdf}=await import('./deposit-pdf.js');
+     if(selectedDepositOrder===order&&$('#detail').open)downloadDepositPdf(order,copy.locale);
+    }catch{feedback.textContent=copy.downloadFailed;}
+   }
+  }
   else if(action==='confirm'||action==='cancel'){const id=selected.id;await api(action,{id});await afterMutation(action==='confirm'?'Cotización confirmada. Tu solicitud está en revisión.':'Solicitud cancelada. Se liberó cualquier saldo reservado.',id);}
   else if(action==='proof'){const result=await api(admin?'admin_proof_url':'proof_url',{id:selected.id});const u=new URL(result.url);if(u.origin!=='https://kgqkszlennwhlyngktcc.supabase.co')throw Error('Enlace de comprobante inválido.');const a=document.createElement('a');a.href=u.href;a.rel='noopener noreferrer';a.target='_blank';a.click();}
   else if(action==='link-wallet'){
@@ -98,10 +174,16 @@ document.addEventListener('click',async e=>{
 });
 document.addEventListener('submit',async e=>{
  const form=e.target.closest('[data-form]');if(!form)return;e.preventDefault();const submit=form.querySelector('[type="submit"]');if(submit.disabled)return;submit.disabled=true;const f=new FormData(form),data=Object.fromEntries(f.entries());
+ const isDeposit=form.dataset.form==='deposit';
+ if(isDeposit)form.dataset.submitting='1';
  try{
   if(['deposit','withdraw','exchange'].includes(form.dataset.form)){
    let payload={...data,request_key:crypto.randomUUID(),method:'balance'};
-   if(form.dataset.form==='deposit'){payload.kind=data.depositMethod==='crypto'?'deposit_inft':'deposit_mxn';payload.method=data.depositMethod;}
+   if(form.dataset.form==='deposit'){
+    if(data.depositMethod==='transfer'&&!depositReceiver(state.bank))throw Error(currentDepositCopy().unavailable);
+    payload.kind=data.depositMethod==='crypto'?'deposit_inft':'deposit_mxn';
+    payload.method=data.depositMethod;
+   }
    if(form.dataset.form==='withdraw')payload.method=data.kind==='withdraw_inft'?'crypto':'transfer';
    // Keep the idempotency key until the server acknowledges the request.
    if(!form.dataset.requestKey)form.dataset.requestKey=payload.request_key;else payload.request_key=form.dataset.requestKey;
@@ -116,9 +198,14 @@ document.addEventListener('submit',async e=>{
    const id=selected.id;await api('admin_review',{...data,id,verified:f.has('verified')});await afterMutation('Decisión registrada en el expediente.',id);
   }else if(form.dataset.form==='admin-price'){await api('admin_price',data);notice('Cotización publicada. El historial conserva el motivo del cambio.');await load();}
   else if(form.dataset.form==='admin-settings'){await api('admin_config',data);notice('Configuración guardada.');await load();}
- }catch(error){notice(error.message,true);let el=form.querySelector('[role="alert"]');if(!el){el=document.createElement('p');el.className='reason';el.setAttribute('role','alert');form.prepend(el);}el.textContent=error.message;}finally{submit.disabled=false;}
+ }catch(error){notice(error.message,true);let el=form.querySelector('[role="alert"]');if(!el){el=document.createElement('p');el.className='reason';el.setAttribute('role','alert');form.prepend(el);}el.textContent=error.message;}finally{
+  if(isDeposit){delete form.dataset.submitting;syncDepositAvailability(form);}
+  else submit.disabled=false;
+ }
 });
 document.addEventListener('input',e=>{if(['exchangeAmount','exchangeKind'].includes(e.target.id))preview();if(e.target.id==='requestSearch'){search=e.target.value;const start=e.target.selectionStart;$('#content').innerHTML=review();$('#requestSearch').focus();$('#requestSearch').setSelectionRange(start,start);}});
-document.addEventListener('change',e=>{if(e.target.id==='requestFilter'){filter=e.target.value;render();}if(e.target.id==='exchangeKind')preview();if(e.target.id==='withdrawKind'){const crypto=e.target.value==='withdraw_inft';$('#bankWithdrawal').hidden=crypto;$('#cryptoWithdrawal').hidden=!crypto;$('#bankWithdrawal').querySelectorAll('input').forEach(i=>{i.disabled=crypto;i.required=!crypto;});}});
+document.addEventListener('change',e=>{
+ if(e.target.id==='depositMethod')syncDepositAvailability(e.target.form);
+ if(e.target.id==='requestFilter'){filter=e.target.value;render();}if(e.target.id==='exchangeKind')preview();if(e.target.id==='withdrawKind'){const crypto=e.target.value==='withdraw_inft';$('#bankWithdrawal').hidden=crypto;$('#cryptoWithdrawal').hidden=!crypto;$('#bankWithdrawal').querySelectorAll('input').forEach(i=>{i.disabled=crypto;i.required=!crypto;});}});
 $('#refresh').addEventListener('click',async()=>{const b=$('#refresh');b.disabled=true;await load();b.disabled=false;});$('#closeDetail').addEventListener('click',()=>$('#detail').close());
 renderNav();load();

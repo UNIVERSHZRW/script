@@ -4,10 +4,21 @@ import {createHash} from 'node:crypto';
 const require=createRequire(import.meta.url);
 let esbuild;try{esbuild=require('esbuild');}catch{esbuild=require(process.env.ESBUILD_PATH||'/workspace/scratch/e1b3688161c0/univershzrw/node_modules/esbuild');}
 await esbuild.transform(await readFile('index.ts','utf8'),{loader:'ts',format:'esm'});
-const files=Object.fromEntries(await Promise.all(['panel.html','panel.css','panel.js','core.mjs'].map(async name=>[name,await readFile(name,'utf8')])));
+const files=Object.fromEntries(await Promise.all(['panel.html','panel.css','panel.js','core.mjs','deposit-order.mjs'].map(async name=>[name,await readFile(name,'utf8')])));
+// The portal loads this same-origin bundle only when the customer downloads an order.
+const pdfBundle=await esbuild.build({
+  entryPoints:['deposit-pdf.js'],bundle:true,write:false,format:'esm',platform:'browser',minify:true,
+  external:['canvg','dompurify','html2canvas'],legalComments:'inline'
+});
+files['deposit-pdf.js']=pdfBundle.outputFiles[0].text;
 const version=createHash('sha256').update(JSON.stringify(files)).digest('hex').slice(0,12);
 files['panel.html']=files['panel.html'].replaceAll('?v=1','?v='+version);
-files['panel.js']=files['panel.js'].replace("'./core.mjs'","'./core.mjs?v="+version+"'");
+for(const [module,imports] of [
+  ['panel.js',['core.mjs','deposit-order.mjs','deposit-pdf.js']],
+  ['deposit-order.mjs',['core.mjs']]
+]){
+  for(const dependency of imports)files[module]=files[module].replace(`'./${dependency}'`,`'./${dependency}?v=${version}'`);
+}
 await mkdir('dist',{recursive:true});
 const worker=`const FILES=${JSON.stringify(files)};
 const SECURITY={'x-content-type-options':'nosniff','referrer-policy':'no-referrer','x-frame-options':'DENY','strict-transport-security':'max-age=31536000; includeSubDomains','permissions-policy':'camera=(), microphone=(), geolocation=()','x-robots-tag':'noindex, nofollow, noarchive','cross-origin-opener-policy':'same-origin-allow-popups','content-security-policy':"default-src 'self'; script-src 'self' https://univershzrw.com; style-src 'self' 'unsafe-inline' https://univershzrw.com https://fonts.googleapis.com; font-src 'self' https://fonts.gstatic.com; img-src 'self' data: blob: https://univershzrw.com; connect-src 'self' https://univershzrw.com https://kgqkszlennwhlyngktcc.supabase.co; frame-src 'none'; frame-ancestors 'none'; object-src 'none'; base-uri 'none'; form-action 'self'; upgrade-insecure-requests"};

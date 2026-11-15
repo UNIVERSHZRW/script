@@ -20,7 +20,7 @@ The main calls to action open the authenticated financial portal described in [.
 
 The public chart displays published **Mesa UNIVERSHZRW reference quotes** and their stated reasons. It never substitutes revenue allocations for market prices. Volume is the sum of settled platform buy/sell operations, rather than an external exchange's volume. Empty quote history remains empty until the owner publishes a quote.
 
-Polygon status, personal on-chain balances and receipt verification use the contract configured through owner administration. An explicit legacy `INFT_TOKEN_ADDRESS` binding can override that read-only lookup; none is needed for the current database configuration. Contract bytecode, exact INFT symbol, supply and decimals are checked. This application does not deploy or mint a token, sign transfers, create external liquidity, or guarantee returns.
+INFYNITY balances are held in the private account ledger. The public site shows dated reference quotes and aggregate internal inventory. Customers access their own balances, receipts and operations through the authenticated panel.
 
 Security headers, canonical www redirects, bounded parsing, origin checks and explicit route/method allowlists are retained. Existing HttpOnly account cookies and the site's shared mobile menu remain in use. The public quote endpoint is read-only; financial writes are authenticated through the separate portal and service-only RPC.
 

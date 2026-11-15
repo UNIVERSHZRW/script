@@ -10,7 +10,7 @@ let calls=[],mutations=[],signedIn=true;const priorFetch=globalThis.fetch;
 globalThis.fetch=async(input,options={})=>{const u=new URL(typeof input==='string'?input:input.url,'https://admin.univershzrw.com'),p=u.pathname,data=options.body?JSON.parse(options.body):null;calls.push(p);const method=options.method||'GET';if(['PATCH','POST'].includes(method)&&!p.includes('/rpc/')&&!p.includes('/functions/')&&!p.includes('/auth/'))mutations.push({p,method,data});
 if(p.endsWith('/media/inspect'))return Response.json({state:'preview',providerName:'Google Drive',name:'Archivo compartido',watch:'https://admin.univershzrw.com/_uhz/portal/backend/media/watch?t=fixture'});if(p.endsWith('/auth/v1/user'))return signedIn?Response.json(owner):Response.json({message:'Inicia sesión'},{status:401});if(p.endsWith('/functions/v1/uhz-admin-control'))return Response.json(data.action==='overview'?overview:{ok:true,files:[],storage:overview.storage});if(p.endsWith('/functions/v1/uhz-inft-wallet')){
  if(data?.action==='admin_config'){financeSaves.push(data.payload);return Response.json({ok:true});}
- return Response.json({config:{cash_reserve:'0',fee_bps:100,bank_name:'',bank_holder:'',bank_clabe:'',token_address:'',treasury_address:''},existing_spei:speiFixture,requests:[],prices:[],liabilities:[],audit:[]});
+ return Response.json({config:{cash_reserve:'0',fee_bps:100,bank_name:'',bank_holder:'',bank_clabe:'',},inventory:{cap:'10000000',assigned:'0',pending:'0',available:'10000000'},existing_spei:speiFixture,requests:[],prices:[],liabilities:[],audit:[]});
 }if(p.includes('/guardian/'))return Response.json({ok:true,rows:[]});
 if(p.includes('/rpc/')){const name=p.split('/').pop(),known={uhz_admin_publisher_list:{items:[]},uhz_admin_members:{items:[{...owner,display_name:'Propietario',state:'active',is_protected:true}],total:1},community_creator_dashboard:{items:[],limit:50},community_license_list:{items:[],limit:50},uhz_community_admin_reports:[],community_campaign_admin:{items:[],claims:[],resources:[]},uhz_admin_payment_center:{summary:{shop_pending:0,ads_pending:0,spei_review:0,paid_today:0},shop_orders:[],ad_requests:[],integrations:[]}};if(Object.hasOwn(known,name))return Response.json(known[name]);throw Error('Unexpected RPC '+name);}
 if(p.includes('/rest/v1/')){const table=p.split('/').pop();if(method==='PATCH')return Response.json([{...product,...data}]);if(method==='POST')return Response.json([{id:crypto.randomUUID(),...data}]);return Response.json(table==='products'?[product]:[],{headers:{'content-range':table==='products'?'0-0/1':'*/0'}});}throw Error('Unexpected request '+p);};
@@ -37,61 +37,13 @@ test('native authenticated administration operates without iframe documents',asy
   await settle();
   assert.deepEqual(financeSaves.map(({bank_name,bank_holder,bank_clabe})=>[bank_name,bank_holder,bank_clabe]),[[speiFixture.name,speiFixture.holder,speiFixture.clabe]]);
  });
- await t.test('only an explicit wallet approval on Polygon creates INFT and the receipt prepares a draft',async()=>{
-  const from='0x'+'1'.repeat(40),contract='0x'+'2'.repeat(40),hash='0x'+'a'.repeat(64),blockHash='0x'+'b'.repeat(64);
-  let chain='0x1',approved=false,confirmed=false,creation=null;
-  const walletCalls=[];
-  window.ethereum={request:async ({method,params})=>{
-   walletCalls.push(method);
-   switch(method){
-    case 'eth_requestAccounts': case 'eth_accounts': return [from];
-    case 'eth_chainId': return chain;
-    case 'wallet_switchEthereumChain': chain=params[0].chainId;return null;
-    case 'eth_estimateGas': return '0xaa000';
-    case 'eth_sendTransaction':
-     if(!approved)throw Object.assign(new Error('User rejected the request'),{code:4001});
-     creation=params[0];return hash;
-    case 'eth_getTransactionReceipt': return confirmed?{transactionHash:hash,blockHash,status:'0x1',contractAddress:contract}:null;
-    case 'eth_getTransactionByHash': return {hash,blockHash,from,to:null,input:creation.data};
-    default: throw Error('Unexpected wallet method '+method);
-   }
-  }};
-  const saveCount=financeSaves.length;
-  fireEvent.change(screen.getByLabelText('Banco receptor'),{target:{value:'Edición de prueba'}});
-  fireEvent.click(screen.getByRole('button',{name:'Crear contrato INFT'}));
-  let dialog=within(screen.getByRole('dialog'));
-  fireEvent.click(dialog.getByRole('button',{name:'Conectar cartera'}));
+ await t.test('owner sees private INFT inventory and manages banking without deployment controls',async()=>{
+  assert.equal(screen.queryByRole('button',{name:'Crear contrato INFT'}),null);
+  fireEvent.click(tab('Tesorería'));
   await settle();
-  assert.equal(chain,'0x89');
-  assert.equal(walletCalls.includes('eth_sendTransaction'),false);
-  fireEvent.click(dialog.getByRole('button',{name:'Publicar contrato'}));
-  await settle();
-  assert.ok(dialog.getByText('Cancelaste la solicitud en la cartera.'));
-  assert.equal(window.localStorage.getItem('uhz-inft-polygon-deployment'),null);
-  approved=true;
-  fireEvent.click(dialog.getByRole('button',{name:'Publicar contrato'}));
-  await settle();
-  assert.equal(creation.from,from);
-  assert.equal(creation.value,'0x0');
-  assert.equal(creation.gas,'0xaa000');
-  assert.equal(creation.to,undefined);
-  assert.ok(creation.data.endsWith(from.slice(2).padStart(64,'0')));
-  assert.ok(dialog.getByText('Transacción enviada. Esperando la confirmación de Polygon.'));
-  fireEvent.click(dialog.getByRole('button',{name:'Cerrar editor'}));
-  confirmed=true;
-  fireEvent.click(screen.getByRole('button',{name:'Crear contrato INFT'}));
-  await settle();
-  dialog=within(screen.getByRole('dialog'));
-  assert.ok(dialog.getByText('Contrato confirmado en Polygon.'));
-  assert.equal(walletCalls.filter(method=>method==='eth_sendTransaction').length,2);
-  fireEvent.click(dialog.getByRole('button',{name:'Cargar en configuración'}));
-  await settle();
-  assert.equal(screen.getByLabelText('Contrato INFT · Polygon').value,contract);
-  assert.equal(screen.getByLabelText('Cartera de tesorería').value,from);
-  assert.equal(screen.getByLabelText('Banco receptor').value,'Edición de prueba');
-  assert.equal(financeSaves.length,saveCount);
-  window.localStorage.removeItem('uhz-inft-polygon-deployment');
-  delete window.ethereum;
+  const inventory=screen.getByRole('heading',{name:'Reserva interna de INFYNITY'}).closest('section');
+  assert.ok(within(inventory).getByText('Asignadas a cuentas'));
+  assert.equal(within(inventory).getAllByText('10,000,000 INFT').length,2);
  });
  await t.test('checks source providers from the native connector workspace',async()=>{fireEvent.click(side().getByRole('button',{name:'Contenido',exact:true}));await settle();fireEvent.click(tab('Conectores'));await settle();fireEvent.change(screen.getByLabelText(/Enlace compartido HTTPS/),{target:{value:'https://drive.google.com/file/d/123456789012345/view'}});fireEvent.submit(document.querySelector('.connector-check'));await settle();assert.ok(screen.getByText('Vista previa del proveedor'));assert.ok(calls.includes('/_uhz/portal/backend/media/inspect'));assert.equal(document.querySelectorAll('iframe').length,0);});
  await t.test('owner-only interface does not offer administrative role grants',()=>{fireEvent.click(side().getByRole('button',{name:'Comunidad',exact:true}));assert.equal(document.querySelector('select[name="role"]'),null);});

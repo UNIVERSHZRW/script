@@ -1,11 +1,6 @@
-export const kinds = ['deposit_mxn','withdraw_mxn','deposit_inft','withdraw_inft','buy_inft','sell_inft','coins_to_inft','inft_to_coins'];
-export const userActions = new Set(['dashboard','request_detail','wallet_challenge','wallet_bind','create_request','confirm','cancel','upload_url','attach_proof','proof_url','attach_crypto_hash']);
+export const kinds = ['deposit_mxn','withdraw_mxn','buy_inft','sell_inft','coins_to_inft','inft_to_coins'];
+export const userActions = new Set(['dashboard','request_detail','create_request','confirm','cancel','upload_url','attach_proof','proof_url']);
 export const adminActions = new Set(['admin_dashboard','admin_detail','admin_config','admin_price','admin_review','admin_proof_url']);
-export function isInftSymbol(value) {
-  if(typeof value!=='string'||!/^0x(?:[0-9a-f]{64})+$/i.test(value))return false;
-  const data=value.slice(2).toLowerCase(),symbol='494e4654'.padEnd(64,'0');
-  return data.length===64?data===symbol:data.slice(0,64)==='20'.padStart(64,'0')&&data.slice(64,128)==='4'.padStart(64,'0')&&data.slice(128)===symbol;
-}
 export function validClabe(value) {
   if (!/^\d{18}$/.test(value)) return false;
   const factors=[3,7,1]; let sum=0;
@@ -24,7 +19,7 @@ export function fileType(b) {
 }
 export function safePayload(body) {
   const source=body.payload||{};if(!source||typeof source!=='object'||Array.isArray(source))throw Error('Solicitud inválida.');
-  const keys=['id','kind','amount','method','request_key','reference','note','clabe','holder','bank','nonce','address','signature','path','crypto_hash','decision','external_reference','verified','payment_link','bank_name','bank_holder','bank_clabe','token_address','treasury_address','fee_bps','price_mxn','coins_per_inft','reason','mime'];
+  const keys=['id','kind','amount','method','request_key','reference','note','clabe','holder','bank','path','decision','external_reference','verified','payment_link','bank_name','bank_holder','bank_clabe','token_address','treasury_address','fee_bps','price_mxn','coins_per_inft','reason','mime'];
   return Object.fromEntries(keys.filter(k=>Object.hasOwn(source,k)).map(k=>[k,source[k]]));
 }
 export function decimalUnits(value, decimals) {
@@ -33,28 +28,5 @@ export function decimalUnits(value, decimals) {
   if(fraction.length>decimals&&/[1-9]/.test(fraction.slice(decimals)))throw Error('La cantidad supera la precisión del contrato.');
   return BigInt(whole)*10n**BigInt(decimals)+BigInt(fraction.slice(0,decimals).padEnd(decimals,'0')||'0');
 }
-export function validateTransfer(receipt,canonical,cfg,r,tx,latest) {
-  if(!receipt||receipt.status!=='0x1'||String(receipt.transactionHash).toLowerCase()!==tx.toLowerCase()||BigInt(receipt.blockNumber)>latest-128n)throw Error('La transferencia necesita 128 confirmaciones en Polygon.');
-  if(!canonical||canonical.hash!==receipt.blockHash)throw Error('Revalida la transferencia confirmada.');
-  const earliest=Date.parse(r.created_at)-(r.kind==='deposit_inft'?600000:0);
-  if(!Number.isFinite(earliest)||Number(BigInt(canonical.timestamp))*1000+999<earliest)throw Error('La transferencia es anterior a esta solicitud.');
-  const source=r.kind==='deposit_inft'?r.wallet_address:cfg.treasury_address;
-  const dest=r.kind==='deposit_inft'?cfg.treasury_address:r.wallet_address;
-  const topic='0xddf252ad1be2c89b69c2b068fc378daa952ba7f163c4a11628f55a4df523b3ef';
-  const logs=(receipt.logs||[]).filter(l=>!l.removed&&l.address.toLowerCase()===cfg.token_address&&l.topics?.length===3&&l.topics[0].toLowerCase()===topic&&('0x'+l.topics[1].slice(-40)).toLowerCase()===source&&('0x'+l.topics[2].slice(-40)).toLowerCase()===dest);
-  const total=logs.reduce((a,l)=>a+BigInt(l.data),0n);
-  if(total===0n||total!==decimalUnits(r.amount,cfg.token_decimals))throw Error('El contrato, las carteras o el importe de la transferencia no coinciden.');
-  return total;
-}
 export const morseMap={A:'.-',B:'-...',C:'-.-.',D:'-..',E:'.',F:'..-.',G:'--.',H:'....',I:'..',J:'.---',K:'-.-',L:'.-..',M:'--',N:'-.',O:'---',P:'.--.',Q:'--.-',R:'.-.',S:'...',T:'-',U:'..-',V:'...-',W:'.--',X:'-..-',Y:'-.--',Z:'--..',0:'-----',1:'.----',2:'..---',3:'...--',4:'....-',5:'.....',6:'-....',7:'--...',8:'---..',9:'----.','-':'-....-'};
 export const toMorse=text=>String(text).toUpperCase().split('').map(x=>morseMap[x]||'/').join(' ');
-
-// Strict Polygon PoS supply filter; do not confuse proposal with minted on-chain tokens.
-export const INFT_FIXED_SUPPLY = 10000000n;
-export function validateInftSupply(hexValue, decimals) {
-  if (!Number.isInteger(decimals) || decimals < 0 || decimals > 18) throw Error('Decimales INFT inválidos.');
-  const actual = BigInt(hexValue);
-  const expected = INFT_FIXED_SUPPLY * 10n ** BigInt(decimals);
-  if (actual !== expected) throw Error('El contrato INFT no respeta el suministro fijo de 10,000,000 unidades.');
-  return true;
-}

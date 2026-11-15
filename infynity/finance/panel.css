@@ -54,3 +54,33 @@ html[data-uhz-inft-page="panel"] #detail .primary:disabled {
     grid-template-columns: repeat(2, minmax(0, 1fr));
   }
 }
+
+.exchange-unavailable {
+  margin-bottom: 18px;
+}
+
+[data-form="exchange"] .form-grid {
+  align-items: start;
+}
+
+[data-form="exchange"] .quote-fee strong {
+  color: var(--inft-text, var(--ink));
+  padding-block: 12px;
+  font-variant-numeric: tabular-nums;
+}
+
+[data-form="exchange"] #exchangeOutput {
+  overflow-wrap: anywhere;
+}
+
+[data-form="exchange"] .primary:only-child {
+  margin-inline-start: auto;
+}
+
+html[data-uhz-inft-page="panel"] [data-form="exchange"] .primary:disabled {
+  color: var(--inft-muted, var(--muted));
+  background: var(--inft-soft, var(--surface));
+  border: 1px solid var(--inft-field-line, var(--line));
+  cursor: not-allowed;
+  opacity: 1;
+}

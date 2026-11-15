@@ -1,4 +1,4 @@
-import {toMorse,paymentLink} from './core.mjs';
+import {toMorse,paymentLink,decimalUnits} from './core.mjs';
 import {depositAmount,depositCopy,depositOrder,depositReceiver,needsDepositOrder} from './deposit-order.mjs';
 const admin=location.hostname==='admin.univershzrw.com';
 const $=s=>document.querySelector(s);
@@ -21,6 +21,49 @@ const status=r=>`<span class="status ${esc(r.status)}">${esc(statuses[r.status]|
 const field=(label,name,type='text',attrs='',hint='')=>`<label class="field"><span>${label}</span><input name="${name}" type="${type}" ${attrs}>${hint?`<small>${hint}</small>`:''}</label>`;
 const wallet=asset=>state?.wallets?.find(w=>w.asset===asset)||{available:'0',reserved:'0'};
 const price=()=>admin?state?.prices?.[0]:state?.price;
+const exchangeOperations={
+ buy_inft:{from:'MXN',to:'INFT',rate:'price_mxn',divide:true},
+ sell_inft:{from:'INFT',to:'MXN',rate:'price_mxn',divide:false},
+ coins_to_inft:{from:'COIN',to:'INFT',rate:'coins_per_inft',divide:true},
+ inft_to_coins:{from:'INFT',to:'COIN',rate:'coins_per_inft',divide:false}
+};
+const exchangeDecimals={MXN:2,INFT:8,COIN:0};
+const assetName=asset=>asset==='COIN'?'Coins':asset;
+const exchangeTranslations={
+ es:{
+  desk:'Mesa de conversión',choose:'Elige tu operación',kind:'Quiero',amount:'Cantidad en',available:'Saldo disponible',
+  fee:'Comisión de conversión',estimate:'Recibes aproximadamente',submit:'Solicitar cotización',
+  review:'Revisa la cotización antes de confirmar. Tu confirmación reserva el saldo de origen.',
+  pending:'Conversiones pendientes de activación',noPrice:'La mesa aún debe publicar la cotización de INFT.',
+  noCustody:'Falta completar la configuración del contrato y la tesorería de INFT en Polygon.',
+  empty:'Introduce una cantidad para ver la estimación.',invalid:'Revisa el importe y los decimales permitidos.',
+  tooSmall:'La cantidad es demasiado pequeña para esta conversión.',
+  insufficient:'El saldo disponible no alcanza para confirmar esta cantidad.',
+  coinLimit:limit=>`El canje admite hasta ${num(limit,0)} Coins por operación.`,
+  ready:'La estimación incluye la comisión.',
+  operations:['Comprar INFT con pesos','Vender INFT por pesos','Canjear Coins por INFT','Comprar Coins con INFT']
+ },
+ en:{
+  desk:'Exchange desk',choose:'Choose your exchange',kind:'I want to',amount:'Amount in',available:'Available balance',
+  fee:'Exchange fee',estimate:'Estimated amount received',submit:'Request quote',
+  review:'Review the quote before confirming. Confirmation reserves the funds you are exchanging.',
+  pending:'Exchange setup pending',noPrice:'The exchange desk still needs to publish the INFT rate.',
+  noCustody:'The INFT contract and treasury setup on Polygon is incomplete.',
+  empty:'Enter an amount to see the estimate.',invalid:'Check the amount and the allowed decimal places.',
+  tooSmall:'The amount is too small for this exchange.',
+  insufficient:'Your available balance is too low to confirm this amount.',
+  coinLimit:limit=>`You can exchange up to ${num(limit,0)} Coins per transaction.`,
+  ready:'The estimate includes the fee.',
+  operations:['Buy INFT with MXN','Sell INFT for MXN','Exchange Coins for INFT','Buy Coins with INFT']
+ }
+};
+const exchangeCopy=()=>exchangeTranslations[document.documentElement.lang.toLowerCase().startsWith('en')?'en':'es'];
+function exchangeUnavailable(copy){
+ const messages=[];
+ if(!price())messages.push(copy.noPrice);
+ if(!state.config.token_address||!state.config.treasury_address)messages.push(copy.noCustody);
+ return messages.join(' ');
+}
 function renderMenuMxn(){
  if(admin)return;
  const amount=state?money(wallet('MXN').available):null;
@@ -70,7 +113,30 @@ function market(){const p=price(),all=[...(state.prices||[])].sort((a,b)=>Number
 }
 function requestsTable(requests,short=false){if(!requests.length)return '<div class="empty">Tu historial comienza con tu primera operación.</div>';return `<div class="table-wrap"><table><thead><tr><th>Operación / Folio</th>${admin?'<th>Cuenta</th>':''}<th>Importe</th><th>Estado</th>${short?'':'<th>Fecha</th>'}<th></th></tr></thead><tbody>${requests.map(r=>`<tr><td><b>${esc(names[r.kind])}</b><br><span class="mono tiny muted">${esc(r.folio)}</span></td>${admin?`<td>${esc(r.email)}</td>`:''}<td>${esc(units(r.amount,['deposit_mxn','withdraw_mxn','buy_inft'].includes(r.kind)?'MXN':r.kind==='coins_to_inft'?'COIN':'INFT'))}</td><td>${status(r)}</td>${short?'':`<td class="muted tiny">${esc(date(r.created_at))}</td>`}<td><button type="button" class="row-link" data-detail="${esc(r.id)}">${admin?'Revisar':needsDepositOrder(r)?currentDepositCopy().view:'Ver detalle'} →</button></td></tr>`).join('')}</tbody></table></div>`;}
 function overview(){return cards()+`<div class="grid-two">${market()}<section class="box"><div class="box-head"><h2>Tu siguiente movimiento</h2></div><div class="quick"><button data-tab="deposit"><span>↓</span>Depositar</button><button data-tab="withdraw"><span>↑</span>Retirar</button><button data-tab="exchange"><span>⇄</span>Comprar / vender</button><button data-go="coins_to_inft"><span>◈</span>Canjear Coins</button></div></section></div><section class="box"><div class="box-head"><h2>Últimos movimientos</h2><button class="secondary" data-tab="history">Ver todos →</button></div>${requestsTable(state.requests.slice(0,5),true)}</section>`;}
-function exchange(){const p=price();return `<div class="grid-two"><section class="box"><p class="eyebrow">MESA DE CONVERSIÓN</p><h2 class="section-title">Elige tu operación</h2><form data-form="exchange"><div class="form-grid"><label class="field full"><span>Quiero</span><select name="kind" id="exchangeKind"><option value="buy_inft">Comprar INFT con pesos</option><option value="sell_inft">Vender INFT por pesos</option><option value="coins_to_inft">Canjear Coins por INFT</option><option value="inft_to_coins">Comprar Coins con INFT</option></select></label>${field('Cantidad de origen','amount','number','min="0.00000001" max="1000000" step="any" required inputmode="decimal" id="exchangeAmount"','La unidad se indica en la estimación.')}<label class="field"><span>Comisión de conversión</span><input readonly value="${num(state.config.fee_bps/100,2)} %"></label></div><div class="quote-preview" id="preview"><small>Recibes aproximadamente</small><b>— INFT</b><small>Introduce una cantidad para consultar el cálculo.</small></div><div class="form-foot"><p>Revisa el importe final de la cotización antes de confirmar. La confirmación reserva el saldo de origen.</p><button class="primary" type="submit">Solicitar cotización →</button></div></form></section><div>${market()}<section class="box"><h3>Tus referencias de conversión</h3><div class="mini-list"><div class="mini-row"><span>1 INFT en pesos</span><b>${p?money(p.price_mxn)+' MXN':'—'}</b></div><div class="mini-row"><span>1 INFT en Coins</span><b>${p?num(p.coins_per_inft,8)+' Coins':'—'}</b></div><div class="mini-row"><span>Límite de canje por solicitud</span><b>1,000 Coins</b></div></div><p class="sub">Cotización de la mesa UNIVERSHZRW. Los Coins se utilizan dentro del ecosistema.</p></section></div></div>`;}
+function exchange(){
+ const p=price(),copy=exchangeCopy(),unavailable=exchangeUnavailable(copy);
+ const previousKind=$('#exchangeKind')?.value??intent.get('operation');
+ const kind=Object.hasOwn(exchangeOperations,previousKind)?previousKind:'buy_inft';
+ const draft=$('#exchangeAmount')?.value??'';
+ return `<div class="grid-two"><section class="box" translate="no">
+  <p class="eyebrow">${copy.desk}</p><h2 class="section-title">${copy.choose}</h2>
+  ${unavailable?`<div class="reason exchange-unavailable"><strong>${copy.pending}</strong>${unavailable}</div>`:''}
+  <form data-form="exchange">
+   <div class="form-grid">
+    <label class="field full"><span>${copy.kind}</span><select name="kind" id="exchangeKind">
+     ${Object.keys(exchangeOperations).map((value,index)=>`<option value="${value}"${value===kind?' selected':''}>${copy.operations[index]}</option>`).join('')}
+    </select></label>
+    <label class="field" for="exchangeAmount"><span id="exchangeAmountLabel"></span>
+     <input name="amount" id="exchangeAmount" type="number" value="${esc(draft)}" required aria-describedby="exchangeBalance${unavailable?'':' exchangeHint'}"${unavailable?' disabled':''}>
+     <small id="exchangeBalance"></small>
+    </label>
+    <div class="field quote-fee"><span>${copy.fee}</span><strong>${num(state.config.fee_bps/100,2)} %</strong></div>
+   </div>
+   ${unavailable?'':`<div class="quote-preview" id="preview" aria-live="polite"><small>${copy.estimate}</small><b id="exchangeOutput"></b><small id="exchangeHint"></small></div>`}
+   <div class="form-foot">${unavailable?'':`<p>${copy.review}</p>`}<button class="primary" type="submit" disabled>${copy.submit} →</button></div>
+  </form>
+ </section><div>${market()}<section class="box"><h3>Tus referencias de conversión</h3><div class="mini-list"><div class="mini-row"><span>1 INFT en pesos</span><b>${p?'$'+num(p.price_mxn,8)+' MXN':'—'}</b></div><div class="mini-row"><span>1 INFT en Coins</span><b>${p?num(p.coins_per_inft,8)+' Coins':'—'}</b></div><div class="mini-row"><span>Límite de canje por solicitud</span><b>${num(state.config.coin_limit,0)} Coins</b></div></div><p class="sub">Cotización de la mesa UNIVERSHZRW. Los Coins se utilizan dentro del ecosistema.</p></section></div></div>`;
+}
 function depositInstructions(request, order, copy) {
  const receiver=order?.receiver;
  return `<section class="deposit-instructions" aria-labelledby="depositOrderTitle">
@@ -129,7 +195,7 @@ function prices(){return `<div class="grid-two"><section class="box"><p class="e
 function priceHistory(){return state.prices.length?`<div class="table-wrap"><table><thead><tr><th>Fecha</th><th>1 INFT / MXN</th><th>Coins / INFT</th><th>Motivo publicado</th></tr></thead><tbody>${[...state.prices].sort((a,b)=>Number(b.id)-Number(a.id)).map(p=>`<tr><td class="tiny">${esc(date(p.created_at))}</td><td><b>${money(p.price_mxn)}</b></td><td>${num(p.coins_per_inft,8)}</td><td class="history-reason">${esc(p.reason)}</td></tr>`).join('')}</tbody></table></div>`:'<div class="empty">Publica la primera cotización para iniciar el historial.</div>';}
 function settings(){const c=state.config;return `<section class="box"><div class="box-head"><div><p class="eyebrow">DATOS DE OPERACIÓN</p><h2 class="section-title">Configuración de INFYNITY</h2></div><span class="admin-badge">SOLO ADMINISTRACIÓN</span></div><form data-form="admin-settings"><h3>Cuenta receptora para depósitos</h3><div class="form-grid">${field('Banco','bank_name','text',`maxlength="100" value="${esc(c.bank_name)}"`)}${field('Titular de la cuenta','bank_holder','text',`maxlength="160" value="${esc(c.bank_holder)}"`)}${field('CLABE interbancaria','bank_clabe','text',`pattern="[0-9]{18}" maxlength="18" inputmode="numeric" value="${esc(c.bank_clabe)}"`)}${field('Comisión de conversión (puntos base)','fee_bps','number',`min="0" max="1000" step="1" required value="${c.fee_bps}"`,'100 puntos base = 1 %. Se muestra antes de confirmar.')}</div><h3 class="section-title">Tesorería de INFT · Polygon</h3><div class="form-grid">${field('Contrato del token INFT','token_address','text',`pattern="0x[0-9a-fA-F]{40}" maxlength="42" value="${esc(c.token_address||'')}" autocomplete="off"`)}${field('Dirección de la tesorería','treasury_address','text',`pattern="0x[0-9a-fA-F]{40}" maxlength="42" value="${esc(c.treasury_address||'')}" autocomplete="off"`)}</div><p class="sub">El contrato y su precisión se verifican en Polygon. La cartera de tesorería debe contener las unidades que respaldan los saldos INFT.</p><div class="form-foot"><p>Los cambios quedan registrados en la auditoría.</p><button class="primary" type="submit">Guardar configuración →</button></div></form></section><section class="box"><h3>Pagos con tarjeta</h3><p class="sub">Asigna el enlace oficial de Mercado Pago desde cada solicitud de depósito. Revisa que el importe recibido coincida con el solicitado antes de liquidar.</p></section>`;}
 function audit(){return `<section class="box"><p class="eyebrow">PMC / REGISTRO ENCADENADO</p><h2 class="section-title">Auditoría de operaciones</h2><p class="sub">Cada evento conserva su huella SHA-256 y la del evento anterior. Los movimientos liquidados y las cotizaciones publicadas son inmutables.</p>${state.audit.length?`<div class="table-wrap section-title"><table><thead><tr><th>Fecha</th><th>Evento</th><th>Huella SHA-256</th><th>Huella anterior</th></tr></thead><tbody>${state.audit.map(a=>`<tr><td class="tiny">${esc(date(a.created_at))}</td><td>${esc(events[a.event]||a.event)}</td><td><div class="mono audit-hash" title="${esc(a.event_hash)}">${esc(a.event_hash)}</div></td><td><div class="mono audit-hash" title="${esc(a.previous_hash)}">${esc(a.previous_hash)}</div></td></tr>`).join('')}</tbody></table></div>`:'<div class="empty">El registro comienza con tu primera operación administrativa.</div>'}</section>`;}
-function render(){renderNav();renderMenuMxn();if(!state){login();return;}const views={overview,exchange,deposit,withdraw,history,security,review,treasury,prices,settings,audit};$('#content').innerHTML=views[tab]();if(tab==='exchange'&&['buy_inft','sell_inft','coins_to_inft','inft_to_coins'].includes(intent.get('operation'))){$('#exchangeKind').value=intent.get('operation');preview();}}
+function render(){renderNav();renderMenuMxn();if(!state){login();return;}const views={overview,exchange,deposit,withdraw,history,security,review,treasury,prices,settings,audit};$('#content').innerHTML=views[tab]();if(tab==='exchange')syncExchangeOperation();}
 async function load(){
  const sequence=++loadSequence;
  try{
@@ -150,8 +216,52 @@ async function load(){
  }
 }
 function changeTab(id){if(!tabs.some(t=>t[0]===id))return;tab=id;$('#notice').hidden=true;render();$('#main').focus({preventScroll:true});window.scrollTo({top:0,behavior:'instant'});}
-function preview(){const kind=$('#exchangeKind')?.value,amount=Number($('#exchangeAmount')?.value||0),p=price();if(!kind)return;const factor=1-state.config.fee_bps/10000;let output=0,asset='INFT',input='MXN';if(p){if(kind==='buy_inft')output=amount/Number(p.price_mxn)*factor;if(kind==='sell_inft'){output=amount*Number(p.price_mxn)*factor;asset='MXN';input='INFT';}if(kind==='coins_to_inft'){output=amount/Number(p.coins_per_inft)*factor;input='COIN';}if(kind==='inft_to_coins'){output=Math.floor(amount*Number(p.coins_per_inft)*factor);asset='COIN';input='INFT';}}
- $('#preview').innerHTML=`<small>Recibes aproximadamente</small><b>${p&&amount?esc(units(output,asset)):'— '+(asset==='COIN'?'Coins':asset)}</b><small>${amount?esc(units(amount,input))+' de origen · ':''}${p?'Comisión incluida. Revisa la cotización final.':'Solicita la cotización de la mesa.'}</small>`;
+const availableToExchange=asset=>asset==='COIN'?state.coins:wallet(asset).available;
+function syncExchangeOperation(reset=false){
+ const amount=$('#exchangeAmount'),copy=exchangeCopy();
+ const {from}=exchangeOperations[$('#exchangeKind').value];
+ const digits=exchangeDecimals[from];
+ if(reset)amount.value='';
+ amount.step=(10**-digits).toFixed(digits);
+ amount.min=amount.step;
+ amount.max=from==='COIN'?state.config.coin_limit:1000000;
+ amount.inputMode=digits?'decimal':'numeric';
+ $('#exchangeAmountLabel').textContent=`${copy.amount} ${assetName(from)}`;
+ $('#exchangeBalance').textContent=`${copy.available} · ${units(availableToExchange(from),from)}`;
+ preview();
+}
+function exchangeEstimate(operation,amount){
+ const scale=100000000n;
+ const rate=decimalUnits(price()[operation.rate],8);
+ const origin=decimalUnits(amount.toFixed(exchangeDecimals[operation.from]),8);
+ const multiplier=BigInt(10000-state.config.fee_bps);
+ const targetScale=10n**BigInt(exchangeDecimals[operation.to]);
+ // The ledger truncates the net quote at the precision of the asset received.
+ return operation.divide
+  ? origin*multiplier*targetScale/(rate*10000n)
+  : origin*rate*multiplier*targetScale/(scale*scale*10000n);
+}
+function exchangeUnits(value,asset){
+ const digits=exchangeDecimals[asset],scale=10n**BigInt(digits);
+ const whole=num(value/scale,0);
+ let fraction=digits?(value%scale).toString().padStart(digits,'0'):'';
+ if(asset==='INFT')fraction=fraction.replace(/0+$/,'');
+ return `${asset==='MXN'?'$':''}${whole}${fraction?'.'+fraction:''} ${assetName(asset)}`;
+}
+function preview(){
+ if(!$('#preview'))return;
+ const amount=$('#exchangeAmount'),copy=exchangeCopy();
+ const operation=exchangeOperations[$('#exchangeKind').value],{from,to}=operation;
+ const validInput=amount.validity.valid;
+ const output=validInput?exchangeEstimate(operation,amount.valueAsNumber):0n;
+ const overCoinLimit=to==='COIN'&&output>BigInt(state.config.coin_limit);
+ const hint=amount.validity.valueMissing&&!amount.validity.badInput?copy.empty:!validInput?copy.invalid:
+  output===0n?copy.tooSmall:overCoinLimit?copy.coinLimit(state.config.coin_limit):
+  amount.valueAsNumber>Number(availableToExchange(from))?copy.insufficient:copy.ready;
+ $('#exchangeOutput').textContent=validInput?exchangeUnits(output,to):'— '+assetName(to);
+ $('#exchangeHint').textContent=hint;
+ const form=amount.form;
+ form.querySelector('[type="submit"]').disabled=!!form.dataset.submitting||!validInput||output===0n||overCoinLimit;
 }
 async function openDetail(id,freshBank){
  const sequence=++detailSequence;
@@ -183,7 +293,7 @@ async function afterMutation(message,id){notice(message);const fresh=await load(
 document.addEventListener('click',async e=>{
  const target=e.target.closest('button,a');if(!target)return;
  if(target.dataset.tab){changeTab(target.dataset.tab);return;}
- if(target.dataset.go){changeTab('exchange');$('#exchangeKind').value=target.dataset.go;preview();return;}
+ if(target.dataset.go){changeTab('exchange');$('#exchangeKind').value=target.dataset.go;syncExchangeOperation(true);return;}
  const detail=target.dataset.detail,action=target.dataset.action;if(!detail&&!action)return;
  e.preventDefault();target.disabled=true;
  try{
@@ -215,8 +325,8 @@ document.addEventListener('click',async e=>{
 });
 document.addEventListener('submit',async e=>{
  const form=e.target.closest('[data-form]');if(!form)return;e.preventDefault();const submit=form.querySelector('[type="submit"]');if(submit.disabled)return;submit.disabled=true;const f=new FormData(form),data=Object.fromEntries(f.entries());
- const isDeposit=form.dataset.form==='deposit';
- if(isDeposit)form.dataset.submitting='1';
+ const isDeposit=form.dataset.form==='deposit',isExchange=form.dataset.form==='exchange';
+ if(isDeposit||isExchange)form.dataset.submitting='1';
  try{
   if(['deposit','withdraw','exchange'].includes(form.dataset.form)){
    let payload={...data,request_key:crypto.randomUUID(),method:'balance'};
@@ -226,6 +336,15 @@ document.addEventListener('submit',async e=>{
     payload.method=data.depositMethod;
    }
    if(form.dataset.form==='withdraw')payload.method=data.kind==='withdraw_inft'?'crypto':'transfer';
+   if(isExchange){
+    const unavailable=exchangeUnavailable(exchangeCopy());
+    if(unavailable)throw Error(unavailable);
+    const digits=exchangeDecimals[exchangeOperations[data.kind].from];
+    payload.amount=form.elements.amount.valueAsNumber.toFixed(digits);
+    const signature=data.kind+'|'+payload.amount;
+    if(form.dataset.requestSignature!==signature)delete form.dataset.requestKey;
+    form.dataset.requestSignature=signature;
+   }
    // Keep the idempotency key until the server acknowledges the request.
    if(!form.dataset.requestKey)form.dataset.requestKey=payload.request_key;else payload.request_key=form.dataset.requestKey;
    const result=await api('create_request',payload);delete form.dataset.requestKey;await afterMutation('Solicitud registrada: '+result.folio,result.id);
@@ -241,13 +360,14 @@ document.addEventListener('submit',async e=>{
   else if(form.dataset.form==='admin-settings'){await api('admin_config',data);notice('Configuración guardada.');await load();}
  }catch(error){notice(error.message,true);let el=form.querySelector('[role="alert"]');if(!el){el=document.createElement('p');el.className='reason';el.setAttribute('role','alert');form.prepend(el);}el.textContent=error.message;}finally{
   if(isDeposit){delete form.dataset.submitting;syncDepositAvailability(form);}
+  else if(isExchange){delete form.dataset.submitting;if(form.isConnected)preview();}
   else submit.disabled=false;
  }
 });
-document.addEventListener('input',e=>{if(['exchangeAmount','exchangeKind'].includes(e.target.id))preview();if(e.target.id==='requestSearch'){search=e.target.value;const start=e.target.selectionStart;$('#content').innerHTML=review();$('#requestSearch').focus();$('#requestSearch').setSelectionRange(start,start);}});
+document.addEventListener('input',e=>{if(e.target.id==='exchangeAmount')preview();if(e.target.id==='requestSearch'){search=e.target.value;const start=e.target.selectionStart;$('#content').innerHTML=review();$('#requestSearch').focus();$('#requestSearch').setSelectionRange(start,start);}});
 document.addEventListener('change',e=>{
  if(e.target.id==='depositMethod')syncDepositAvailability(e.target.form);
- if(e.target.id==='requestFilter'){filter=e.target.value;render();}if(e.target.id==='exchangeKind')preview();if(e.target.id==='withdrawKind'){const crypto=e.target.value==='withdraw_inft';$('#bankWithdrawal').hidden=crypto;$('#cryptoWithdrawal').hidden=!crypto;$('#bankWithdrawal').querySelectorAll('input').forEach(i=>{i.disabled=crypto;i.required=!crypto;});}});
+ if(e.target.id==='requestFilter'){filter=e.target.value;render();}if(e.target.id==='exchangeKind')syncExchangeOperation(true);if(e.target.id==='withdrawKind'){const crypto=e.target.value==='withdraw_inft';$('#bankWithdrawal').hidden=crypto;$('#cryptoWithdrawal').hidden=!crypto;$('#bankWithdrawal').querySelectorAll('input').forEach(i=>{i.disabled=crypto;i.required=!crypto;});}});
 $('#refresh').addEventListener('click',async()=>{const b=$('#refresh');b.disabled=true;await load();b.disabled=false;});$('#closeDetail').addEventListener('click',()=>$('#detail').close());
 if(!admin){
  const refreshSession=()=>{
@@ -260,6 +380,7 @@ if(!admin){
   void load();
  };
  window.addEventListener('uhz:session',refreshSession);
+ window.addEventListener('uhz:language-change',()=>{if(state&&tab==='exchange'&&!$('[data-form="exchange"]')?.dataset.submitting)render();});
  window.addEventListener('pageshow',event=>{if(event.persisted)refreshSession();});
  window.addEventListener('message',event=>{
   if(event.origin===location.origin&&event.data?.type==='uhz:session')refreshSession();

@@ -28,7 +28,7 @@ The portal uses the existing UNIVERSHZRW cookie session and the `uhz-inft-wallet
 
 ## Deployment and validation
 
-For SPEI deposits, save the receiving bank, account holder and 18-digit CLABE under INFYNITY → Configuración financiera in the owner console. Customers can reopen an active transfer request in Movimientos to download its deposit order after the receiving account is configured. The order lists the amount and the folio to use as the payment description. The portal generates the PDF locally with [jsPDF](https://github.com/parallax/jsPDF) and keeps the bank receipt upload as a separate step.
+For SPEI deposits, save the receiving bank, account holder and 18-digit CLABE under INFYNITY → Configuración financiera in the owner console. Generar factura SPEI creates a request and opens its deposit details. Customers can reopen a pending transfer with Ver factura in Movimientos. Descargar factura becomes available when the receiving account is configured. The deposit order lists the amount and the folio to use as the payment description. The portal generates the PDF locally with [jsPDF](https://github.com/parallax/jsPDF) and keeps the bank receipt upload as a separate step.
 
 Apply `schema.sql` as one Supabase migration, deploy `index.ts` plus `core.mjs` as `uhz-inft-wallet` with JWT verification enabled, and publish the [panel Worker packaged with the public palette](../website/README.md) as `univershzrw-inft-panel`. Route `/criptomoneda/panel*` on apex/www plus `/inft*` on the admin hostname to it. The existing account proxy must allow that Edge Function while rejecting `admin_*` actions on the customer hostname.
 

@@ -6,6 +6,15 @@ Owner operations: https://admin.univershzrw.com/inft
 
 `worker.mjs` is the self-contained `univershzrw-moneda` Cloudflare Worker. It includes the site, styles, native WebGL coin, CSS 3D fallback, SVG favicon, optimized artwork and documentation. Preserve existing routes, settings and observability when updating it through the content API.
 
+Build the public palette against the matching version of each Worker before publishing. Run these commands from this directory after building the finance Worker.
+
+```sh
+node build-palette.mjs moneda worker.mjs /tmp/univershzrw-moneda.mjs
+node build-palette.mjs panel ../finance/dist/worker.mjs /tmp/univershzrw-inft-panel.mjs
+```
+
+Publish the landing Worker first so the panel can load the versioned stylesheet. The wrapper adds this stylesheet to the two public INFYNITY pages.
+
 The main calls to action open the authenticated financial portal described in [../finance/README.md](../finance/README.md). That portal provides actual account bookkeeping, privately uploaded deposit evidence, manual reconciliation, withdrawals with reserved balances, confirmed exchange quotes and owner controls. The former public availability form has been replaced with links to those operations. The legacy terminal root redirects to the account portal; obsolete mutation endpoints remain closed.
 
 The public chart displays published **Mesa UNIVERSHZRW reference quotes** and their stated reasons. It never substitutes revenue allocations for market prices. Volume is the sum of settled platform buy/sell operations, rather than an external exchange's volume. Empty quote history remains empty until the owner publishes a quote.

@@ -14,6 +14,7 @@ node build-palette.mjs panel ../finance/dist/worker.mjs /tmp/univershzrw-inft-pa
 ```
 
 Publish the landing Worker first so the panel can load the versioned stylesheet. The wrapper adds this stylesheet to the two public INFYNITY pages.
+When replacing a published palette, pass the previous stylesheet as the fourth argument to the landing build. This keeps its URL available while the two Workers are updated.
 
 The main calls to action open the authenticated financial portal described in [../finance/README.md](../finance/README.md). That portal provides actual account bookkeeping, privately uploaded deposit evidence, manual reconciliation, withdrawals with reserved balances, confirmed exchange quotes and owner controls. The former public availability form has been replaced with links to those operations. The legacy terminal root redirects to the account portal; obsolete mutation endpoints remain closed.
 

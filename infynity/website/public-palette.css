@@ -4,37 +4,36 @@ html[data-uhz-inft-page] {
   --inft-peach: #f59e7b;
   --inft-canvas: var(--inft-ice);
   --inft-surface: #fff;
-  --inft-soft: #e7eff2;
+  --inft-soft: #e9eef1;
   --inft-text: var(--inft-teal);
-  --inft-muted: #4e6870;
-  --inft-line: #c3d4d9;
-  --inft-field-line: #77939a;
-  --inft-focus: #266473;
+  --inft-muted: #4d626b;
+  --inft-line: #c7d1d6;
+  --inft-field-line: #778b94;
+  --inft-focus: var(--inft-teal);
   --inft-chart: var(--inft-teal);
   --inft-peach-soft: #fae7df;
   --inft-error: #803a2b;
-  --inft-chrome: var(--inft-teal);
-  --inft-chrome-soft: #23515b;
-  --inft-chrome-line: #60838b;
-  --inft-on-teal-muted: #cbdfe4;
+  --inft-chrome: var(--inft-ice);
+  --inft-art: var(--inft-ice);
   --inft-peach-hover: #ffb598;
   background-color: var(--inft-canvas);
   color-scheme: light;
 }
 
 html[data-uhz-inft-page][data-uhz-theme="dark"] {
-  --inft-canvas: #0a2931;
-  --inft-surface: var(--inft-teal);
-  --inft-soft: #174650;
+  --inft-canvas: #1c1c1c;
+  --inft-surface: #262626;
+  --inft-soft: #303030;
   --inft-text: var(--inft-ice);
-  --inft-muted: #bdcfd4;
-  --inft-line: #446b74;
-  --inft-field-line: #71939b;
+  --inft-muted: #c7ccd0;
+  --inft-line: #565656;
+  --inft-field-line: #818181;
   --inft-focus: var(--inft-peach);
   --inft-chart: var(--inft-peach);
   --inft-peach-soft: #513934;
   --inft-error: #ffc7b4;
-  --inft-chrome: #0b323b;
+  --inft-chrome: var(--inft-canvas);
+  --inft-art: var(--inft-surface);
   color-scheme: dark;
 }
 
@@ -48,9 +47,9 @@ html[data-uhz-inft-page][data-uhz-ui] {
   --uhz-action: var(--inft-chart);
   --uhz-on-action: var(--inft-canvas);
   --uhz-chrome: var(--inft-chrome);
-  --uhz-on-chrome: var(--inft-ice);
-  --uhz-chrome-soft: var(--inft-chrome-soft);
-  --uhz-chrome-line: var(--inft-chrome-line);
+  --uhz-on-chrome: var(--inft-text);
+  --uhz-chrome-soft: var(--inft-soft);
+  --uhz-chrome-line: var(--inft-line);
   --uhz-focus: var(--inft-focus);
   background-color: var(--inft-canvas) !important;
 }
@@ -64,7 +63,7 @@ html[data-uhz-inft-page] body {
   --line: var(--inft-line);
   --green: var(--inft-text);
   --green-soft: var(--inft-soft);
-  --navy: var(--inft-teal);
+  --navy: var(--inft-chrome);
   --gold: var(--inft-peach);
   --red: var(--inft-error);
   --soft: var(--inft-soft);
@@ -104,7 +103,7 @@ html[data-uhz-inft-page] :is(main, dialog) :is(input, select, textarea) {
 }
 
 html[data-uhz-inft-page] body :is(#uhz-ui-desktop, #uhz-ui-mobile, .rail, .hero-art) :focus-visible {
-  outline-color: var(--inft-peach);
+  outline-color: var(--inft-focus);
 }
 
 /* INFYNITY introduction, pricing and wallet. */
@@ -139,8 +138,8 @@ html[data-uhz-inft-page="landing"] body :is(
 }
 
 html[data-uhz-inft-page="landing"] body :is(.mini-logo, .skip-link) {
-  background: var(--inft-teal);
-  color: var(--inft-ice);
+  background: var(--inft-peach);
+  color: var(--inft-teal);
 }
 
 html[data-uhz-inft-page="landing"] body :is(.status-dot, .status-dot.live) {
@@ -149,38 +148,44 @@ html[data-uhz-inft-page="landing"] body :is(.status-dot, .status-dot.live) {
 }
 
 html[data-uhz-inft-page="landing"] body .hero-art {
-  background: var(--inft-teal) radial-gradient(ellipse at 50% 45%, var(--inft-chrome-soft), var(--inft-teal) 60%, #0a2931);
-  color: var(--inft-ice);
+  background: var(--inft-art);
+  box-shadow: inset 0 0 0 1px var(--inft-line);
+  color: var(--inft-text);
 }
 
 html[data-uhz-inft-page="landing"] body :is(.art-corner, .art-bottom small, .coin-toggle) {
-  color: var(--inft-on-teal-muted);
+  color: var(--inft-muted);
 }
 
 html[data-uhz-inft-page="landing"] body .coin-toggle {
-  border-color: var(--inft-chrome-line);
+  background: var(--inft-surface);
+  border-color: var(--inft-field-line);
+}
+
+html[data-uhz-inft-page="landing"] body .coin-toggle:hover {
+  background: var(--inft-soft);
 }
 
 html[data-uhz-inft-page="landing"] body .evaluation-section {
-  background: var(--inft-teal);
-  color: var(--inft-ice);
+  background: var(--inft-canvas);
+  color: var(--inft-text);
 }
 
 html[data-uhz-inft-page="landing"] body .evaluation-section :is(h2, strong) {
-  color: var(--inft-ice);
+  color: var(--inft-text);
 }
 
 html[data-uhz-inft-page="landing"] body .evaluation-section :is(p, .evaluation-note) {
-  color: var(--inft-on-teal-muted);
+  color: var(--inft-muted);
 }
 
 html[data-uhz-inft-page="landing"] body .evaluation-section :is(.eyebrow, .evaluation-grid > article > span),
 html[data-uhz-inft-page="landing"] .evaluation-note span::before {
-  color: var(--inft-peach);
+  color: var(--inft-chart);
 }
 
 html[data-uhz-inft-page="landing"] body :is(.evaluation-grid > article, .evaluation-note) {
-  border-color: var(--inft-chrome-line);
+  border-color: var(--inft-line);
 }
 
 html[data-uhz-inft-page="landing"] body :is(.closing-infinity, .chart-empty) {
@@ -236,27 +241,50 @@ html[data-uhz-inft-page="panel"] body .login {
   border-color: var(--inft-line) !important;
 }
 
+html[data-uhz-inft-page="panel"] .login-art {
+  background: var(--inft-art) !important;
+}
+
+/* Use the existing official art and show the two stamped faces over the page's backdrop. */
+html[data-uhz-inft-page="panel"] .login-art::before {
+  --inft-coin-mask: radial-gradient(ellipse 24.2% 33.2% at 25% 44.8%, #000 99%, transparent),
+    radial-gradient(ellipse 24.2% 33.2% at 73.3% 44.8%, #000 99%, transparent);
+  inset: 50% auto auto 50%;
+  width: min(100%, 34rem);
+  aspect-ratio: 1447 / 1087;
+  transform: translate(-50%, -49%);
+  background: url('/criptomoneda/assets/moneda.webp') center / 100% 100% no-repeat;
+  -webkit-mask-image: var(--inft-coin-mask);
+  mask-image: var(--inft-coin-mask);
+}
+
+html[data-uhz-inft-page="panel"] .login-art > small {
+  background: var(--inft-canvas);
+  color: var(--inft-text) !important;
+  text-shadow: none;
+}
+
 html[data-uhz-inft-page="panel"] .workspace :is(.rail, .morse) {
-  background: var(--inft-teal);
-  color: var(--inft-ice);
+  background: var(--inft-chrome);
+  color: var(--inft-text);
 }
 
 html[data-uhz-inft-page="panel"] #main .card.emphasis {
-  background: var(--inft-teal) !important;
-  border-color: var(--inft-chrome-line) !important;
-  color: var(--inft-ice) !important;
+  background: var(--inft-soft) !important;
+  border-color: var(--inft-line) !important;
+  color: var(--inft-text) !important;
 }
 
 html[data-uhz-inft-page="panel"] :is(.rail-label, .identity small, .rail-bottom, .card.emphasis .label, .card.emphasis .sub, .morse small) {
-  color: var(--inft-on-teal-muted);
+  color: var(--inft-muted);
 }
 
 html[data-uhz-inft-page="panel"] .rail nav button {
-  color: var(--inft-ice);
+  color: var(--inft-text);
 }
 
 html[data-uhz-inft-page="panel"] .rail nav button:hover {
-  background: var(--inft-chrome-soft);
+  background: var(--inft-soft);
 }
 
 html[data-uhz-inft-page="panel"] .rail nav button span {
@@ -270,13 +298,13 @@ html[data-uhz-inft-page="panel"] .rail nav button.active {
 }
 
 html[data-uhz-inft-page="panel"] :is(.rail-bottom a, .card.emphasis .coin-icon) {
-  color: var(--inft-peach);
+  color: var(--inft-chart);
 }
 
 html[data-uhz-inft-page="panel"] .symbol {
-  background: var(--inft-chrome-soft);
-  border-color: var(--inft-chrome-line);
-  color: var(--inft-peach);
+  background: var(--inft-peach);
+  border-color: var(--inft-peach);
+  color: var(--inft-teal);
 }
 
 html[data-uhz-inft-page="panel"] .pulse-dot {

@@ -94,6 +94,43 @@ export function createGoogleSignIn({origin, apiOrigin, supabaseFetch, checkedUse
     return redirect(destination, [cookie('', 0), ...sessionCookies(session)]);
   }
 
+  const buttonStyles = `
+#authArea .uhz-google-sign-in {
+  margin-block-start: 12px;
+}
+#authArea .uhz-google-button {
+  box-sizing: border-box;
+  display: flex;
+  align-items: center;
+  gap: 14px;
+  width: 100%;
+  min-height: 52px;
+  padding: 10px 16px;
+  border: 1px solid #747775;
+  border-radius: 8px;
+  background: #fff;
+  color: #1f1f1f;
+  font: 500 16px/1.25 "Google Sans", system-ui, sans-serif;
+  text-align: start;
+  cursor: pointer;
+}
+#authArea .uhz-google-button:hover:not(:disabled) {
+  background: #f8faff;
+}
+#authArea .uhz-google-button:focus-visible {
+  outline: 2px solid #1a73e8;
+  outline-offset: 2px;
+}
+#authArea .uhz-google-button:disabled {
+  cursor: wait;
+  opacity: .72;
+}
+#authArea .uhz-google-mark {
+  display: block;
+  flex: none;
+}
+`;
+
   function browserClient(portalPrefix, authOrigin) {
     const forms = ['loginForm', 'registerForm'].map(id => document.getElementById(id)).filter(Boolean);
     if (!forms.length) return;
@@ -105,20 +142,30 @@ export function createGoogleSignIn({origin, apiOrigin, supabaseFetch, checkedUse
     };
     const params = new URL(location.href).searchParams;
     const destination = params.get('return_to') || (params.get('inft') === '1' ? '/criptomoneda/panel' : '/mi-cuenta');
+    const googleMark = `<svg class="uhz-google-mark" viewBox="0 0 256 262" width="22" height="22" aria-hidden="true" focusable="false">
+      <path d="M255.878,133.451 C255.878,122.717 255.007,114.884 253.122,106.761 L130.55,106.761 L130.55,155.209 L202.497,155.209 C201.047,167.249 193.214,185.381 175.807,197.565 L175.563,199.187 L214.318,229.21 L217.003,229.478 C241.662,206.704 255.878,173.196 255.878,133.451" fill="#4285F4" />
+      <path d="M130.55,261.1 C165.798,261.1 195.389,249.495 217.003,229.478 L175.807,197.565 C164.783,205.253 149.987,210.62 130.55,210.62 C96.027,210.62 66.726,187.847 56.281,156.37 L54.75,156.5 L14.452,187.687 L13.925,189.152 C35.393,231.798 79.49,261.1 130.55,261.1" fill="#34A853" />
+      <path d="M56.281,156.37 C53.525,148.247 51.93,139.543 51.93,130.55 C51.93,121.556 53.525,112.853 56.136,104.73 L56.063,103 L15.26,71.312 L13.925,71.947 C5.077,89.644 0,109.517 0,130.55 C0,151.583 5.077,171.455 13.925,189.152 L56.281,156.37" fill="#FBBC05" />
+      <path d="M130.55,50.479 C155.064,50.479 171.6,61.068 181.029,69.917 L217.873,33.943 C195.245,12.91 165.798,0 130.55,0 C79.49,0 35.393,29.301 13.925,71.947 L56.136,104.73 C66.726,73.253 96.027,50.479 130.55,50.479" fill="#EB4335" />
+    </svg>`;
     const controls = forms.map(form => {
       const group = document.createElement('div');
-      group.style.marginTop = '12px';
+      group.className = 'uhz-google-sign-in';
       const button = document.createElement('button');
       button.type = 'button';
-      button.className = 'button ghost';
+      button.className = 'uhz-google-button';
+      button.innerHTML = googleMark;
+      const label = document.createElement('span');
+      button.append(label);
       const feedback = document.createElement('p');
       feedback.setAttribute('role', 'status');
       feedback.hidden = true;
       group.append(feedback);
-      return {button, feedback, group, form};
+      return {button, label, feedback, group, form};
     });
     function updateLabels() {
-      for (const {button} of controls) button.textContent = button.disabled ? labels().busy : labels().button;
+      const text = labels();
+      for (const {button, label} of controls) label.textContent = button.disabled ? text.busy : text.button;
     }
     function showRetry(feedback) {
       feedback.textContent = labels().retry;
@@ -208,9 +255,13 @@ export function createGoogleSignIn({origin, apiOrigin, supabaseFetch, checkedUse
     const url = new URL(request.url);
     if (url.origin !== origin || url.pathname !== '/' || request.method !== 'GET' ||
         !response.ok || !response.headers.get('content-type')?.startsWith('text/html')) return response;
-    const result = new HTMLRewriter().on('head', {
-      element(head) { head.append('<script src="' + prefix + '/client.js" defer></script>', {html: true}); },
-    }).transform(response);
+    const result = new HTMLRewriter()
+      .on('head style[nonce]', {
+        element(style) { style.append(buttonStyles, {html: true}); },
+      })
+      .on('head', {
+        element(head) { head.append('<script src="' + prefix + '/client.js" defer></script>', {html: true}); },
+      }).transform(response);
     const headers = new Headers(result.headers);
     headers.delete('content-length');
     headers.delete('etag');

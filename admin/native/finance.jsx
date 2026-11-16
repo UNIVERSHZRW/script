@@ -3,6 +3,7 @@ export function Finance({tab}){const {stamp,notify,touch}=useApp(),r=useResource
 return <>{tab==='solicitudes'&&<><div className="metrics three"><Stat label="Solicitudes en seguimiento" value={number(pending.length)} detail="Recibidas, cotizadas y en revisión" icon="clock"/><Stat label="En proceso" value={number(requests.filter(x=>x.status==='processing').length)} detail="Operaciones por conciliar" icon="refresh"/><Stat label="Valor de 1 INFT" value={latest?money(latest.price_mxn):'—'} detail={latest?'Cotización de '+date(latest.created_at):'Historial de cotizaciones'} icon="coin"/></div><Panel title="Solicitudes financieras" subtitle="Depósitos, retiros y conversiones"><Toolbar search={search} onSearch={setSearch} placeholder="Buscar folio o correo…"><select aria-label="Estado financiero" value={filter} onChange={e=>setFilter(e.target.value)}><option value="pending">En seguimiento</option><option value="all">Todos los estados</option>{['completed','rejected','cancelled'].map(x=><option key={x} value={x}>{statusLabels[x]}</option>)}</select><Button icon="refresh" onClick={r.refresh}>Actualizar</Button></Toolbar><DataTable rows={requests.filter(x=>(filter==='all'||filter==='pending'&&['requested','quoted','review','processing'].includes(x.status)||x.status===filter)&&[x.email,x.folio].join(' ').toLowerCase().includes(search.toLowerCase()))} columns={[["folio","Folio"],["email","Cuenta"],["kind","Operación",v=>financeKinds[v]||v],["amount","Cantidad",(v,x)=>['deposit_mxn','withdraw_mxn','buy_inft'].includes(x.kind)?money(v):number(v,8)+' '+(x.kind==='coins_to_inft'?'Coins':'INFT')],["status","Estado"],["created_at","Fecha"]]} actions={x=><Button onClick={()=>setSelected(x.id)}>Revisar</Button>} onRow={x=>setSelected(x.id)}/></Panel></>}
  {tab==='tesoreria'&&<FinanceTreasury config={c} inventory={data.inventory} liabilities={liabilities}/>}
 {tab==='cotizaciones'&&<><div className="split-panels"><Panel title="Publicar cotización" subtitle="Valor de la mesa y motivo del cambio"><div className="pad"><ActionForm fields={[["price_mxn","1 INFT en pesos","number"],["coins_per_inft","Coins por cada INFT","number"],["reason","Motivo de la cotización","textarea"]]} onSubmit={async values=>{await api.finance('admin_price',values);notify('Cotización publicada.');touch();}} submit="Publicar cotización"/></div></Panel><Panel title="Historial de valor"><div className="pad">{prices.length>1?<PriceChart rows={prices}/>:<p className="muted">El historial se forma con las cotizaciones registradas.</p>}<strong className="big-number">{latest?money(latest.price_mxn):'—'}</strong><p className="muted">{latest?.reason||'Cotización de la mesa'}</p></div></Panel></div><Panel title="Cotizaciones registradas"><DataTable rows={prices} columns={[["created_at","Fecha"],["price_mxn","1 INFT / MXN",v=>money(v)],["coins_per_inft","Coins / INFT",v=>number(v,8)],["reason","Motivo"]]}/></Panel></>}
+{tab==='cotizaciones'&&data.business&&<BusinessFinance data={data.business}/>}
 {tab==='ajustes-finanzas'&&<FinanceSettings config={c} existingSpei={data.existing_spei} onSave={async values=>{
   await api.finance('admin_config',values);
   notify('Configuración financiera guardada.');
@@ -11,6 +12,68 @@ return <>{tab==='solicitudes'&&<><div className="metrics three"><Stat label="Sol
 {tab==='auditoria-finanzas'&&<Panel title="Trazabilidad financiera" subtitle="Registro encadenado de operaciones"><DataTable rows={audit} columns={[["created_at","Fecha"],["event","Evento"],["event_hash","Huella SHA-256"],["previous_hash","Huella anterior"]]}/></Panel>}
 {selected&&<FinanceDetail id={selected} onClose={()=>setSelected(null)} onChanged={()=>{touch();r.refresh();}}/>}</>;
 }
+function BusinessFinance({data}) {
+ const {notify,touch}=useApp();
+ const [reversal,setReversal]=useState(null);
+ const terms=data.terms||{};
+ const complete=async(action,values,message)=>{
+  await api.finance(action,values);
+  notify(message);
+  touch();
+ };
+ return <>
+  <div className="metrics three">
+   <Stat label="Valuación empresarial" value={data.valuation?money(data.valuation.value_mxn):'—'}
+    detail={data.valuation?'Corte '+data.valuation.snapshot_date:'Corte pendiente'} icon="coin"/>
+   <Stat label="Unidades de referencia" value={data.unit_base==null?'—':number(data.unit_base)}
+    detail="Base documentada para calcular el valor por INFT" icon="layers"/>
+   <Stat label="Reparto sobre el margen neto" value={terms.share_bps==null?'—':number(terms.share_bps/100,2)+' %'}
+    detail="Estimación por venta conciliada" icon="chart"/>
+  </div>
+  <div className="split-panels">
+   <Panel title="Base del valor de INFT" subtitle="El valor en pesos se recalcula con cada corte empresarial">
+    <div className="pad">
+     <ActionForm key={terms.id} initial={terms} optional={['share_bps','terms_reference']} fields={[
+      ['unit_base','Unidades de referencia aprobadas','number'],
+      ['basis_reference','Folio del documento de unidades','text'],
+      ['share_bps','Reparto en puntos base','number'],
+      ['terms_reference','Folio de las condiciones de reparto','text']
+     ]} submit="Guardar base" onSubmit={values=>complete('admin_business_terms',values,'Base registrada.')}/>
+     <p className="muted">100 puntos base equivalen a 1%. El porcentaje aplica al margen después de costos.</p>
+    </div>
+   </Panel>
+   <Panel title="Conciliar venta de Coins o plan" subtitle="Usa el pago verificado y los costos de esa operación">
+    <div className="pad">
+     <ActionForm initial={{product:'coins',method:'mercado_pago'}} fields={[
+      ['product','Producto','select',[['coins','Coins'],['plan','Plan']]],
+      ['method','Medio de pago','select',[['mercado_pago','Mercado Pago'],['spei','SPEI']]],
+      ['external_reference','Identificador del pago','text'],
+      ['gross_mxn','Importe cobrado en MXN','number'],
+      ['costs_mxn','Costos e impuestos en MXN','number'],
+      ['verified','Verifiqué el pago y sus costos','checkbox']
+     ]} submit="Registrar conciliación" onSubmit={values=>complete('admin_business_sale',values,'Venta conciliada.')}/>
+    </div>
+   </Panel>
+  </div>
+  <Panel title="Ventas conciliadas" subtitle="Cálculo de participación antes del cierre de utilidades">
+   <DataTable rows={data.sales||[]} columns={[
+    ['id','Folio',v=>'UHZ-'+v],
+    ['created_at','Fecha'],
+    ['product','Producto',v=>v==='plan'?'Plan':'Coins'],
+    ['gross_mxn','Cobrado',v=>money(v)],
+    ['costs_mxn','Costos',v=>money(v)],
+    ['pool_mxn','Bolsa estimada',(v,row)=>row.reversed_at?'Revertida':money(v)]
+   ]} actions={row=>!row.reversed_at&&<Button onClick={()=>setReversal(row)}>Revertir</Button>}/>
+  </Panel>
+  {reversal&&<Dialog title="Revertir venta conciliada" subtitle={'Folio UHZ-'+reversal.id} onClose={()=>setReversal(null)}>
+    <ActionForm fields={[[ 'reason','Motivo de la reversión','textarea' ]]} submit="Registrar reversión" onSubmit={async values=>{
+     await complete('admin_business_reverse',{...values,sale_id:reversal.id},'Reversión registrada.');
+     setReversal(null);
+    }}/>
+   </Dialog>}
+ </>;
+}
+
 function FinanceTreasury({config,inventory,liabilities}){
  const pesos=liabilities.find(entry=>entry.asset==='MXN')||{total:0,reserved:0};
  const inft=liabilities.find(entry=>entry.asset==='INFT')||{total:0,reserved:0};

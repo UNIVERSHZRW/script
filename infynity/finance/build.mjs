@@ -4,7 +4,7 @@ import {createHash} from 'node:crypto';
 const require=createRequire(import.meta.url);
 let esbuild;try{esbuild=require('esbuild');}catch{esbuild=require(process.env.ESBUILD_PATH||'/workspace/scratch/e1b3688161c0/univershzrw/node_modules/esbuild');}
 await esbuild.transform(await readFile('index.ts','utf8'),{loader:'ts',format:'esm'});
-const files=Object.fromEntries(await Promise.all(['panel.html','panel.css','panel.js','core.mjs','deposit-order.mjs'].map(async name=>[name,await readFile(name,'utf8')])));
+const files=Object.fromEntries(await Promise.all(['panel.html','panel.css','panel.js','core.mjs','deposit-order.mjs','business-ui.mjs'].map(async name=>[name,await readFile(name,'utf8')])));
 // The portal loads this same-origin bundle only when the customer downloads an order.
 const pdfBundle=await esbuild.build({
   entryPoints:['deposit-pdf.js'],bundle:true,write:false,format:'esm',platform:'browser',minify:true,
@@ -14,7 +14,7 @@ files['deposit-pdf.js']=pdfBundle.outputFiles[0].text;
 const version=createHash('sha256').update(JSON.stringify(files)).digest('hex').slice(0,12);
 files['panel.html']=files['panel.html'].replaceAll('?v=1','?v='+version);
 for(const [module,imports] of [
-  ['panel.js',['core.mjs','deposit-order.mjs','deposit-pdf.js']],
+  ['panel.js',['core.mjs','deposit-order.mjs','deposit-pdf.js','business-ui.mjs']],
   ['deposit-order.mjs',['core.mjs']]
 ]){
   for(const dependency of imports)files[module]=files[module].replace(`'./${dependency}'`,`'./${dependency}?v=${version}'`);

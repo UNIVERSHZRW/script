@@ -84,3 +84,31 @@ html[data-uhz-inft-page="panel"] [data-form="exchange"] .primary:disabled {
   cursor: not-allowed;
   opacity: 1;
 }
+
+/* Internal business valuation. The chart follows the active panel theme. */
+.ref-amounts {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 14px;
+  margin: 16px 0;
+}
+.ref-amounts div {
+  padding: 14px;
+  border: 1px solid var(--line);
+  border-radius: 12px;
+}
+.ref-amounts span, .ref-amounts strong {
+  display: block;
+}
+.ref-amounts span { color: var(--muted); }
+.ref-amounts strong {
+  font-size: clamp(1.1rem, 3vw, 1.65rem);
+  overflow-wrap: anywhere;
+}
+.chart.ref-chart { height: clamp(100px, 20vw, 180px); }
+.ref-chart path { stroke: currentColor; opacity: .2; }
+.ref-chart polyline { stroke: currentColor; }
+.reference-panel .sub { margin-bottom: 10px; }
+@media (max-width: 500px) {
+  .ref-amounts { grid-template-columns: 1fr; }
+}

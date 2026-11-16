@@ -128,6 +128,69 @@ test('database: balances, authorization, replay, quotes, encryption and immutabl
   await assert.rejects(()=>db.exec('delete from private.uhz_fin_journal'),/inmutable/);await assert.rejects(()=>db.exec('update private.uhz_fin_prices set price_mxn=999'),/inmutable/);await assert.rejects(()=>db.exec('delete from private.uhz_fin_audit'),/inmutable/);
   const a=(await db.query('select * from private.uhz_fin_audit order by id')).rows;for(let i=1;i<a.length;i++)assert.equal(a[i].previous_hash,a[i-1].event_hash);
  });
+ await t.test('business valuation uses published cuts and real holdings without posting any money',async()=>{
+  await db.exec(`create table public.uhz_valuation_snapshots(
+    snapshot_date date primary key, captured_at timestamptz default now(), accounts_auth int,
+    resources int, products int, published boolean, methodology_version text);
+   insert into public.uhz_valuation_snapshots(snapshot_date,accounts_auth,resources,products,published,methodology_version) values
+    ('2026-11-13',4,20,8,true,'1.0'), ('2026-11-14',3,16,8,true,'1.0'),
+    ('2026-11-15',999,999,999,false,'1.0'), ('2026-11-16',999,999,999,true,'2.0');`);
+  await db.exec(await readFile(new URL('../migrations/20261115_inft_business_reference.sql',import.meta.url),'utf8'));
+  const business = async (user,action,payload={}) => (await db.query(
+    'select public.uhz_finance($1,$2,$3,$4) as result',[user,session(user),action,payload])).rows[0].result;
+  const before=(await call(alice,'dashboard')).wallets;
+  let data=await business(alice,'business');
+  assert.equal(data.valuation.value_mxn,15117);
+  assert.equal(data.previous.value_mxn,15200);
+  assert.equal(data.history.length,2);
+  assert.equal(data.unit_value_mxn,null);
+  assert.equal(Number(data.holding_units),2);
+  assert.equal(data.share_bps,null);
+  assert.equal(data.sales,undefined);
+  assert.equal(data.terms,undefined);
+  assert.equal((await business(alice,'dashboard')).business.valuation.value_mxn,15117);
+
+  await assert.rejects(()=>business(alice,'admin_business'),/exclusivo/);
+  await assert.rejects(()=>business(alice,'admin_business_sale'),/exclusivo/);
+  await assert.rejects(()=>business(owner,'admin_business_terms',{unit_base:300,basis_reference:'Owner file 0001',share_bps:2500}),/documentadas/);
+  const policy={unit_base:300,basis_reference:'Owner file 0001',share_bps:2500,terms_reference:'Contract 0001'};
+  await business(owner,'admin_business_terms',policy);
+  assert.equal((await business(owner,'admin_business_terms',policy)).duplicate,true);
+  data=await business(alice,'business');
+  assert.equal(data.unit_value_mxn,'50.39000000');
+  assert.equal(data.holding_value_mxn,'100.78');
+  assert.equal(data.holding_change_mxn,'-0.55');
+  await db.exec("insert into public.uhz_valuation_snapshots(snapshot_date,accounts_auth,resources,products,published,methodology_version) values ('2026-11-17',5,16,8,true,'1.0')");
+  assert.equal((await business(alice,'business')).holding_change_mxn,'0.47');
+
+  // No sale is paid out by recording it. Fractional holdings do not qualify.
+  await db.query("insert into private.uhz_fin_wallets(user_id,asset,available) values ($1,'INFT',0.9),($2,'INFT',6)",[bob,owner]);
+  const receipt={product:'coins',method:'mercado_pago',external_reference:'mp-test-0001',gross_mxn:'100.00',costs_mxn:'64.00',verified:true};
+  await assert.rejects(()=>business(owner,'admin_business_sale',{...receipt,verified:false}),/Confirma la venta/);
+  const sale=await business(owner,'admin_business_sale',receipt);
+  assert.equal((await business(owner,'admin_business_sale',{...receipt,external_reference:'MP-TEST-0001'})).duplicate,true);
+  await assert.rejects(()=>business(owner,'admin_business_sale',{...receipt,costs_mxn:63}),/otros datos/);
+  const aliceResult=await business(alice,'business');
+  assert.equal(aliceResult.allocation_total_mxn,'2.25');
+  assert.equal(aliceResult.allocations.length,1);
+  assert.equal(aliceResult.allocations[0].units,2);
+  assert.equal(aliceResult.allocations[0].reference,undefined);
+  assert.equal(Number((await business(owner,'admin_dashboard')).business.sales[0].pool_mxn),9);
+  const bobResult=await business(bob,'business');
+  assert.equal(bobResult.allocations.length,0);
+  assert.equal(Number(bobResult.eligible_units),0);
+  assert.deepEqual((await call(alice,'dashboard')).wallets,before);
+
+  await business(owner,'admin_business_reverse',{sale_id:sale.id,reason:'Provider refund'});
+  assert.equal((await business(owner,'admin_business_reverse',{sale_id:sale.id,reason:'Repeated refund'})).duplicate,true);
+  const reversed=await business(alice,'business');
+  assert.equal(Number(reversed.allocation_total_mxn),0);
+  assert.ok(reversed.allocations[0].reversed_at);
+  const acl=(await db.query("select has_table_privilege('authenticated','private.uhz_fin_product_allocations','SELECT') as exposed, has_function_privilege('anon','private.uhz_fin_business(uuid,uuid,text,jsonb)','EXECUTE') as callable")).rows[0];
+  assert.equal(acl.exposed,false);
+  assert.equal(acl.callable,false);
+  await assert.rejects(()=>db.exec('delete from private.uhz_fin_product_allocations'),/inmutable/);
+ });
  await t.test('revoked sessions and restricted users cannot read their balances',async()=>{
   await db.query('delete from auth.sessions where user_id=$1',[bob]);await assert.rejects(()=>call(bob,'dashboard'),/activa/);
   await db.query("insert into private.uhz_member_controls(user_id,state) values($1,'suspended')",[alice]);await assert.rejects(()=>call(alice,'dashboard'),/activa/);

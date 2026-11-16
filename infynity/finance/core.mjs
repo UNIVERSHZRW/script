@@ -1,6 +1,7 @@
 export const kinds = ['deposit_mxn','withdraw_mxn','buy_inft','sell_inft','coins_to_inft','inft_to_coins'];
-export const userActions = new Set(['dashboard','request_detail','create_request','confirm','cancel','upload_url','attach_proof','proof_url']);
-export const adminActions = new Set(['admin_dashboard','admin_detail','admin_config','admin_price','admin_review','admin_proof_url']);
+export const userActions = new Set(['dashboard','request_detail','create_request','confirm','cancel','upload_url','attach_proof','proof_url','business']);
+export const businessAdminActions = new Set(['admin_business','admin_business_terms','admin_business_sale','admin_business_reverse']);
+export const adminActions = new Set(['admin_dashboard','admin_detail','admin_config','admin_price','admin_review','admin_proof_url',...businessAdminActions]);
 export function validClabe(value) {
   if (!/^\d{18}$/.test(value)) return false;
   const factors=[3,7,1]; let sum=0;
@@ -19,7 +20,7 @@ export function fileType(b) {
 }
 export function safePayload(body) {
   const source=body.payload||{};if(!source||typeof source!=='object'||Array.isArray(source))throw Error('Solicitud inválida.');
-  const keys=['id','kind','amount','method','request_key','reference','note','clabe','holder','bank','path','decision','external_reference','verified','payment_link','bank_name','bank_holder','bank_clabe','token_address','treasury_address','fee_bps','price_mxn','coins_per_inft','reason','mime'];
+  const keys=['id','kind','amount','method','request_key','reference','note','clabe','holder','bank','path','decision','external_reference','verified','payment_link','bank_name','bank_holder','bank_clabe','token_address','treasury_address','fee_bps','price_mxn','coins_per_inft','reason','mime','unit_base','basis_reference','share_bps','terms_reference','product','gross_mxn','costs_mxn','sale_id'];
   return Object.fromEntries(keys.filter(k=>Object.hasOwn(source,k)).map(k=>[k,source[k]]));
 }
 export function decimalUnits(value, decimals) {

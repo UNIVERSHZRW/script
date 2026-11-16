@@ -1,5 +1,6 @@
 import {toMorse,paymentLink,decimalUnits} from './core.mjs';
 import {depositAmount,depositCopy,depositOrder,depositReceiver,needsDepositOrder} from './deposit-order.mjs';
+import {allocationPanel,holdingReference,valuationPanel} from './business-ui.mjs';
 const admin=location.hostname==='admin.univershzrw.com';
 const $=s=>document.querySelector(s);
 const esc=v=>String(v??'').replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
@@ -108,7 +109,10 @@ function login(){
  const dest=admin?'https://admin.univershzrw.com/':'/iniciar-sesion?inft=1';
  $('#content').innerHTML=`<section class="login"><div class="login-copy"><p class="eyebrow">INFYNITY / ${admin?'MESA DE OPERACIONES':'TU CUENTA UNIVERSHZRW'}</p><h2>${admin?'Administración con control de cada movimiento.':'Tus Coins. Tu INFT.<br>Todo conectado.'}</h2><p>${admin?'Accede con tu cuenta de administración para revisar depósitos, retiros, conversiones y cotizaciones.':'Entra con tu cuenta para consultar tu saldo, depositar pesos, convertir Coins y dar seguimiento a tus operaciones.'}</p><div class="actions"><a class="primary" href="${dest}">${admin?'Entrar a administración':'Iniciar sesión'} <span aria-hidden="true">↗</span></a>${admin?'':'<a class="secondary" href="/registrarse">Crear cuenta</a>'}</div><a class="login-path" href="https://univershzrw.com/criptomoneda">Conocer INFYNITY →</a></div><div class="login-art" aria-hidden="true"><div class="orbit"></div><div class="orbit two"></div><div class="spin-coin"><div class="coin-face"><b>∞</b><small>INFYNITY</small></div><div class="coin-face back"><b>U</b><small>UNIVERSHZRW</small></div></div><small>UN UNIVERSO DE POSIBILIDADES</small></div></section>`;
 }
-function cards(){const mxn=wallet('MXN'),inft=wallet('INFT');return `<div class="cards"><article class="card emphasis"><div class="label">Saldo INFYNITY <span class="coin-icon">∞</span></div><strong>${num(inft.available,8)} <span class="unit">INFT</span></strong><p class="sub">${price()?money(Number(inft.available)*Number(price().price_mxn))+' MXN · valor de referencia':'${exchangeCopy().internalBalance}'}<br>${num(inft.reserved,8)} INFT reservados</p></article><article class="card"><div class="label">Pesos disponibles <span class="coin-icon">＄</span></div><strong>${money(mxn.available)} <span class="unit">MXN</span></strong><p class="sub">${money(mxn.reserved)} MXN reservados<br>Cuenta de operaciones</p></article><article class="card"><div class="label">Tus Coins <span class="coin-icon">◈</span></div><strong>${num(state.coins,0)} <span class="unit">Coins</span></strong><p class="sub">Saldo del ecosistema UNIVERSHZRW<br>Consulta el canje en Convertir</p></article></div>`;}
+function cards(){const mxn=wallet('MXN'),inft=wallet('INFT');
+ const reference=holdingReference(state.business,document.documentElement.lang);
+ const value=reference||(price()?money(Number(inft.available)*Number(price().price_mxn))+' MXN · cotización de la mesa':exchangeCopy().internalBalance);
+ return `<div class="cards"><article class="card emphasis"><div class="label">Saldo INFYNITY <span class="coin-icon">∞</span></div><strong>${num(inft.available,8)} <span class="unit">INFT</span></strong><p class="sub">${esc(value)}<br>${num(inft.reserved,8)} INFT reservados</p></article><article class="card"><div class="label">Pesos disponibles <span class="coin-icon">＄</span></div><strong>${money(mxn.available)} <span class="unit">MXN</span></strong><p class="sub">${money(mxn.reserved)} MXN reservados<br>Cuenta de operaciones</p></article><article class="card"><div class="label">Tus Coins <span class="coin-icon">◈</span></div><strong>${num(state.coins,0)} <span class="unit">Coins</span></strong><p class="sub">Saldo del ecosistema UNIVERSHZRW<br>Consulta el canje en Convertir</p></article></div>`;}
 function chart(prices){
  const points=[...prices].sort((a,b)=>Number(a.id)-Number(b.id));if(points.length<2)return `<div class="chart-empty"><b>⌁</b>${points.length?'Primera cotización publicada':'Historial de cotizaciones'}</div>`;
  const vals=points.map(p=>Number(p.price_mxn)),min=Math.min(...vals),max=Math.max(...vals),range=max-min||max*.05||1;
@@ -119,7 +123,7 @@ function market(){const p=price(),all=[...(state.prices||[])].sort((a,b)=>Number
  return `<section class="box"><div class="box-head"><div><p class="eyebrow">COTIZACIÓN DE LA MESA</p><h2 class="section-title">INFYNITY <span class="muted unit">/ MXN</span></h2></div>${change!==null?`<span class="change ${change<0?'down':''}">${change>=0?'+':''}${num(change,2)} %</span>`:'<span class="status">INFT</span>'}</div><div class="price">${p?money(p.price_mxn):'—'} <span class="unit">MXN / INFT</span></div><p class="sub">${p?esc(p.source)+' · '+esc(date(p.created_at)):'Cotización pendiente de publicación'}</p>${chart(all)}${p?`<div class="reason"><strong>Motivo de la última cotización</strong>${esc(p.reason)}</div>`:''}</section>`;
 }
 function requestsTable(requests,short=false){if(!requests.length)return '<div class="empty">Tu historial comienza con tu primera operación.</div>';return `<div class="table-wrap"><table><thead><tr><th>Operación / Folio</th>${admin?'<th>Cuenta</th>':''}<th>Importe</th><th>Estado</th>${short?'':'<th>Fecha</th>'}<th></th></tr></thead><tbody>${requests.map(r=>`<tr><td><b>${esc(names[r.kind])}</b><br><span class="mono tiny muted">${esc(r.folio)}</span></td>${admin?`<td>${esc(r.email)}</td>`:''}<td>${esc(units(r.amount,['deposit_mxn','withdraw_mxn','buy_inft'].includes(r.kind)?'MXN':r.kind==='coins_to_inft'?'COIN':'INFT'))}</td><td>${status(r)}</td>${short?'':`<td class="muted tiny">${esc(date(r.created_at))}</td>`}<td><button type="button" class="row-link" data-detail="${esc(r.id)}">${admin?'Revisar':needsDepositOrder(r)?currentDepositCopy().view:'Ver detalle'} →</button></td></tr>`).join('')}</tbody></table></div>`;}
-function overview(){return cards()+`<div class="grid-two">${market()}<section class="box"><div class="box-head"><h2>Tu siguiente movimiento</h2></div><div class="quick"><button data-tab="deposit"><span>↓</span>Depositar</button><button data-tab="withdraw"><span>↑</span>Retirar</button><button data-tab="exchange"><span>⇄</span>Comprar / vender</button><button data-go="coins_to_inft"><span>◈</span>Canjear Coins</button></div></section></div><section class="box"><div class="box-head"><h2>Últimos movimientos</h2><button class="secondary" data-tab="history">Ver todos →</button></div>${requestsTable(state.requests.slice(0,5),true)}</section>${inventoryBox()}`;}
+function overview(){return cards()+valuationPanel(state.business,document.documentElement.lang)+`<div class="grid-two">${market()}<section class="box"><div class="box-head"><h2>Tu siguiente movimiento</h2></div><div class="quick"><button data-tab="deposit"><span>↓</span>Depositar</button><button data-tab="withdraw"><span>↑</span>Retirar</button><button data-tab="exchange"><span>⇄</span>Comprar / vender</button><button data-go="coins_to_inft"><span>◈</span>Canjear Coins</button></div></section></div><section class="box"><div class="box-head"><h2>Últimos movimientos</h2><button class="secondary" data-tab="history">Ver todos →</button></div>${requestsTable(state.requests.slice(0,5),true)}</section>${inventoryBox()}`;}
 function exchange(){
  const p=price(),copy=exchangeCopy(),unavailable=exchangeUnavailable(copy);
  const previousKind=$('#exchangeKind')?.value??intent.get('operation');
@@ -210,7 +214,7 @@ function withdraw(){return `<div class="grid-two">
  <button type="button" class="secondary" data-go="sell_inft">Convertir INFT a pesos →</button>
  <p class="sub">Tu historial muestra únicamente los últimos cuatro dígitos de la CLABE de destino.</p></section>
  </div>`;}
-function history(){return `<section class="box"><div class="box-head"><h2>Operaciones</h2><span class="status">${state.requests.length} registros recientes</span></div>${requestsTable(state.requests)}</section><section class="box"><h2>Libro de movimientos</h2>${state.journal.length?`<div class="table-wrap"><table><thead><tr><th>Fecha</th><th>Movimiento</th><th>Disponible</th><th>Reservado</th></tr></thead><tbody>${state.journal.map(j=>`<tr><td class="tiny muted">${esc(date(j.created_at))}</td><td>${esc(events[j.event]||j.event)}</td><td>${Number(j.delta_available)>0?'+':''}${esc(units(j.delta_available,j.asset))}</td><td>${Number(j.delta_reserved)>0?'+':''}${esc(units(j.delta_reserved,j.asset))}</td></tr>`).join('')}</tbody></table></div>`:'<div class="empty">Los movimientos de saldo aparecerán al registrar tus operaciones.</div>'}</section>`;}
+function history(){return allocationPanel(state.business,document.documentElement.lang)+ `<section class="box"><div class="box-head"><h2>Operaciones</h2><span class="status">${state.requests.length} registros recientes</span></div>${requestsTable(state.requests)}</section><section class="box"><h2>Libro de movimientos</h2>${state.journal.length?`<div class="table-wrap"><table><thead><tr><th>Fecha</th><th>Movimiento</th><th>Disponible</th><th>Reservado</th></tr></thead><tbody>${state.journal.map(j=>`<tr><td class="tiny muted">${esc(date(j.created_at))}</td><td>${esc(events[j.event]||j.event)}</td><td>${Number(j.delta_available)>0?'+':''}${esc(units(j.delta_available,j.asset))}</td><td>${Number(j.delta_reserved)>0?'+':''}${esc(units(j.delta_reserved,j.asset))}</td></tr>`).join('')}</tbody></table></div>`:'<div class="empty">Los movimientos de saldo aparecerán al registrar tus operaciones.</div>'}</section>`;}
 function security(){return `<section class="box"><h2>Protección y trazabilidad</h2><div class="security-grid"><div class="security-item"><b>Acceso con tu cuenta</b><p>Sesión verificada, permisos por cuenta y acceso exclusivo del titular a su historial.</p></div><div class="security-item"><b>Datos bancarios cifrados</b><p>CLABE de retiro cifrada con AES-256. Comprobantes privados con enlaces temporales.</p></div><div class="security-item"><b>Operaciones conciliadas</b><p>Referencias únicas, reserva de saldo y revisión de cada liquidación.</p></div><div class="security-item"><b>Huella de integridad SHA-256</b><p>Cada evento incorpora la huella del anterior en un registro inmutable de auditoría.</p></div></div></section><section class="box"><p class="eyebrow">PMC / EL LENGUAJE DE LAS PARTÍCULAS</p><h2 class="section-title">Pulsaciones con identidad.</h2><p class="sub">Los comprobantes representan su folio con puntos y rayas Morse. Esta representación visual acompaña a la huella criptográfica del registro.</p><div class="morse section-title"><small>INFYNITY EN MORSE</small>${esc(toMorse('INFYNITY'))}</div></section>`;}
 function review(){let rows=state.requests.filter(r=>filter==='all'||(filter==='pending'?['requested','quoted','review','processing'].includes(r.status):r.status===filter));if(search)rows=rows.filter(r=>(r.folio+' '+r.email).toLowerCase().includes(search.toLowerCase()));return `<div class="cards"><article class="card emphasis"><div class="label">Solicitudes en revisión</div><strong>${state.requests.filter(r=>r.status==='review').length}</strong><p class="sub">Pendientes de conciliación</p></article><article class="card"><div class="label">En proceso</div><strong>${state.requests.filter(r=>r.status==='processing').length}</strong><p class="sub">Seguimiento de liquidación</p></article><article class="card"><div class="label">Última cotización</div><strong>${price()?money(price().price_mxn):'—'} <span class="unit">MXN</span></strong><p class="sub">Por cada INFT · mesa UNIVERSHZRW</p></article></div><section class="box"><div class="box-head"><h2>Solicitudes de clientes</h2><span class="admin-badge">ADMINISTRACIÓN</span></div><div class="filter-row"><input id="requestSearch" type="search" placeholder="Buscar por folio o correo" aria-label="Buscar solicitudes" value="${esc(search)}"><select id="requestFilter" aria-label="Filtrar estado">${[['pending','En seguimiento'],['all','Todos'],['completed','Liquidadas'],['rejected','Rechazadas'],['cancelled','Canceladas']].map(([v,l])=>`<option value="${v}" ${filter===v?'selected':''}>${l}</option>`).join('')}</select></div>${rows.length?requestsTable(rows):'<div class="empty">No hay solicitudes en esta vista.</div>'}</section>`;}
 function treasury(){
@@ -240,6 +244,24 @@ async function load(){
    if(!state)$('#content').innerHTML='<section class="box empty">No se pudo actualizar tu cuenta. Pulsa Actualizar para reintentar.</section>';
   }
  }
+}
+const showsBusinessData=()=>!admin&&state&&['overview','history'].includes(tab)&&!$('#detail').open&&!document.hidden;
+let refreshingBusiness=false;
+async function refreshBusiness(){
+ if(!showsBusinessData()||refreshingBusiness)return;
+ const current=state,sequence=loadSequence;
+ refreshingBusiness=true;
+ try{
+  const business=await api('business');
+  if(state!==current||sequence!==loadSequence||!showsBusinessData())return;
+  state.business=business;
+  render();
+ }catch(e){
+  if(state===current&&sequence===loadSequence&&[401,403].includes(e.status)){
+   state=null;
+   render();
+  }
+ }finally{refreshingBusiness=false;}
 }
 function changeTab(id){if(!tabs.some(t=>t[0]===id))return;tab=id;$('#notice').hidden=true;render();$('#main').focus({preventScroll:true});window.scrollTo({top:0,behavior:'instant'});}
 const availableToExchange=asset=>asset==='COIN'?state.coins:wallet(asset).available;
@@ -399,7 +421,9 @@ if(!admin){
   void load();
  };
  window.addEventListener('uhz:session',refreshSession);
- window.addEventListener('uhz:language-change',()=>{if(state&&(tab==='overview'||tab==='exchange'&&!$('[data-form="exchange"]')?.dataset.submitting))render();});
+ window.addEventListener('uhz:language-change',()=>{if(state&&(tab==='overview'||tab==='history'||tab==='exchange'&&!$('[data-form="exchange"]')?.dataset.submitting))render();});
+ document.addEventListener('visibilitychange',()=>{if(!document.hidden)void refreshBusiness();});
+ window.setInterval(()=>{void refreshBusiness();},120000);
  window.addEventListener('pageshow',event=>{if(event.persisted)refreshSession();});
  window.addEventListener('message',event=>{
   if(event.origin===location.origin&&event.data?.type==='uhz:session')refreshSession();

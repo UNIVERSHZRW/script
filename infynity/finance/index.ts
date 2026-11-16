@@ -1,5 +1,5 @@
 import { createClient } from 'npm:@supabase/supabase-js@2.80.0';
-import { userActions, adminActions, validClabe, paymentLink, fileType, safePayload } from './core.mjs';
+import { userActions, adminActions, businessAdminActions, validClabe, paymentLink, fileType, safePayload } from './core.mjs';
 import { depositReceiver } from './deposit-order.mjs';
 
 const project=Deno.env.get('SUPABASE_URL')!;
@@ -23,6 +23,7 @@ Deno.serve(async(req)=>{
     const p=safePayload(body);
     if(p.id&&!uuid.test(p.id))throw Error('Folio inválido.');
     const rpc=async(a:string,data:any={})=>{const {data:out,error}=await sb.rpc('uhz_finance',{p_actor:user.id,p_session:session,p_action:a,p_payload:data});if(error){if(error.code==='23505')throw Error('La referencia o el comprobante ya está registrado.');if(error.code==='23514')throw Error('Revisa el importe y el saldo disponible.');if(['P0001','42501'].includes(error.code))throw Error(error.message);throw Error('No se pudo registrar la operación. Revisa los datos.');}return out;};
+    if(action==='business'||businessAdminActions.has(action))return response(await rpc(action,p));
     // Fresh DB session and owner role are checked on every request, including uploads.
     const dash=await rpc(adminActions.has(action)?'admin_dashboard':'dashboard');
     if(action==='admin_dashboard') {

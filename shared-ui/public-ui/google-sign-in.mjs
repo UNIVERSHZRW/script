@@ -96,29 +96,36 @@ export function createGoogleSignIn({origin, apiOrigin, supabaseFetch, checkedUse
 
   const buttonStyles = `
 #authArea .uhz-google-sign-in {
-  margin-block-start: 12px;
+  margin-block-start: 14px;
 }
 #authArea .uhz-google-button {
+  appearance: none;
   box-sizing: border-box;
   display: flex;
   align-items: center;
-  gap: 14px;
+  justify-content: center;
+  gap: 12px;
   width: 100%;
-  min-height: 52px;
+  min-height: 48px;
+  margin: 0;
   padding: 10px 16px;
-  border: 1px solid #747775;
-  border-radius: 8px;
-  background: #fff;
-  color: #1f1f1f;
-  font: 500 16px/1.25 "Google Sans", system-ui, sans-serif;
-  text-align: start;
+  border: 0;
+  border-radius: 10px;
+  box-shadow: none;
+  background: var(--panel2, #edf4f7);
+  background: color-mix(in srgb, var(--ink, #184c72) 7%, var(--panel, #fff));
+  color: var(--ink, #184c72);
+  font: inherit;
+  font-weight: 600;
+  line-height: 1.25;
+  text-align: center;
   cursor: pointer;
 }
 #authArea .uhz-google-button:hover:not(:disabled) {
-  background: #f8faff;
+  background: color-mix(in srgb, var(--ink, #184c72) 11%, var(--panel, #fff));
 }
 #authArea .uhz-google-button:focus-visible {
-  outline: 2px solid #1a73e8;
+  outline: 2px solid currentColor;
   outline-offset: 2px;
 }
 #authArea .uhz-google-button:disabled {
@@ -251,24 +258,35 @@ export function createGoogleSignIn({origin, apiOrigin, supabaseFetch, checkedUse
     }
   }
 
-  function addClient(request, response) {
+  async function addButtonAssets(request, response) {
     const url = new URL(request.url);
-    if (url.origin !== origin || url.pathname !== '/' || request.method !== 'GET' ||
-        !response.ok || !response.headers.get('content-type')?.startsWith('text/html')) return response;
-    const result = new HTMLRewriter()
-      .on('head style[nonce]', {
-        element(style) { style.append(buttonStyles, {html: true}); },
-      })
-      .on('head', {
-        element(head) { head.append('<script src="' + prefix + '/client.js" defer></script>', {html: true}); },
-      }).transform(response);
-    const headers = new Headers(result.headers);
+    if (url.origin !== origin || request.method !== 'GET' || !response.ok) return response;
+
+    const contentType = response.headers.get('content-type') || '';
+    let body;
+    if (url.pathname === '/upgrade.css' && contentType.startsWith('text/css')) {
+      body = (await response.text()) + buttonStyles;
+    } else if (url.pathname === '/' && contentType.startsWith('text/html')) {
+      body = new HTMLRewriter()
+        .on('link[rel="stylesheet"][href^="/upgrade.css?"]', {
+          element(link) {
+            link.setAttribute('href', link.getAttribute('href') + '&google-button=2');
+          },
+        })
+        .on('head', {
+          element(head) { head.append('<script src="' + prefix + '/client.js" defer></script>', {html: true}); },
+        }).transform(response).body;
+    } else {
+      return response;
+    }
+
+    const headers = new Headers(response.headers);
     headers.delete('content-length');
     headers.delete('etag');
-    return new Response(result.body, {status: result.status, statusText: result.statusText, headers});
+    return new Response(body, {status: response.status, statusText: response.statusText, headers});
   }
 
-  return {route, addClient};
+  return {route, addButtonAssets};
 }
 
 export const portalExport = /export\s*\{\s*community_entry_default as default\s*\};\s*$/;
@@ -280,7 +298,7 @@ export function googleSignInRuntime() {
     + 'const googlePortal = { ...community_entry_default, async fetch(req, env, ctx) {\n'
     + '  const auth = await googleSignIn.route(req, env);\n'
     + '  if (auth) return auth;\n'
-    + '  return googleSignIn.addClient(req, await community_entry_default.fetch(req, env, ctx));\n'
+    + '  return googleSignIn.addButtonAssets(req, await community_entry_default.fetch(req, env, ctx));\n'
     + '} };\nexport { googlePortal as default };\n';
 }
 

@@ -1,0 +1,362 @@
+html[data-uhz-inft-page] {
+  --inft-ice: #f4f8fa;
+  --inft-teal: #0f3d47;
+  --inft-peach: #f59e7b;
+  --inft-canvas: var(--inft-ice);
+  --inft-surface: #fff;
+  --inft-soft: #e9eef1;
+  --inft-text: var(--inft-teal);
+  --inft-muted: #4d626b;
+  --inft-line: #c7d1d6;
+  --inft-field-line: #778b94;
+  --inft-focus: var(--inft-teal);
+  --inft-chart: var(--inft-teal);
+  --inft-peach-soft: #fae7df;
+  --inft-error: #803a2b;
+  --inft-chrome: var(--inft-ice);
+  --inft-art: var(--inft-ice);
+  --inft-peach-hover: #ffb598;
+  background-color: var(--inft-canvas);
+  color-scheme: light;
+}
+
+html[data-uhz-inft-page][data-uhz-theme="dark"] {
+  --inft-canvas: #1c1c1c;
+  --inft-surface: #262626;
+  --inft-soft: #303030;
+  --inft-text: var(--inft-ice);
+  --inft-muted: #c7ccd0;
+  --inft-line: #565656;
+  --inft-field-line: #818181;
+  --inft-focus: var(--inft-peach);
+  --inft-chart: var(--inft-peach);
+  --inft-peach-soft: #513934;
+  --inft-error: #ffc7b4;
+  --inft-chrome: var(--inft-canvas);
+  --inft-art: var(--inft-surface);
+  color-scheme: dark;
+}
+
+html[data-uhz-inft-page][data-uhz-ui] {
+  --uhz-canvas: var(--inft-canvas);
+  --uhz-surface: var(--inft-surface);
+  --uhz-soft: var(--inft-soft);
+  --uhz-ink: var(--inft-text);
+  --uhz-muted: var(--inft-muted);
+  --uhz-line: var(--inft-line);
+  --uhz-action: var(--inft-chart);
+  --uhz-on-action: var(--inft-canvas);
+  --uhz-chrome: var(--inft-chrome);
+  --uhz-on-chrome: var(--inft-text);
+  --uhz-chrome-soft: var(--inft-soft);
+  --uhz-chrome-line: var(--inft-line);
+  --uhz-focus: var(--inft-focus);
+  background-color: var(--inft-canvas) !important;
+}
+
+html[data-uhz-inft-page] body {
+  --paper: var(--inft-canvas);
+  --white: var(--inft-surface);
+  --surface: var(--inft-surface);
+  --ink: var(--inft-text);
+  --muted: var(--inft-muted);
+  --line: var(--inft-line);
+  --green: var(--inft-text);
+  --green-soft: var(--inft-soft);
+  --navy: var(--inft-chrome);
+  --gold: var(--inft-peach);
+  --red: var(--inft-error);
+  --soft: var(--inft-soft);
+  background-color: var(--inft-canvas) !important;
+  color: var(--inft-text);
+  accent-color: var(--inft-chart);
+}
+
+html[data-uhz-inft-page] body :is(.button.primary, .workspace .primary, .workspace .gold) {
+  background: var(--inft-peach);
+  border-color: var(--inft-peach);
+  color: var(--inft-teal);
+}
+
+html[data-uhz-inft-page] body :is(.button.primary, .workspace .primary, .workspace .gold):hover {
+  background: var(--inft-peach-hover);
+  border-color: var(--inft-peach-hover);
+}
+
+html[data-uhz-inft-page] body :is(.button.secondary, .workspace .secondary, .row-link) {
+  background: var(--inft-surface);
+  border-color: var(--inft-field-line);
+  color: var(--inft-text);
+}
+
+html[data-uhz-inft-page] body :is(.button.secondary, .workspace .secondary, .row-link, .quick button):hover {
+  background: var(--inft-soft);
+}
+
+html[data-uhz-inft-page] body :is(a, button, summary, input, select, textarea):focus-visible {
+  outline-color: var(--inft-focus);
+}
+
+html[data-uhz-inft-page] :is(main, dialog) :is(input, select, textarea) {
+  --uhz-line: var(--inft-field-line);
+  border-color: var(--inft-field-line);
+}
+
+html[data-uhz-inft-page] body :is(#uhz-ui-desktop, #uhz-ui-mobile, .rail, .hero-art) :focus-visible {
+  outline-color: var(--inft-focus);
+}
+
+/* INFYNITY introduction, pricing and wallet. */
+html[data-uhz-inft-page="landing"][data-uhz-ui] body :is(.market-section, .security-section, .closing) {
+  background-color: var(--inft-soft) !important;
+}
+
+html[data-uhz-inft-page="landing"] body :is(.market-section, .security-section, .closing, .feature.featured,
+  .conversion-panel, .comparison .inft-col, .trade-tabs, .coins-icon) {
+  background-color: var(--inft-soft);
+  border-color: var(--inft-line);
+  color: var(--inft-text);
+}
+
+html[data-uhz-inft-page="landing"] body :is(.feature-icon, .featured .feature-icon, .verify-panel, .amount-box) {
+  background: var(--inft-surface);
+  border-color: var(--inft-line);
+}
+
+html[data-uhz-inft-page="landing"] body :is(
+  .feature-number, .bridge-arrow, .lock-icon, .chart-empty > span, .swap-icon
+) {
+  color: var(--inft-muted);
+}
+
+html[data-uhz-inft-page="landing"] body :is(
+  .pair-icon, .inft-icon, .chart-controls [aria-pressed="true"], .trade-tabs [aria-selected="true"]
+) {
+  background: var(--inft-peach);
+  border-color: var(--inft-peach);
+  color: var(--inft-teal);
+}
+
+html[data-uhz-inft-page="landing"] body :is(.mini-logo, .skip-link) {
+  background: var(--inft-peach);
+  color: var(--inft-teal);
+}
+
+html[data-uhz-inft-page="landing"] body :is(.status-dot, .status-dot.live) {
+  background: var(--inft-chart);
+  box-shadow: 0 0 0 3px var(--inft-line);
+}
+
+html[data-uhz-inft-page="landing"] body .hero-art {
+  background: var(--inft-art);
+  box-shadow: inset 0 0 0 1px var(--inft-line);
+  color: var(--inft-text);
+}
+
+html[data-uhz-inft-page="landing"] body :is(.art-corner, .art-bottom small, .coin-toggle) {
+  color: var(--inft-muted);
+}
+
+html[data-uhz-inft-page="landing"] body .coin-toggle {
+  background: var(--inft-surface);
+  border-color: var(--inft-field-line);
+}
+
+html[data-uhz-inft-page="landing"] body .coin-toggle:hover {
+  background: var(--inft-soft);
+}
+
+html[data-uhz-inft-page="landing"] body .evaluation-section {
+  background: var(--inft-canvas);
+  color: var(--inft-text);
+}
+
+html[data-uhz-inft-page="landing"] body .evaluation-section :is(h2, strong) {
+  color: var(--inft-text);
+}
+
+html[data-uhz-inft-page="landing"] body .evaluation-section :is(p, .evaluation-note) {
+  color: var(--inft-muted);
+}
+
+html[data-uhz-inft-page="landing"] body .evaluation-section :is(.eyebrow, .evaluation-grid > article > span),
+html[data-uhz-inft-page="landing"] .evaluation-note span::before {
+  color: var(--inft-chart);
+}
+
+html[data-uhz-inft-page="landing"] body :is(.evaluation-grid > article, .evaluation-note) {
+  border-color: var(--inft-line);
+}
+
+html[data-uhz-inft-page="landing"] body :is(.closing-infinity, .chart-empty) {
+  color: var(--inft-text);
+}
+
+html[data-uhz-inft-page="landing"] body .closing-infinity {
+  opacity: .07;
+}
+
+html[data-uhz-inft-page="landing"] body .chart-empty {
+  background: var(--inft-surface);
+}
+
+html[data-uhz-inft-page="landing"] body .form-status.error {
+  color: var(--inft-error);
+}
+
+html[data-uhz-inft-page="landing"] #inftWalletPicker,
+html[data-uhz-inft-page="panel"] dialog {
+  background: var(--inft-surface);
+  border-color: var(--inft-line);
+  color: var(--inft-text);
+}
+
+html[data-uhz-inft-page="landing"] #inftWalletPicker p {
+  color: var(--inft-muted);
+}
+
+html[data-uhz-inft-page="landing"] #inftWalletPicker :is(.inft-wallet-provider, .inft-wallet-cancel) {
+  background: var(--inft-soft);
+  border-color: var(--inft-field-line);
+  color: var(--inft-text);
+}
+
+html[data-uhz-inft-page="landing"] #inftWalletPicker .inft-wallet-provider:hover {
+  background: var(--inft-peach);
+  border-color: var(--inft-peach);
+  color: var(--inft-teal);
+}
+
+html[data-uhz-inft-page="landing"] #inftWalletPicker button:focus-visible {
+  outline-color: var(--inft-focus);
+}
+
+/* Customer account, including states rendered after sign-in. */
+html[data-uhz-inft-page="panel"] body :is(.workspace, main) {
+  background-color: var(--inft-canvas) !important;
+}
+
+html[data-uhz-inft-page="panel"] body .login {
+  background: var(--inft-surface) !important;
+  border-color: var(--inft-line) !important;
+}
+
+html[data-uhz-inft-page="panel"] .login-art {
+  background: var(--inft-art) !important;
+}
+
+/* Use the existing official art and show the two stamped faces over the page's backdrop. */
+html[data-uhz-inft-page="panel"] .login-art::before {
+  --inft-coin-mask: radial-gradient(ellipse 24.2% 33.2% at 25% 44.8%, #000 99%, transparent),
+    radial-gradient(ellipse 24.2% 33.2% at 73.3% 44.8%, #000 99%, transparent);
+  inset: 50% auto auto 50%;
+  width: min(100%, 34rem);
+  aspect-ratio: 1447 / 1087;
+  transform: translate(-50%, -49%);
+  background: url('/criptomoneda/assets/moneda.webp') center / 100% 100% no-repeat;
+  -webkit-mask-image: var(--inft-coin-mask);
+  mask-image: var(--inft-coin-mask);
+}
+
+html[data-uhz-inft-page="panel"] .login-art > small {
+  background: var(--inft-canvas);
+  color: var(--inft-text) !important;
+  text-shadow: none;
+}
+
+html[data-uhz-inft-page="panel"] .workspace :is(.rail, .morse) {
+  background: var(--inft-chrome);
+  color: var(--inft-text);
+}
+
+html[data-uhz-inft-page="panel"] #main .card.emphasis {
+  background: var(--inft-soft) !important;
+  border-color: var(--inft-line) !important;
+  color: var(--inft-text) !important;
+}
+
+html[data-uhz-inft-page="panel"] :is(.rail-label, .identity small, .rail-bottom, .card.emphasis .label, .card.emphasis .sub, .morse small) {
+  color: var(--inft-muted);
+}
+
+html[data-uhz-inft-page="panel"] .rail nav button {
+  color: var(--inft-text);
+}
+
+html[data-uhz-inft-page="panel"] .rail nav button:hover {
+  background: var(--inft-soft);
+}
+
+html[data-uhz-inft-page="panel"] .rail nav button span {
+  color: inherit;
+}
+
+html[data-uhz-inft-page="panel"] .rail nav button.active {
+  background: var(--inft-peach);
+  box-shadow: none;
+  color: var(--inft-teal);
+}
+
+html[data-uhz-inft-page="panel"] :is(.rail-bottom a, .card.emphasis .coin-icon) {
+  color: var(--inft-chart);
+}
+
+html[data-uhz-inft-page="panel"] .symbol {
+  background: var(--inft-peach);
+  border-color: var(--inft-peach);
+  color: var(--inft-teal);
+}
+
+html[data-uhz-inft-page="panel"] .pulse-dot {
+  background: var(--inft-peach);
+  box-shadow: 0 0 0 5px #f59e7b22;
+}
+
+html[data-uhz-inft-page="panel"] :is(.eyebrow, .quick button span, .coin-icon, .login-path),
+html[data-uhz-inft-page="panel"] .steps li::before {
+  color: var(--inft-text);
+}
+
+html[data-uhz-inft-page="panel"] :is(.reason, .quote-preview, .bank-data, .wallet-address, .quick button, .ghost, .status, .change),
+html[data-uhz-inft-page="panel"] #notice {
+  background: var(--inft-soft);
+  color: var(--inft-text);
+}
+
+html[data-uhz-inft-page="panel"] :is(#notice, .mini-row, td),
+html[data-uhz-inft-page="panel"] .steps li::before {
+  border-color: var(--inft-line);
+}
+
+html[data-uhz-inft-page="panel"] :is(.status.review, .status.processing) {
+  background: var(--inft-peach);
+  color: var(--inft-teal);
+}
+
+html[data-uhz-inft-page="panel"] :is(.status.rejected, .status.cancelled, .change.down),
+html[data-uhz-inft-page="panel"] #notice.error {
+  background: var(--inft-peach-soft);
+  border-color: var(--inft-error);
+  color: var(--inft-error);
+}
+
+html[data-uhz-inft-page="panel"] .chart-empty {
+  background: linear-gradient(transparent calc(100% - 1px), var(--inft-line) 0) 0 0 / 100% 40px;
+}
+
+html[data-uhz-inft-page="panel"] :is(.chart-empty b, .workspace footer) {
+  color: var(--inft-muted);
+}
+
+/* SVG colors are presentation attributes in the existing market code. */
+html[data-uhz-inft-page] :is(#chart-line-path, .chart path[vector-effect="non-scaling-stroke"]) {
+  stroke: var(--inft-chart);
+}
+
+html[data-uhz-inft-page] :is(#chart-fill, .chart #shade) stop {
+  stop-color: var(--inft-peach);
+}
+
+html[data-uhz-inft-page] .chart path[stroke-dasharray] {
+  stroke: var(--inft-line);
+}

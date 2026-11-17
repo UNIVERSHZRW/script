@@ -8,27 +8,32 @@ The portal uses the existing UNIVERSHZRW cookie session and the `uhz-inft-wallet
 ## Operation
 
 1. In administration, register the actual receiving bank account, holder and CLABE. The checksum is validated.
-2. Register the actual INFT token contract and treasury address on Polygon. The server checks the contract decimals. This application does not issue a token or create liquidity.
+2. INFYNITY is an internal balance tied to the verified UNIVERSHZRW account. The ledger caps assigned and committed units at 10,000,000 INFT.
 3. Publish a reference quote in MXN and Coins, including the reason for the quote. Published quotes are immutable and attributed to Mesa UNIVERSHZRW; they are not presented as independent exchange prices.
 4. Customers submit deposit requests and privately upload evidence. The owner verifies the actual bank/checkout receipt and records its unique external reference before crediting a balance. Card requests use an official hosted Mercado Pago payment link assigned to that individual request.
-5. Withdrawals reserve an existing balance. The owner executes the payment outside this application, then records the matching transfer reference or INFT transaction hash. The application does not initiate bank or blockchain transfers.
-6. Customers explicitly confirm an exchange quote, valid for ten minutes, before origin funds are reserved. Settlement checks the actual on-chain INFT reserve and registered cash reserve. Coins debits use the existing Coins ledger and existing content-spend lock. The per-request Coins limit is 1,000 in either direction.
+5. MXN withdrawals reserve an existing balance. The owner records the bank transfer reference after executing the payment. Customers can convert INFT to MXN in the panel before requesting a withdrawal.
+6. Customers explicitly confirm an exchange quote, valid for ten minutes, before origin funds are reserved. Confirmation and settlement enforce the internal INFT inventory and reconciled MXN reserve. Coins debits use the existing Coins ledger and existing content-spend lock. The per-request Coins limit is 1,000 in either direction.
 
 ## Security and accounting
 
+The customer overview computes the estimated MXN value of the account’s total INFT balance from the latest published business valuation. The business valuation uses the same versioned operating metrics and model as `/inversionistas`. Amounts and changes are calculated in Postgres, compared against the prior real cut and refreshed while the customer views the summary or movements. The valuation is informational and does not post MXN or INFT to the wallet.
+
+In owner administration, use INFYNITY → Cotizaciones to register the documented unit base and, when applicable, the documented percentage of net margin for allocation estimates. A reconciled Coins or plan payment is recorded once per provider reference. The estimate deducts actual costs, snapshots each eligible account’s whole INFT, and shows the corresponding share in Movimientos. Reversals preserve the evidence and remove the amount from the estimate. This reporting flow uses reconciled receipts and does not activate a checkout or execute a payout.
+
 - No example funds, artificial price history, investment-return promises or simulated confirmations are stored in production.
 - Available and reserved amounts use PostgreSQL fixed precision. Balance and reserve mutations are serialized in one database transaction, with shared Coins locking and nonnegative constraints.
-- Payment references and crypto transaction hashes are unique. A completed request is idempotent; cancellation/rejection refunds at most once.
+- Payment references are unique. A completed request is idempotent; cancellation/rejection refunds at most once.
 - Private receipt bucket; signed uploads, verified file signatures, 2 MB limit, server-computed SHA-256 and short-lived download links.
 - Payout instructions use pgcrypto AES-256 with a server-only key in Supabase Vault. Customer responses expose only the last four CLABE digits. Owner reads are audited.
-- Wallet ownership uses a five-minute, one-use, account-bound signed challenge. INFT deposits must originate from that linked address; withdrawals must be received by it. Polygon receipts must be successful, canonical, at least 128 blocks deep and match the configured contract, source, destination and exact amount. Both confirmed and current treasury balances are considered.
 - Financial journals, published quotes, settled proof references and hash-chained audit entries reject updates and deletes.
 - PMC/Morse represents the receipt folio. Cryptographic integrity uses SHA-256 and standard encryption; Morse is not described as encryption or quantum security.
 - Existing account controls, verified email, password-reset restrictions and live DB session revocation apply to every financial action.
 
 ## Deployment and validation
 
-Apply `schema.sql` as one Supabase migration, deploy `index.ts` plus `core.mjs` as `uhz-inft-wallet` with JWT verification enabled, publish `dist/worker.mjs` as `univershzrw-inft-panel`, and route `/criptomoneda/panel*` on apex/www plus `/inft*` on the admin hostname to it. The existing account proxy must allow that Edge Function while rejecting `admin_*` actions on the customer hostname.
+For SPEI deposits, save the receiving bank, account holder and 18-digit CLABE under INFYNITY → Configuración financiera in the owner console. Cargar SPEI existente fills the form with the receiving account configured in Supabase. Review the destination and select Guardar configuración to apply it to INFYNITY. Generar factura SPEI creates a request and opens its deposit details. Customers can reopen a pending transfer with Ver factura in Movimientos. Descargar factura becomes available when the receiving account is configured. The deposit order lists the amount and the folio to use as the payment description. The portal generates the PDF locally with [jsPDF](https://github.com/parallax/jsPDF) and keeps the bank receipt upload as a separate step.
+
+For a fresh database, apply `schema.sql` and then `migrations/20261115_internal_inft.sql`. In the project with `public.uhz_valuation_snapshots`, apply `migrations/20261115_inft_business_reference.sql` after the internal balance migration. Deploy `index.ts` with `core.mjs` and `deposit-order.mjs` as `uhz-inft-wallet` with JWT verification enabled, and publish the [panel Worker packaged with the public palette](../website/README.md) as `univershzrw-inft-panel`. Route `/criptomoneda/panel*` on apex/www plus `/inft*` on the admin hostname to it. The existing account proxy must allow that Edge Function while rejecting `admin_*` actions on the customer hostname.
 
 `npm test` runs isolated PostgreSQL/PGlite scenarios covering permissions, ownership, session revocation, duplicate receipts, idempotent requests, insufficient funds, encrypted payout details, quote confirmation, reserve coverage, Coins refunds and immutability. No financial fixture is inserted in the live database. `npm run build` validates syntax and packages the static financial portal. Install development tools locally or set `PGLITE_ROOT` and `ESBUILD_PATH` to available installations.
 

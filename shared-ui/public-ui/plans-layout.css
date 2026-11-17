@@ -1,0 +1,543 @@
+:root {
+  scroll-padding-top: 88px;
+}
+
+body {
+  margin: 0;
+  background: var(--uhz-canvas, #eff8f5);
+  color: var(--uhz-ink, #002941);
+}
+
+#contenido-principal.uhz-plans {
+  --plans-ink: var(--uhz-ink, #002941);
+  --plans-muted: var(--uhz-muted, #42616f);
+  --plans-surface: var(--uhz-surface, #fff);
+  --plans-soft: var(--uhz-soft, #e3f1ed);
+  --plans-line: var(--uhz-line, #a5c4bc);
+  --plans-action: var(--uhz-action, #006079);
+  --plans-on-action: var(--uhz-on-action, #fff);
+  --plans-focus: var(--uhz-focus, #007884);
+  --plans-highlight: color-mix(in srgb, var(--plans-surface) 91%, var(--plans-action));
+  --plans-radius: 16px;
+  --plans-gap: clamp(12px, 2vw, 22px);
+  box-sizing: border-box;
+  width: min(100%, 1220px);
+  margin-inline: auto;
+  padding: clamp(28px, 5vw, 60px) clamp(16px, 4vw, 48px) clamp(48px, 8vw, 96px);
+  color: var(--plans-ink);
+  font: 400 1rem/1.55 Inter, system-ui, sans-serif;
+}
+
+.uhz-plans *,
+.uhz-plans *::before,
+.uhz-plans *::after {
+  box-sizing: border-box;
+}
+
+.uhz-plans [hidden],
+html:lang(en) .uhz-plans .plans-copy > [lang="es-MX"],
+html:not(:lang(en)) .uhz-plans .plans-copy > [lang="en"] {
+  display: none;
+}
+
+.uhz-plans .plans-sr-only {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  padding: 0;
+  margin: -1px;
+  overflow: hidden;
+  clip-path: inset(50%);
+  white-space: nowrap;
+}
+
+.uhz-plans :is(h1, h2, h3, p, dl, dd, ul, ol) {
+  margin: 0;
+}
+
+.uhz-plans p {
+  color: var(--plans-muted);
+}
+
+.uhz-plans h1 {
+  color: var(--plans-ink);
+  font-size: clamp(2.5rem, 6vw, 4.5rem);
+  line-height: 1.04;
+  letter-spacing: -.055em;
+  font-weight: 780;
+}
+
+.uhz-plans h2 {
+  font-size: clamp(1.45rem, 2.8vw, 2rem);
+  line-height: 1.2;
+  letter-spacing: -.028em;
+}
+
+.uhz-plans h3 {
+  font-size: clamp(1.15rem, 2vw, 1.5rem);
+  line-height: 1.25;
+  letter-spacing: -.025em;
+}
+
+.uhz-plans :is(a, button, summary, input):focus-visible {
+  outline: 2px solid var(--plans-focus);
+  outline-offset: 4px;
+}
+
+.uhz-plans .plans-header {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) minmax(290px, 350px);
+  align-items: center;
+  gap: clamp(22px, 5vw, 64px);
+}
+
+.uhz-plans .plans-intro p {
+  max-width: 50ch;
+  margin-block-start: 16px;
+  font-size: clamp(1rem, 1.8vw, 1.16rem);
+}
+
+.uhz-plans .plans-account {
+  min-width: 0;
+  padding: 18px 20px;
+  background: var(--plans-surface);
+  border: 1px solid var(--plans-line);
+  border-radius: var(--plans-radius);
+}
+
+.uhz-plans .plans-account h2 {
+  font-size: 1.05rem;
+  letter-spacing: -.015em;
+}
+
+.uhz-plans .plans-account dl {
+  display: grid;
+  grid-template-columns: minmax(0, 3fr) minmax(0, 2fr);
+  gap: 10px 15px;
+  margin-block: 14px 9px;
+}
+
+.uhz-plans dt {
+  color: var(--plans-muted);
+  font-size: .82rem;
+  font-weight: 550;
+}
+
+.uhz-plans dd {
+  margin-block-start: 3px;
+  color: var(--plans-ink);
+  font-weight: 700;
+  overflow-wrap: anywhere;
+}
+
+.uhz-plans .plans-account dd {
+  font-size: .92rem;
+}
+
+.uhz-plans .plans-account #balance,
+.uhz-plans .plans-history > strong,
+.uhz-plans .plans-simulator dd {
+  font-variant-numeric: tabular-nums;
+}
+
+.uhz-plans .plans-link {
+  display: inline-block;
+  padding-block: 6px;
+  color: var(--plans-action);
+  font-size: .94rem;
+  font-weight: 680;
+  text-underline-offset: .23em;
+}
+
+.uhz-plans .plans-jump {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 2px clamp(14px, 3vw, 30px);
+  margin-block-start: clamp(16px, 4vw, 32px);
+  padding-block: 4px;
+  border-block: 1px solid var(--plans-line);
+}
+
+.uhz-plans .plans-jump a {
+  display: inline-flex;
+  align-items: center;
+  min-height: 40px;
+  color: var(--plans-action);
+  font-size: .92rem;
+  font-weight: 660;
+  text-decoration: none;
+  text-underline-offset: .24em;
+}
+
+.uhz-plans .plans-jump a:hover {
+  text-decoration: underline;
+}
+
+.uhz-plans .plans-section {
+  margin-block-start: clamp(36px, 6vw, 68px);
+}
+
+.uhz-plans #membresias {
+  margin-block-start: clamp(26px, 4vw, 40px);
+}
+
+.uhz-plans .plans-section > h2 {
+  margin-block-end: 16px;
+}
+
+.uhz-plans .plans-grid {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: var(--plans-gap);
+}
+
+.uhz-plans .plans-card {
+  min-width: 0;
+  padding: clamp(18px, 3vw, 32px);
+  background: var(--plans-surface);
+  border: 1px solid var(--plans-line);
+  border-radius: var(--plans-radius);
+}
+
+.uhz-plans .plans-membership {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  border-block-start: 3px solid var(--plans-line);
+}
+
+.uhz-plans .plans-premium {
+  background: var(--plans-highlight);
+  border-block-start-color: var(--plans-action);
+}
+
+.uhz-plans .plans-price {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: baseline;
+  gap: 4px 9px;
+  margin-block: 10px 12px;
+}
+
+.uhz-plans .plans-price strong {
+  color: var(--plans-ink);
+  font-size: clamp(2.15rem, 4.5vw, 3.2rem);
+  line-height: 1.05;
+  font-weight: 760;
+  letter-spacing: -.045em;
+  font-variant-numeric: tabular-nums;
+}
+
+.uhz-plans .plans-price small {
+  color: var(--plans-muted);
+  font-size: .875rem;
+}
+
+.uhz-plans .plans-benefits {
+  display: grid;
+  gap: 10px;
+  width: 100%;
+  padding: 0;
+  list-style: none;
+}
+
+.uhz-plans .plans-membership .plans-benefits {
+  margin-block: 18px 24px;
+  padding-block-start: 16px;
+  border-block-start: 1px solid var(--plans-line);
+}
+
+.uhz-plans .plans-benefits li {
+  position: relative;
+  padding-inline-start: 23px;
+  color: var(--plans-ink);
+  font-size: .94rem;
+}
+
+.uhz-plans .plans-benefits li::before {
+  content: "";
+  position: absolute;
+  inset: .38em auto auto 3px;
+  width: 7px;
+  height: 10px;
+  border: solid var(--plans-action);
+  border-width: 0 2px 2px 0;
+  transform: rotate(45deg);
+}
+
+.uhz-plans .plans-button {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  min-height: 44px;
+  max-width: 100%;
+  padding: 9px 16px;
+  border: 1px solid var(--plans-action);
+  border-radius: 9px;
+  background: var(--plans-surface);
+  color: var(--plans-action);
+  font-size: .94rem;
+  font-weight: 690;
+  text-align: center;
+  text-decoration: none;
+}
+
+.uhz-plans .plans-button:hover {
+  background: var(--plans-soft);
+}
+
+.uhz-plans .plans-membership > .plans-button {
+  margin-block-start: auto;
+}
+
+.uhz-plans .plans-button-primary {
+  background: var(--plans-action);
+  color: var(--plans-on-action);
+}
+
+.uhz-plans .plans-button-primary:hover {
+  background: color-mix(in srgb, var(--plans-action) 87%, var(--plans-surface));
+}
+
+.uhz-plans .plans-table {
+  overflow: hidden;
+  border: 1px solid var(--plans-line);
+  border-radius: var(--plans-radius);
+  background: var(--plans-surface);
+}
+
+.uhz-plans table {
+  width: 100%;
+  border-collapse: collapse;
+  table-layout: fixed;
+  color: var(--plans-ink);
+}
+
+.uhz-plans :is(th, td) {
+  padding: 11px clamp(7px, 2vw, 20px);
+  text-align: start;
+  vertical-align: middle;
+  overflow-wrap: anywhere;
+}
+
+.uhz-plans thead th {
+  background: var(--plans-soft);
+  color: var(--plans-ink);
+}
+
+.uhz-plans thead th:first-child {
+  width: 46%;
+}
+
+.uhz-plans tbody tr + tr {
+  border-block-start: 1px solid var(--plans-line);
+}
+
+.uhz-plans tbody th {
+  font-weight: 620;
+}
+
+.uhz-plans tbody td {
+  color: var(--plans-muted);
+}
+
+.uhz-plans .plans-coins {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) auto;
+  align-items: center;
+  gap: var(--plans-gap);
+}
+
+.uhz-plans .plans-disclosure {
+  margin-block-start: 10px;
+  border: 1px solid var(--plans-line);
+  border-radius: 12px;
+  background: var(--plans-surface);
+}
+
+.uhz-plans :is(.plans-table, .plans-coins) + .plans-disclosure {
+  margin-block-start: 14px;
+}
+
+.uhz-plans .plans-disclosure > summary {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+  min-height: 49px;
+  padding: 10px clamp(14px, 2vw, 22px);
+  border-radius: 11px;
+  color: var(--plans-ink);
+  font-weight: 660;
+  cursor: pointer;
+  list-style: none;
+}
+
+.uhz-plans .plans-disclosure > summary::-webkit-details-marker {
+  display: none;
+}
+
+.uhz-plans .plans-disclosure > summary:hover,
+.uhz-plans .plans-disclosure[open] > summary {
+  background: var(--plans-soft);
+}
+
+.uhz-plans .plans-disclosure > summary::after {
+  content: "";
+  flex: 0 0 8px;
+  width: 8px;
+  height: 8px;
+  margin-inline-end: 4px;
+  border: solid var(--plans-action);
+  border-width: 0 2px 2px 0;
+  transform: translateY(-2px) rotate(45deg);
+}
+
+.uhz-plans .plans-disclosure[open] > summary::after {
+  transform: translateY(2px) rotate(225deg);
+}
+
+.uhz-plans .plans-disclosure-content {
+  padding: clamp(14px, 2vw, 22px);
+}
+
+.uhz-plans .plans-disclosure-content > .plans-link {
+  margin: 8px 16px 0 0;
+}
+
+.uhz-plans .plans-disclosure-content .plans-card {
+  padding: clamp(14px, 2vw, 22px);
+}
+
+.uhz-plans .plans-note {
+  color: var(--plans-muted);
+  font-size: .875rem;
+}
+
+.uhz-plans .plans-packages {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: clamp(6px, 1.5vw, 14px);
+  margin-block: 14px;
+}
+
+.uhz-plans :is(.plans-package, .plans-coin-estimate input) {
+  border: 1px solid var(--plans-line);
+  border-radius: 9px;
+  background: var(--plans-surface);
+  color: var(--plans-ink);
+  font: inherit;
+}
+
+.uhz-plans .plans-package {
+  display: grid;
+  justify-items: start;
+  gap: 3px;
+  min-height: 64px;
+  padding: 8px clamp(7px, 1.5vw, 14px);
+  text-align: start;
+  cursor: pointer;
+}
+
+.uhz-plans .plans-package:hover {
+  background: var(--plans-soft);
+}
+
+.uhz-plans .plans-package.selected {
+  border-color: var(--plans-action);
+  background: var(--plans-highlight);
+  box-shadow: inset 0 0 0 1px var(--plans-action);
+}
+
+.uhz-plans .plans-package span {
+  color: var(--plans-muted);
+  font-size: .83rem;
+}
+
+.uhz-plans .plans-coin-estimate {
+  display: grid;
+  gap: 6px;
+  justify-items: start;
+}
+
+.uhz-plans .plans-coin-estimate label,
+.uhz-plans .plans-simulator label {
+  font-weight: 650;
+}
+
+.uhz-plans .plans-coin-estimate input {
+  width: min(100%, 10rem);
+  min-height: 44px;
+  padding: 6px 10px;
+}
+
+.uhz-plans .plans-history > strong {
+  display: block;
+  margin-block: 7px;
+  color: var(--plans-action);
+  font-size: 1.4rem;
+}
+
+.uhz-plans .plans-history ol {
+  display: grid;
+  gap: 5px;
+  padding-inline-start: 20px;
+  color: var(--plans-muted);
+  font-size: .92rem;
+  overflow-wrap: anywhere;
+}
+
+.uhz-plans .plans-simulator {
+  max-width: 650px;
+  margin-block-start: 16px;
+  padding: clamp(14px, 2vw, 20px);
+  border-radius: 10px;
+  background: var(--plans-soft);
+}
+
+.uhz-plans .plans-simulator input {
+  display: block;
+  width: 100%;
+  margin: 12px 0;
+  accent-color: var(--plans-action);
+}
+
+.uhz-plans .plans-simulator dl {
+  margin-block-end: 10px;
+}
+
+@media (max-width: 720px) {
+  :root {
+    scroll-padding-top: 18px;
+  }
+
+  .uhz-plans .plans-header,
+  .uhz-plans .plans-grid,
+  .uhz-plans .plans-coins {
+    grid-template-columns: minmax(0, 1fr);
+  }
+
+  .uhz-plans .plans-simulator dl {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+
+  .uhz-plans .plans-jump a {
+    min-height: 36px;
+    font-size: .875rem;
+  }
+
+  .uhz-plans table {
+    font-size: .86rem;
+    line-height: 1.4;
+  }
+
+  .uhz-plans .plans-button {
+    width: 100%;
+  }
+}
+
+@media (max-width: 370px) {
+  .uhz-plans .plans-package strong {
+    font-size: .9rem;
+  }
+}

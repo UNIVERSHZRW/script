@@ -10,6 +10,14 @@ At widths up to 800px the header is 66px tall with branding, notifications, acco
 
 The response revision is `x-uhz-mobile-menu: compact-20261107`. Existing versioned script URLs and `?asset=app-shell` remain supported and use no-store caching. Crypto and newly linked homepage shell styles use a mobile media query to preserve desktop presentation.
 
+## Google sign-in
+
+`public-ui/google-sign-in.mjs` extends the existing `univershzrw-comunidad` account Worker. The login and registration forms display the button when Supabase reports Google enabled. The callback uses PKCE and the portal's existing secure session cookies and account checks.
+
+Set the Supabase Google provider with a Google OAuth Web client. Register `https://kgqkszlennwhlyngktcc.supabase.co/auth/v1/callback` in Google, and allow `https://univershzrw.com/_uhz/portal/google/callback` in the Supabase URL configuration. Keep the client secret in Supabase Auth settings.
+
+`node --test shared-ui/public-ui/google-sign-in.test.mjs` tests the server flow. `prepareGoogleSignIn` patches the current unmodified account Worker export before publishing through the script content API.
+
 ## Validation
 
 Syntax checks passed for the header and both Worker modules. Request checks confirmed legacy/versioned asset routes, MIME handling, HEAD without body, unsupported methods, and unchanged upstream passthrough.

@@ -1,6 +1,7 @@
 import {readFile,writeFile,mkdir} from 'node:fs/promises';
 import {createRequire} from 'node:module';
 import {createHash} from 'node:crypto';
+import { repairAccountEndpoints } from '../../shared-ui/public-ui/repair-account-endpoints.mjs';
 const require=createRequire(import.meta.url);
 const esbuild=require(process.env.ESBUILD_PATH||'esbuild');
 const acorn=require('acorn');
@@ -36,7 +37,7 @@ primary=change(primary,"html=html.replace('</head>','<link rel=\"stylesheet\" hr
 primary=primary.replaceAll("connect-src 'self'; frame-src 'self'; object-src 'none'; base-uri 'self'; form-action 'self'; frame-ancestors 'self'", "connect-src 'self' https://kgqkszlennwhlyngktcc.storage.supabase.co https://kgqkszlennwhlyngktcc.supabase.co; frame-src 'self'; object-src 'none'; base-uri 'self'; form-action 'self'; frame-ancestors 'self'");
 primary=primary.replaceAll("connect-src 'self';", "connect-src 'self' https://kgqkszlennwhlyngktcc.storage.supabase.co https://kgqkszlennwhlyngktcc.supabase.co;");
 await writeFile('dist/univershzrw-admin.mjs',primary);
-let proxy=await read('original/univershzrw-comunidad.mjs');
+let proxy=repairAccountEndpoints(await read('original/univershzrw-comunidad.mjs'));
 proxy="const ownerIdentityUser=u=>!!u&&String(u.email||'').toLowerCase()==='univershzrw@gmail.com'&&u.uhz_status?.role==='superadmin';\nconst ownerUser=u=>ownerIdentityUser(u)&&!u.uhz_status?.must_change_password;\n"+proxy;
 proxy=proxy.replaceAll('limited(env.WRITE_LIMIT,','limited(env.WRITE_LIMIT||env.API_LIMIT,');
 proxy=proxy.replaceAll("s.u.uhz_status?.role!=='superadmin'","!ownerUser(s.u)").replaceAll("u.uhz_status?.role!=='superadmin'","!ownerUser(u)").replaceAll("session.u?.uhz_status?.role!=='superadmin'","!ownerUser(session.u)");

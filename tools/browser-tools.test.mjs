@@ -11,12 +11,13 @@ test('serves tools page with five functional sections',async()=>{
  for(const section of ['panel-enlaces','panel-qr','panel-imagenes','panel-seo','panel-meta'])assert.ok(html.includes(section),section);
  assert.match(html,/Herramientas gratuitas/);
 });
-test('only same-origin scripts and no outbound browser connections',async()=>{
+test('permits shared same-origin assets and blocks off-site connections and forms',async()=>{
  const r=await worker.fetch(new Request(url('/herramientas')));
  const csp=r.headers.get('content-security-policy');
- assert.match(csp,/script-src 'self'/);
- assert.match(csp,/connect-src 'none'/);
- assert.match(csp,/form-action 'none'/);
+ const directives=new Map(csp.split(';').map(part=>part.trim().split(/\s+/)).map(([name,...values])=>[name,values]));
+ assert.deepEqual(directives.get('script-src'),["'self'"]);
+ assert.deepEqual(directives.get('connect-src'),["'self'"]);
+ assert.deepEqual(directives.get('form-action'),["'none'"]);
 });
 test('browser processing code has no upload endpoint',async()=>{
  const r=await worker.fetch(new Request(url('/herramientas/app.js')));

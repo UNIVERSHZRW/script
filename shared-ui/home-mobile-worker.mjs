@@ -1,3 +1,47 @@
+function removeLibraryListingLinks(source) {
+  return source
+    .replace(/(?: \/ )?<a href=(\\*)"\/biblioteca\/?\1"[^<>]*>[^<>]*<\/a>/g, '')
+    .replace(/\{label:(\\*)(['"])Biblioteca\1\2,path:\1\2\/biblioteca\1\2,group:\1\2Explorar\1\2\},/g, '')
+    .replace(/\[(\\*)(['"])Biblioteca\1\2,\1\2\/biblioteca\1\2\],/g, '')
+    .replace(/const library=document\.getElementById\('publicaciones'\);if\(library&&!library\.querySelector\('\.uhz-ed-library-link'\)\)\{const p=document\.createElement\('p'\);p\.className='uhz-ed-library-link';const a=document\.createElement\('a'\);a\.href='\/biblioteca';a\.textContent='[^']*';p\.append\(a\);library\.append\(p\);\}/g, '')
+    .replace(/const o=document\.getElementById\("publicaciones"\);if\(o&&!o\.querySelector\("\.uhz-ed-library-link"\)\)\{const e=document\.createElement\("p"\);e\.className="uhz-ed-library-link";const a=document\.createElement\("a"\);a\.href="\/biblioteca",a\.textContent="[^"]*",e\.append\(a\),o\.append\(e\)\}/g, '')
+    .replaceAll('<url><loc>https://univershzrw.com/biblioteca</loc></url>', '');
+}
+
+async function handleRetiredLibraryRequest(request, env) {
+  const url = new URL(request.url);
+  let page = url.pathname;
+  if (page === '/_uhz/page') {
+    page = url.searchParams.get('_uhz_path') || '';
+    try { page = decodeURIComponent(page); } catch {}
+  }
+
+  if (/^\/biblioteca\/?$/.test(page)) {
+    return new Response(request.method === 'HEAD' ? null : 'Esta página ya no está disponible.', {
+      status: 410,
+      headers: {
+        'content-type': 'text/plain; charset=utf-8',
+        'cache-control': 'no-store',
+        'x-content-type-options': 'nosniff',
+      },
+    });
+  }
+
+  const editorialScript = /^\/_uhz\/build\/site-enterprise-[0-9a-f]+\.js$/.test(url.pathname);
+  const sitemap = url.pathname === '/sitemap-pages.xml';
+  if (!(editorialScript || sitemap) || !['GET', 'HEAD'].includes(request.method)) return null;
+
+  const original = await env.ORIGINAL_SITE.fetch(request);
+  const type = original.headers.get('content-type') || '';
+  if (!original.ok || !(editorialScript ? /javascript/i.test(type) : /xml/i.test(type))) return original;
+
+  const headers = new Headers(original.headers);
+  for (const name of ['content-length', 'content-encoding', 'etag', 'last-modified']) headers.delete(name);
+  headers.set('cache-control', 'no-store');
+  const body = request.method === 'HEAD' ? null : removeLibraryListingLinks(await original.text());
+  return new Response(body, {status: original.status, statusText: original.statusText, headers});
+}
+
 const homeEditorialStyles = `
 html body #publicaciones.publications-wide,
 html body #uso-responsable.compliance-wide {
@@ -330,10 +374,19 @@ export default {async fetch(req,env){
  if (url.pathname === '/_uhz/uhz-home-app.css' && url.searchParams.get('editorial') === '1') {
    return asset(req, homeEditorialStyles, 'text/css');
  }
+ const libraryResponse = await handleRetiredLibraryRequest(req, env);
+ if (libraryResponse) return libraryResponse;
  if(url.pathname==='/_uhz/uhz-home-app.css')return url.searchParams.has('script')?asset(req,script,'application/javascript'):asset(req,css,'text/css');
  const original=await env.ORIGINAL_SITE.fetch(req);
  if(!['/','/index.html'].includes(url.pathname)||!original.headers.get('content-type')?.includes('text/html'))return original;
  const page=new HTMLRewriter()
+   .on('script[src^="/_uhz/build/site-enterprise-"]', {
+     element(script) {
+       const asset = new URL(script.getAttribute('src'), url);
+       asset.searchParams.set('v', 'sin-biblioteca');
+       script.setAttribute('src', asset.pathname + asset.search + asset.hash);
+     }
+   })
    .on('head', {
      element(head) {
        head.append('<link rel="stylesheet" href="/_uhz/uhz-home-app.css?editorial=1&amp;v=20261116-share">', {html: true});

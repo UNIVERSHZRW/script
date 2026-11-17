@@ -121,8 +121,7 @@ html body #publicaciones.publications-wide .publication-item p {
   line-height: 1.5 !important;
 }
 
-html body #publicaciones.publications-wide .publication-main-link,
-html body #publicaciones.publications-wide .uhz-ed-library-link a {
+html body #publicaciones.publications-wide .publication-main-link {
   display: inline-flex !important;
   align-items: center;
   justify-content: flex-start !important;
@@ -152,16 +151,11 @@ html body #publicaciones.publications-wide .publication-main-link {
   transform: rotate(45deg);
 }
 
-html body #publicaciones.publications-wide :is(.publication-main-link, .uhz-ed-library-link a):hover {
+html body #publicaciones.publications-wide .publication-main-link:hover {
   text-decoration: underline !important;
   text-underline-offset: .2em;
 }
 
-#publicaciones > .uhz-ed-library-link {
-  margin: 12px 0 0;
-  padding-top: 5px;
-  border-top: 1px solid var(--editorial-line);
-}
 
 #uso-responsable.compliance-wide .uhz-legal-summary-pro {
   padding: 0 !important;

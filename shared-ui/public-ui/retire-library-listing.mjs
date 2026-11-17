@@ -29,20 +29,60 @@ export function removeLegacyLibraryMenuLinks(source) {
   return removeLibraryListingLinks(source.replace(tablePattern, () => 'const UI_ASSETS = ' + JSON.stringify(assets) + ';'));
 }
 
-export function retireLibraryListing(source) {
-  const guard = 'if(t!=="/biblioteca"&&!/^\\/biblioteca\\/[A-Za-z0-9_-]{1,100}$/.test(t))';
-  const retired = 'if(t==="/biblioteca")return U("Esta p\\xE1gina ya no est\\xE1 disponible.",410,n,!1);';
-  const detailGuard = 'if(!/^\\/biblioteca\\/[A-Za-z0-9_-]{1,100}$/.test(t))';
-  const listingStart = 'if(t==="/biblioteca"){let l=r.map(';
-  const detailsStart = '}let d=t.slice(12)';
-  const start = source.indexOf(listingStart);
-  const end = source.indexOf(detailsStart, start);
-
-  if (source.split(guard).length !== 2 || source.split(listingStart).length !== 2 || end < start) {
-    throw new Error('The library listing handler does not match the reviewed Worker.');
+export async function handleRetiredLibraryRequest(request, env) {
+  const url = new URL(request.url);
+  let page = url.pathname;
+  if (page === '/_uhz/page') {
+    page = url.searchParams.get('_uhz_path') || '';
+    try { page = decodeURIComponent(page); } catch {}
   }
 
-  const indexRemoved = source.slice(0, start) + source.slice(end + 1);
-  return removeLibraryListingLinks(indexRemoved.replace(guard, retired + detailGuard))
-    .replace(/(src=(\\*)"\/_uhz\/build\/site-enterprise-[0-9a-f]+\.js)(\2")/g, '$1?v=sin-biblioteca$3');
+  if (/^\/biblioteca\/?$/.test(page)) {
+    return new Response(request.method === 'HEAD' ? null : 'Esta página ya no está disponible.', {
+      status: 410,
+      headers: {
+        'content-type': 'text/plain; charset=utf-8',
+        'cache-control': 'no-store',
+        'x-content-type-options': 'nosniff',
+      },
+    });
+  }
+
+  const editorialScript = /^\/_uhz\/build\/site-enterprise-[0-9a-f]+\.js$/.test(url.pathname);
+  const sitemap = url.pathname === '/sitemap-pages.xml';
+  if (!(editorialScript || sitemap) || !['GET', 'HEAD'].includes(request.method)) return null;
+
+  const original = await env.ORIGINAL_SITE.fetch(request);
+  const type = original.headers.get('content-type') || '';
+  if (!original.ok || !(editorialScript ? /javascript/i.test(type) : /xml/i.test(type))) return original;
+
+  const headers = new Headers(original.headers);
+  for (const name of ['content-length', 'content-encoding', 'etag', 'last-modified']) headers.delete(name);
+  headers.set('cache-control', 'no-store');
+  const body = request.method === 'HEAD' ? null : removeLibraryListingLinks(await original.text());
+  return new Response(body, {status: original.status, statusText: original.statusText, headers});
+}
+
+export function prepareHomeLibraryRetirement(source) {
+  const fetchAnchor = "if(url.pathname==='/_uhz/uhz-home-app.css')";
+  const htmlAnchor = 'const page=new HTMLRewriter()';
+  if (source.split(fetchAnchor).length !== 2 || source.split(htmlAnchor).length !== 2) {
+    throw new Error('The homepage fetch and HTML handlers do not match the reviewed Worker.');
+  }
+
+  const fetchStep = 'const libraryResponse = await handleRetiredLibraryRequest(req, env);\n if (libraryResponse) return libraryResponse;\n ';
+  const markup = [
+    '',
+    '   .on(\'script[src^="/_uhz/build/site-enterprise-"]\', {',
+    '     element(script) {',
+    "       const asset = new URL(script.getAttribute('src'), url);",
+    "       asset.searchParams.set('v', 'sin-biblioteca');",
+    "       script.setAttribute('src', asset.pathname + asset.search + asset.hash);",
+    '     }',
+    '   })',
+  ].join('\n');
+
+  return removeLibraryListingLinks.toString() + '\n\n' +
+    handleRetiredLibraryRequest.toString() + '\n\n' +
+    source.replace(fetchAnchor, () => fetchStep + fetchAnchor).replace(htmlAnchor, () => htmlAnchor + markup);
 }

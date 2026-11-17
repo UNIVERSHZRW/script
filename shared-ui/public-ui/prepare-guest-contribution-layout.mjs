@@ -40,7 +40,8 @@ html body[data-page="random"] main#contenido.uhz-contribute > :is(.hero, .inft-i
   box-shadow: none;
 }
 `;
-  return updateGuestContributionRewards(source.replace(declaration, () => 'const STYLE=' + JSON.stringify(css) + ';'));
+  const withLayout = source.replace(declaration, () => 'const STYLE=' + JSON.stringify(css) + ';');
+  return updateCoinsGuideLayout(updateGuestContributionRewards(withLayout));
 }
 
 export function updateGuestContributionRewards(source) {
@@ -74,6 +75,39 @@ export function updateGuestContributionRewards(source) {
 html:lang(en) body[data-page="random"] .inft-invite [lang="es"],
 html:not(:lang(en)) body[data-page="random"] .inft-invite [lang="en"] {
   display: none;
+}
+`;
+
+  return source
+    .replace(pagesDeclaration, () => 'const PAGES=' + JSON.stringify(pages) + ';')
+    .replace(styleDeclaration, () => 'const STYLE=' + JSON.stringify(css) + ';');
+}
+
+export function updateCoinsGuideLayout(source) {
+  const pagesDeclaration = /^const PAGES=(.+);$/m;
+  const styleDeclaration = /^const STYLE=(.+);$/m;
+  const pagesMatch = source.match(pagesDeclaration);
+  const styleMatch = source.match(styleDeclaration);
+  if (!pagesMatch || !styleMatch) {
+    throw new Error('The contribution pages and styles could not be found.');
+  }
+
+  const pages = JSON.parse(pagesMatch[1]);
+  const previousIntro = "<nav class=\"navtiles\" aria-label=\"Opciones para aportar contenido\"><a href=\"/Aportar_contenido/random\"><span>Aportar sin cuenta</span></a><a href=\"/Aportar_contenido/coins\" aria-current=\"page\"><span>Ganar Coins</span></a></nav><section class=\"hero\" style=\"padding-top:24px\"><span class=\"eyebrow\">01 / Participación documentada</span>";
+  if (!pages.coins?.startsWith(previousIntro)) {
+    throw new Error('The Coins guide introduction does not match the reviewed layout.');
+  }
+
+  pages.coins = '<section class="hero coins-guide-intro">' + pages.coins.slice(previousIntro.length);
+  const css = JSON.parse(styleMatch[1]) + `
+html body[data-page="coins"] main#contenido.uhz-contribute > .coins-guide-intro {
+  background: transparent !important;
+  border: 0;
+  box-shadow: none;
+  padding-block: clamp(26px, 4vw, 46px) clamp(26px, 3vw, 40px);
+}
+body[data-page="coins"] .coins-guide-intro h1 {
+  margin-block-start: 0;
 }
 `;
 
